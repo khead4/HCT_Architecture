@@ -19,12 +19,12 @@ const sections = [
   },
   {
     id: "survey",
-    title: "Site + Survey Intelligence",
-    stage: "Site understanding",
-    desc: "Parcel, boundaries, elevations, utilities, easements, slope, soil, and site facts.",
-    goal: "Understand physical site reality before committing to design moves.",
-    actions: ["Review survey", "Flag issues", "Annotate constraints", "Verify data"],
-    ai: ["Explains site implications", "Highlights risks", "Source-links survey claims"]
+    title: "Site Intelligence Module",
+    stage: "Verified site knowledge",
+    desc: "Evidence, survey, GIS, policy, environmental, utility, risk, opportunity, and digital twin records.",
+    goal: "Transform raw site information into a verified design knowledge system.",
+    actions: ["Intake evidence", "Verify claims", "Score risks", "Package decisions"],
+    ai: ["Explains what is verified", "Flags missing inputs", "Recommends next best actions"]
   },
   {
     id: "data",
@@ -518,10 +518,22 @@ function initialSiteSurvey() {
       parcelAddress: "Demo Parcel, Cold Climate Zone",
       siteSize: "14,520 sq ft",
       ownerClient: "Residential client / research review",
+      clientName: "Residential client / research review",
+      architectName: "HCT / ASTRA design team",
+      parcelNumber: "Pending parcel lookup",
+      municipality: "Aalborg Municipality",
       projectType: "Residential prototype",
+      projectStage: "Site feasibility / concept planning",
       currentLandUse: "Demo residential parcel",
       desiredFutureUse: "Daylight-rich low-energy residence",
       architectNotes: "Preserve landscape connection, daylight, and clear design rationale while tracking site risk and regulatory constraints.",
+      clientGoals: "Daylight, energy efficiency, low carbon, accessibility, landscape preservation, and a disciplined budget target.",
+      annualEnergyUse: "Target pending ASHRAE model",
+      embodiedCarbon: "Low-carbon timber strategy under review",
+      constructionCost: "Budget target pending client approval",
+      daylightFactor: "High daylight priority with glare checks",
+      walkability: "Site access and frontage under review",
+      stormwaterRetention: "Rainwater-supported planting and western low-point mitigation",
       surveyorName: "",
       surveyorCompany: "",
       surveyDate: "",
@@ -593,12 +605,12 @@ function initialSiteSurvey() {
       { name: "Soil/geotechnical", value: "Moderate bearing capacity. Deeper excavation should be reviewed by civil/structural consultants.", status: "needs engineer" }
     ],
     opportunities: [
-      { name: "Building placement", value: "Use the verified slope and stormwater path to avoid placing the primary mass in the low western flow area." },
-      { name: "Solar orientation", value: "Southwest orientation supports daylight goals but should be paired with shading and envelope review." },
-      { name: "Views to preserve", value: "Best long view is toward the west/southwest edge of the parcel." },
-      { name: "Natural ventilation", value: "Tree line and open edges can be studied for seasonal wind buffering and cross-ventilation." },
-      { name: "Landscape strategy", value: "Northern tree line can provide seasonal wind buffering." },
-      { name: "Stormwater reuse", value: "Rainwater and landscape systems can connect client sustainability goals to hydrology findings." }
+      { name: "Solar orientation", impact: 95, value: "Southwest orientation supports daylight goals but should be paired with shading and envelope review." },
+      { name: "Views to preserve", impact: 90, value: "Best long view is toward the west/southwest edge of the parcel." },
+      { name: "Stormwater reuse", impact: 85, value: "Rainwater and landscape systems can connect client sustainability goals to hydrology findings." },
+      { name: "Passive cooling", impact: 82, value: "Tree line and open edges can be studied for seasonal wind buffering and cross-ventilation." },
+      { name: "Building placement", impact: 80, value: "Use the verified slope and stormwater path to avoid placing the primary mass in the low western flow area." },
+      { name: "Landscape strategy", impact: 76, value: "Northern tree line can provide seasonal wind buffering." }
     ],
     sourceFindings: [
       { aspect: "Parcel area", category: "Survey", value: "14,520 sq ft", documentType: "Topographic Survey", otherDocumentType: "", sourceName: "Surveyor upload", sourceUrl: "", owner: "Land Surveyor", status: "verified", verifiedBy: "Land Surveyor", lastChecked: "" },
@@ -614,13 +626,16 @@ function initialSiteSurvey() {
       { name: "Primary view corridor", layerType: "Viewshed", finding: "Best long view is toward the west/southwest edge of the parcel.", geometry: "West / southwest view cone", sourceName: "Custom research layer", sourceUrl: "", status: "active", usedFor: "Orientation, glazing, exterior spaces", documentType: "GIS Layer", otherDocumentType: "", verifiedBy: "GIS Analyst", lastChecked: "" }
     ],
     hazards: [
-      { name: "Steep site", value: "Average slope should be verified against spot elevations before foundation assumptions.", documentType: "Topographic Survey", sourceName: "Surveyor field record", status: "needs review", verifiedBy: "", lastChecked: "" },
-      { name: "Floodplain / stormwater", value: "Western low point intersects a medium-risk stormwater flow path.", documentType: "GIS Layer", sourceName: "Stormwater overlay", status: "active", verifiedBy: "GIS Analyst", lastChecked: "" },
-      { name: "Unknown soil conditions", value: "Geotechnical report needed before excavation or structural assumptions.", documentType: "Soil / Geotechnical", sourceName: "Pending geotech", status: "missing", verifiedBy: "", lastChecked: "" }
+      { name: "Flooding", severity: "High", value: "Western low point intersects a medium-risk stormwater flow path.", documentType: "GIS Layer", sourceName: "Stormwater overlay", status: "active", verifiedBy: "GIS Analyst", lastChecked: "" },
+      { name: "Slope", severity: "Medium", value: "Average slope should be verified against spot elevations before foundation assumptions.", documentType: "Topographic Survey", sourceName: "Surveyor field record", status: "needs review", verifiedBy: "", lastChecked: "" },
+      { name: "Soil unknown", severity: "High", value: "Geotechnical report needed before excavation or structural assumptions.", documentType: "Soil / Geotechnical", sourceName: "Pending geotech", status: "missing", verifiedBy: "", lastChecked: "" },
+      { name: "Utility conflict", severity: "Medium", value: "Coordinate water-east, power-south, and stormwater-west with service entries and massing.", documentType: "Utility Locate", sourceName: "Utility locate / civil review", status: "needs review", verifiedBy: "", lastChecked: "" }
     ],
     sensors: [
       { name: "West low-point moisture", sensorType: "Moisture", location: "Western drainage low point", latestReading: "No live feed connected", unit: "", timestamp: "", status: "missing", sourceName: "Sensor / IoT Feed" },
-      { name: "Boundary noise reading", sensorType: "Noise", location: "Southern frontage", latestReading: "Pending field reading", unit: "dBA", timestamp: "", status: "needs review", sourceName: "Field sensor" }
+      { name: "Boundary noise reading", sensorType: "Noise", location: "Southern frontage", latestReading: "Pending field reading", unit: "dBA", timestamp: "", status: "needs review", sourceName: "Field sensor" },
+      { name: "On-site temperature", sensorType: "Temperature", location: "Center parcel", latestReading: "Manual weather lookup needed", unit: "F", timestamp: "", status: "needs review", sourceName: "Weather / field feed" },
+      { name: "Traffic observation", sensorType: "Other", location: "Southern frontage", latestReading: "Manual count pending", unit: "vehicles/hr", timestamp: "", status: "missing", sourceName: "Traffic feed" }
     ],
     policyLookups: [
       { name: "Zoning district lookup", address: "Demo Parcel, Cold Climate Zone", jurisdiction: "Aalborg Municipality", result: "Residential district assumed until official source is uploaded or linked.", documentType: "Zoning Policy", sourceName: "Manual reviewer entry", sourceUrl: "", status: "pending lookup", lastChecked: "" },
@@ -642,20 +657,21 @@ function initialSiteSurvey() {
       { question: "What should wait?", answer: "Foundation strategy, final grading, exact service entry design, and permit-ready compliance claims." }
     ],
     packageItems: [
+      { name: "Executive summary", included: true },
       { name: "Site summary", included: true },
       { name: "Survey summary", included: true },
       { name: "GIS summary", included: true },
+      { name: "Policy summary", included: true },
       { name: "Environmental summary", included: true },
-      { name: "Constraints", included: true },
-      { name: "Opportunities", included: true },
-      { name: "Risks", included: true },
-      { name: "Hazards", included: true },
-      { name: "Sensor updates", included: true },
-      { name: "Policy lookup records", included: true },
-      { name: "Source verification log", included: true },
-      { name: "Missing information", included: true },
+      { name: "Utility summary", included: true },
+      { name: "Risk register", included: true },
+      { name: "Opportunity register", included: true },
       { name: "Design implications", included: true },
-      { name: "Recommended next actions", included: true }
+      { name: "Sustainability implications", included: true },
+      { name: "Recommended actions", included: true },
+      { name: "Missing information", included: true },
+      { name: "Compliance readiness", included: true },
+      { name: "AI confidence score", included: true }
     ]
   };
 }
@@ -701,9 +717,15 @@ function loadSiteSurvey() {
   }
 }
 
+function initialActiveSection() {
+  if (typeof window === "undefined") return "dashboard";
+  const requested = new URLSearchParams(window.location.search).get("section") || window.location.hash.replace("#", "");
+  return sections.some(section => section.id === requested) ? requested : "dashboard";
+}
+
 const state = {
   project: null,
-  activeSection: "dashboard",
+  activeSection: initialActiveSection(),
   selectedRole: null,
   journeyOverrides: {},
   programSpaces: initialProgramSpaces(),
@@ -923,6 +945,176 @@ function siteSurveyAssistantFindings(survey) {
         ? "The assistant can advise, but source names are still incomplete for some records, so every claim should remain reviewable."
         : "The assistant has enough named source records to generate traceable next-step guidance."
     }
+  ];
+}
+
+function siteStatusClass(value) {
+  return String(value || "unknown").toLowerCase().replace(/[^a-z0-9]+/g, "-") || "unknown";
+}
+
+function siteEvidenceRecords(survey) {
+  return [
+    ...(survey.sourceFindings || []),
+    ...(survey.additionalAspects || []),
+    ...(survey.gisFindings || []),
+    ...(survey.evidence || []),
+    ...(survey.hazards || []),
+    ...(survey.policyLookups || []),
+    ...(survey.uploads || [])
+  ];
+}
+
+function isVerifiedSiteStatus(status) {
+  return ["verified", "active", "source linked", "approved"].includes(String(status || "").toLowerCase());
+}
+
+function clampNumber(value, min, max) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return min;
+  return Math.max(min, Math.min(max, number));
+}
+
+function siteOpportunityScore(item, index = 0) {
+  const defaults = [95, 90, 85, 82, 80, 76, 72, 68];
+  return clampNumber(item.impact ?? defaults[index % defaults.length], 0, 100);
+}
+
+function siteRiskSeverity(item) {
+  if (item.severity) return item.severity;
+  const status = String(item.status || "").toLowerCase();
+  const text = `${item.name || ""} ${item.value || ""}`.toLowerCase();
+  if (status.includes("missing") || text.includes("flood") || text.includes("soil")) return "High";
+  if (status.includes("needs") || status.includes("conflict")) return "Medium";
+  return "Low";
+}
+
+function siteIntelligenceStats(survey) {
+  const evidence = siteEvidenceRecords(survey);
+  const verified = evidence.filter(item => isVerifiedSiteStatus(item.status)).length;
+  const missing = evidence.filter(item => String(item.status || "").toLowerCase().includes("missing")).length;
+  const needsReview = evidence.filter(item => String(item.status || "").toLowerCase().includes("review") || String(item.status || "").toLowerCase().includes("pending")).length;
+  const criticalRisks = (survey.hazards || []).filter(item => siteRiskSeverity(item).toLowerCase() === "high").length;
+  const opportunityAverage = survey.opportunities?.length
+    ? Math.round(survey.opportunities.reduce((sum, item, index) => sum + siteOpportunityScore(item, index), 0) / survey.opportunities.length)
+    : 0;
+  const confidence = clampNumber(55 + verified * 2.8 - missing * 7 - needsReview * 2.4 - criticalRisks * 3 + opportunityAverage * 0.12, 34, 96);
+
+  return {
+    evidenceTotal: evidence.length,
+    verified,
+    missing,
+    needsReview,
+    criticalRisks,
+    opportunityAverage,
+    confidence: Math.round(confidence)
+  };
+}
+
+function siteWorkflowSteps() {
+  return [
+    "Site Intake",
+    "Survey Collection",
+    "GIS Analysis",
+    "Policy + Zoning Analysis",
+    "Environmental Analysis",
+    "Utility Verification",
+    "Risk Assessment",
+    "Site Opportunity Discovery",
+    "AI Interpretation",
+    "Site Intelligence Package"
+  ];
+}
+
+function siteEvidenceCategoryRows(survey) {
+  const categoryNames = ["Survey", "GIS", "Policy", "Environmental", "Utility", "Sensor", "Consultant Reports"];
+  const records = siteEvidenceRecords(survey);
+  return categoryNames.map(category => {
+    const matching = records.filter(item => {
+      const haystack = `${item.category || ""} ${item.documentType || ""} ${item.type || ""} ${item.name || ""} ${item.aspect || ""}`.toLowerCase();
+      return haystack.includes(category.toLowerCase().replace("consultant reports", "consultant"));
+    });
+    const verified = matching.filter(item => isVerifiedSiteStatus(item.status)).length;
+    return {
+      category,
+      total: matching.length,
+      status: matching.length
+        ? verified === matching.length ? "verified" : "needs review"
+        : "missing"
+    };
+  });
+}
+
+function siteLayerStatus(label, survey) {
+  const haystack = (survey.gisFindings || []).map(item => `${item.name || ""} ${item.layerType || ""} ${item.finding || ""}`).join(" ").toLowerCase();
+  const lower = label.toLowerCase();
+  if (haystack.includes(lower) || (lower.includes("flood") && haystack.includes("hydrology")) || (lower.includes("vegetation") && haystack.includes("tree"))) {
+    return "active";
+  }
+  if (lower.includes("wetlands") || lower.includes("noise") || lower.includes("solar")) return "missing";
+  return "needs review";
+}
+
+function siteLayerRows(survey) {
+  return ["Parcel Boundary", "Floodplain", "Wetlands", "Soil", "Transportation", "Utility", "Vegetation", "Viewshed", "Solar", "Noise"]
+    .map(layer => ({ layer, status: siteLayerStatus(layer, survey) }));
+}
+
+function siteOverviewRows(fields) {
+  return [
+    ["Project Name", fields.projectName],
+    ["Client", fields.clientName || fields.ownerClient],
+    ["Architect", fields.architectName],
+    ["Address", fields.parcelAddress],
+    ["Parcel Number", fields.parcelNumber || fields.parcelApn],
+    ["Municipality", fields.municipality || fields.jurisdiction],
+    ["Country", fields.country || "Pending"],
+    ["Site Area", fields.siteSize],
+    ["Existing Land Use", fields.currentLandUse],
+    ["Proposed Use", fields.desiredFutureUse],
+    ["Project Stage", fields.projectStage]
+  ];
+}
+
+function siteKpiRows(fields) {
+  return [
+    ["Annual Energy Use", fields.annualEnergyUse],
+    ["Embodied Carbon", fields.embodiedCarbon],
+    ["Construction Cost", fields.constructionCost],
+    ["Daylight Factor", fields.daylightFactor],
+    ["Walkability", fields.walkability],
+    ["Stormwater Retention", fields.stormwaterRetention]
+  ];
+}
+
+function siteDigitalTwinRows(survey) {
+  const liveFeeds = [
+    ["Weather", "manual"],
+    ["Noise", "pending"],
+    ["Moisture", "missing"],
+    ["Temperature", "pending"],
+    ["Traffic", "missing"],
+    ["Air Quality", "missing"],
+    ["Energy", "not connected"],
+    ["Water", "not connected"]
+  ];
+  return liveFeeds.map(([feed, fallback]) => {
+    const sensor = (survey.sensors || []).find(item => `${item.name || ""} ${item.sensorType || ""}`.toLowerCase().includes(feed.toLowerCase()));
+    return {
+      feed,
+      status: sensor?.status || fallback,
+      reading: sensor ? `${sensor.latestReading || "Reading pending"} ${sensor.unit || ""}`.trim() : "No live feed",
+      update: sensor?.timestamp || "No update"
+    };
+  });
+}
+
+function siteAdvisorPrompts() {
+  return [
+    "What is verified, missing, and risky in the Site Intelligence Package?",
+    "What can be designed today, and what needs consultant review?",
+    "Which site opportunities should shape the massing strategy?",
+    "What zoning or policy constraints could delay permitting?",
+    "What sustainability decisions should be made from the current evidence?"
   ];
 }
 
@@ -2868,46 +3060,94 @@ function siteSurveySurface(project) {
     usedFor: "Site context",
     documentType: "GIS Layer"
   }));
+  const stats = siteIntelligenceStats(survey);
+  const evidenceCategoryRows = siteEvidenceCategoryRows(survey);
+  const layerRows = siteLayerRows(survey);
+  const riskRows = (survey.hazards || []).map(item => ({ ...item, severity: siteRiskSeverity(item) }));
+  const digitalTwinRows = siteDigitalTwinRows(survey);
+  const advisorPrompts = siteAdvisorPrompts();
 
   return `
     <div class="surface-pad site-survey-workspace">
       <header class="site-survey-hero">
         <button class="journey-link" data-section="dashboard">Back to flow</button>
         <div>
-          <span class="mini-label">Site intelligence module</span>
-          <h3>Site + Survey Intelligence</h3>
-          <p>Collect, verify, organize, and interpret site evidence so survey, GIS, utilities, environmental conditions, risks, and opportunities become usable project memory.</p>
+          <span class="mini-label">ASTRA site intelligence module</span>
+          <h3>Verified site knowledge system</h3>
+          <p>Transform raw site information into a design-ready intelligence package for feasibility, zoning, AI generation, sustainability, engineering, costing, and construction planning.</p>
         </div>
         <div class="site-output-card">
-          <span>Output</span>
+          <span>AI confidence score</span>
           <strong>Site Intelligence Package</strong>
-          <p>Survey facts, GIS layers, environmental conditions, constraints, opportunities, missing information, and recommended next actions.</p>
+          <p>${stats.confidence}% readiness based on verified evidence, unresolved risks, missing information, and scored site opportunities.</p>
         </div>
       </header>
 
+      <section class="site-command-grid" aria-label="Site intelligence summary">
+        ${[
+          ["Verified Evidence", stats.verified, `${stats.evidenceTotal} total records`],
+          ["Missing Inputs", stats.missing, `${stats.needsReview} need review`],
+          ["Critical Risks", stats.criticalRisks, "consultant attention"],
+          ["Opportunity Score", stats.opportunityAverage, "average impact"]
+        ].map(item => `
+          <article>
+            <span>${escapeHtml(item[0])}</span>
+            <strong>${escapeHtml(item[1])}</strong>
+            <p>${escapeHtml(item[2])}</p>
+          </article>
+        `).join("")}
+      </section>
+
+      <section class="site-workflow-band" aria-label="Site intelligence workflow">
+        ${siteWorkflowSteps().map((step, index) => `
+          <div class="${index < 3 ? "done" : index === 8 ? "active" : index > 8 ? "next" : ""}">
+            <span>${String(index + 1).padStart(2, "0")}</span>
+            <strong>${escapeHtml(step)}</strong>
+          </div>
+        `).join("")}
+      </section>
+
       <section class="site-survey-section site-intake-panel">
         <div>
-          <span class="mini-label">1. Site intake</span>
-          <h3>Project Location Foundation</h3>
-          <p>Basic location and ownership information anchors every survey, GIS, code, and design decision that follows.</p>
+          <span class="mini-label">Section 1 / Project overview</span>
+          <h3>Project Information, Goals + KPIs</h3>
+          <p>Basic project identity anchors every survey, GIS, code, AI, cost, and design decision that follows.</p>
         </div>
         <div class="site-intake-grid">
           ${siteFieldInput("projectName", "Project name")}
+          ${siteFieldInput("clientName", "Client")}
+          ${siteFieldInput("architectName", "Architect")}
           ${siteFieldInput("parcelAddress", "Parcel / address")}
+          ${siteFieldInput("parcelNumber", "Parcel number")}
+          ${siteFieldInput("municipality", "Municipality")}
+          ${siteFieldInput("country", "Country")}
           ${siteFieldInput("siteSize", "Site size")}
           ${siteFieldInput("ownerClient", "Property owner / client")}
           ${siteFieldInput("projectType", "Project type")}
+          ${siteFieldInput("projectStage", "Project stage")}
           ${siteFieldInput("currentLandUse", "Current land use")}
           ${siteFieldInput("desiredFutureUse", "Desired future use")}
           ${siteFieldTextarea("architectNotes", "Architect / client notes")}
+          ${siteFieldTextarea("clientGoals", "Client goals")}
+        </div>
+        <div class="site-goal-grid">
+          ${["Daylight", "Energy Efficiency", "Low Carbon", "Accessibility", "Landscape Preservation", "Budget Target"].map(goal => `<span>${escapeHtml(goal)}</span>`).join("")}
+        </div>
+        <div class="site-kpi-grid">
+          ${siteKpiRows(fields).map(row => `
+            <article>
+              <span>${escapeHtml(row[0])}</span>
+              <strong>${escapeHtml(row[1] || "Pending")}</strong>
+            </article>
+          `).join("")}
         </div>
       </section>
 
       <section class="site-survey-section survey-upload-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">2. Source document intake</span>
-            <h3>Documents, Sources + Extracted Facts</h3>
+            <span class="mini-label">Section 2 / Evidence library</span>
+            <h3>Every Claim Comes From Evidence</h3>
             <p>Upload or identify the source, then record the exact site fact, policy fact, GIS condition, or survey value taken from it.</p>
           </div>
           <label class="site-upload-control">
@@ -2922,6 +3162,15 @@ function siteSurveySurface(project) {
           ${siteFieldInput("uploadSourceUrl", "Source URL / citation")}
           ${siteFieldInput("uploadUploadedBy", "Uploaded by")}
           ${siteFieldSelect("uploadVerificationStatus", "Verification status", siteVerificationStatusOptions)}
+        </div>
+        <div class="evidence-category-grid">
+          ${evidenceCategoryRows.map(item => `
+            <article class="${escapeHtml(siteStatusClass(item.status))}">
+              <span>${escapeHtml(item.category)}</span>
+              <strong>${escapeHtml(item.status)}</strong>
+              <p>${escapeHtml(item.total)} evidence record${item.total === 1 ? "" : "s"}</p>
+            </article>
+          `).join("")}
         </div>
         ${survey.uploads.length ? `
           <div class="uploaded-evidence-list uploaded-evidence-cards">
@@ -2968,9 +3217,9 @@ function siteSurveySurface(project) {
 
       <section class="site-survey-section surveyor-verification-panel">
         <div>
-          <span class="mini-label">3. Land surveyor verification</span>
-          <h3>Human Verification + Elevation Form</h3>
-          <p>The surveyor can enter field-confirmed information, source confidence, benchmark datum, elevation range, contours, and site notes before the AI treats them as design inputs.</p>
+          <span class="mini-label">Section 3 / Survey intelligence</span>
+          <h3>Boundary, Topography + Hydrology Conditions</h3>
+          <p>The surveyor can enter field-confirmed boundaries, easements, encroachments, structures, elevation range, contour interval, slope, and drainage notes before the AI treats them as design inputs.</p>
         </div>
         <div class="site-intake-grid">
           ${siteFieldInput("surveyorName", "Surveyor name")}
@@ -2995,11 +3244,24 @@ function siteSurveySurface(project) {
       <section class="site-survey-section gis-context-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">4. GIS + policy lookup</span>
-            <h3>Parcel + Spatial Conditions</h3>
-            <p>Connect the surveyed parcel to zoning, floodplain, soils, slope, hydrology, transportation, and adjacent land-use context.</p>
+            <span class="mini-label">Section 4 / GIS intelligence</span>
+            <h3>Spatial Layers + Interactive Parcel Context</h3>
+            <p>Connect the surveyed parcel to zoning, floodplain, wetlands, soils, transportation, utility, vegetation, viewshed, solar, and noise layers.</p>
           </div>
           <div class="map-status">${escapeHtml(project.site.verifiedBy)} verified</div>
+        </div>
+        <div class="gis-layer-status-grid">
+          ${layerRows.map(item => `
+            <article class="${escapeHtml(siteStatusClass(item.status))}">
+              <span>${escapeHtml(item.layer)}</span>
+              <strong>${escapeHtml(item.status)}</strong>
+            </article>
+          `).join("")}
+        </div>
+        <div class="site-section-actions">
+          <button class="add-row-button" type="button">Toggle Layers</button>
+          <button class="add-row-button" data-download="gis">Export GIS Data</button>
+          <button class="add-row-button" data-download="parcel">Generate GIS Report</button>
         </div>
         <div class="site-intake-grid">
           ${siteFieldInput("addressLookup", "Lookup address")}
@@ -3024,6 +3286,18 @@ function siteSurveySurface(project) {
           <button class="add-row-button" data-policy-lookup-create>Create Lookup Record From Address</button>
           <button class="add-row-button" data-add-site-row="policyLookups">Add Custom Policy Record</button>
           <button class="add-row-button" data-add-site-row="gisFindings">Add Custom GIS Finding</button>
+        </div>
+        <div class="policy-interpretation-card">
+          <span class="mini-label">Section 5 / Policy intelligence</span>
+          <h3>AI Policy Interpretation</h3>
+          <div>
+            <strong>Front Setback</strong>
+            <p>20 ft verified rule. Impact: reduces the buildable area at the frontage and keeps the first massing move away from the street edge.</p>
+          </div>
+          <div>
+            <strong>Design Recommendation</strong>
+            <p>Shift or trim the building envelope before permit review, then keep the source-linked rule visible in CAD/Rhino and the Site Intelligence Package.</p>
+          </div>
         </div>
         <div class="site-ai-question-grid policy-record-grid">
           ${survey.policyLookups.map((item, index) => `
@@ -3081,9 +3355,9 @@ function siteSurveySurface(project) {
       <section class="site-survey-section environmental-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">5. Environmental conditions</span>
-            <h3>Physical Site Behavior</h3>
-            <p>Record sun, wind, hydrology, vegetation, climate, views, noise, and other environmental conditions with source type and verification status.</p>
+            <span class="mini-label">Section 6 / Environmental intelligence</span>
+            <h3>Solar, Climate, Wind, Water + Ecology</h3>
+            <p>Record sun path, solar access, exposure, climate zone, wind, humidity, precipitation, vegetation, protected species, tree inventory, noise, and other environmental conditions.</p>
           </div>
           <button class="add-row-button" data-add-site-row="environmental">Add Custom Condition</button>
         </div>
@@ -3101,9 +3375,9 @@ function siteSurveySurface(project) {
       <section class="site-survey-section utilities-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">6. Utility + infrastructure review</span>
-            <h3>Existing Service Conditions</h3>
-            <p>Track water, sewer, power, data, fire access, service entries, and any infrastructure uncertainty the surveyor or civil team must verify.</p>
+            <span class="mini-label">Section 7 / Utility intelligence</span>
+            <h3>Capacity, Distance, Upgrade Need + Risk</h3>
+            <p>Track water, sewer, electrical, telecommunications, fire access, renewable potential, IoT readiness, service entries, and any infrastructure uncertainty the civil team must verify.</p>
           </div>
           <button class="add-row-button" data-add-site-row="utilities">Add Custom Utility</button>
         </div>
@@ -3121,16 +3395,27 @@ function siteSurveySurface(project) {
       <section class="site-survey-section hazards-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">7. Site hazards + risk register</span>
-            <h3>Verified Risk Watchlist</h3>
-            <p>Hazards become project memory so the AI can monitor them during design, policy review, engineering, and handoff.</p>
+            <span class="mini-label">Section 8 / Risk intelligence</span>
+            <h3>Project-Wide Risk Engine</h3>
+            <p>Hazards become project memory so the AI can monitor severity, status, mitigation actions, permit delay risk, engineering review needs, and cost exposure.</p>
           </div>
           <button class="add-row-button" data-add-site-row="hazards">Add Custom Hazard</button>
+        </div>
+        <div class="risk-dashboard-grid">
+          ${riskRows.map(item => `
+            <article class="${escapeHtml(siteStatusClass(item.severity))}">
+              <span>${escapeHtml(item.name || "Risk")}</span>
+              <strong>${escapeHtml(item.severity)}</strong>
+              <em>${escapeHtml(item.status || "needs review")}</em>
+              <p>${escapeHtml(item.value || "Mitigation action pending.")}</p>
+            </article>
+          `).join("")}
         </div>
         <div class="site-ai-question-grid hazard-record-grid">
           ${survey.hazards.map((item, index) => `
             <article>
               ${siteRowInput("hazards", index, "name", item.name || "", "Hazard")}
+              ${siteRowInput("hazards", index, "severity", item.severity || siteRiskSeverity(item), "Severity")}
               ${siteRowTextarea("hazards", index, "value", item.value || "", "Site impact / design concern")}
               ${siteSourceControls("hazards", index, item)}
             </article>
@@ -3141,11 +3426,20 @@ function siteSurveySurface(project) {
       <section class="site-survey-section sensor-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">8. Sensor / IoT updates</span>
-            <h3>Field Readings + Live Update Records</h3>
-            <p>Use this for real-time sensor feeds later, or manual readings now. Each reading stores type, location, value, timestamp, and verification status.</p>
+            <span class="mini-label">Section 10 / Site digital twin</span>
+            <h3>Live Site Data + Sensor Health</h3>
+            <p>Use this for real-time weather, noise, moisture, temperature, traffic, air quality, energy, and water feeds later, or manual readings now.</p>
           </div>
           <button class="add-row-button" data-add-site-row="sensors">Add Sensor Reading</button>
+        </div>
+        <div class="digital-twin-grid">
+          ${digitalTwinRows.map(item => `
+            <article class="${escapeHtml(siteStatusClass(item.status))}">
+              <span>${escapeHtml(item.feed)}</span>
+              <strong>${escapeHtml(item.reading)}</strong>
+              <p>${escapeHtml(item.status)} / ${escapeHtml(item.update)}</p>
+            </article>
+          `).join("")}
         </div>
         <div class="site-ai-question-grid sensor-record-grid">
           ${survey.sensors.map((item, index) => `
@@ -3167,8 +3461,8 @@ function siteSurveySurface(project) {
         <div>
           <div class="survey-section-head compact-head">
             <div>
-              <span class="mini-label">9. Site constraints</span>
-              <h3>Design Limits</h3>
+              <span class="mini-label">Policy + design constraints</span>
+              <h3>Buildable Limits</h3>
             </div>
             <button class="add-row-button" data-add-site-row="constraints">Add Constraint</button>
           </div>
@@ -3185,15 +3479,21 @@ function siteSurveySurface(project) {
         <div>
           <div class="survey-section-head compact-head">
             <div>
-              <span class="mini-label">10. Site opportunities</span>
-              <h3>Design Possibilities</h3>
+              <span class="mini-label">Section 9 / Opportunity intelligence</span>
+              <h3>Scored Site Opportunities</h3>
             </div>
             <button class="add-row-button" data-add-site-row="opportunities">Add Opportunity</button>
           </div>
           <div class="opportunity-list">
             ${survey.opportunities.map((item, index) => `
               <article>
+                <div class="opportunity-score">
+                  <span>Impact</span>
+                  <strong>${siteOpportunityScore(item, index)}</strong>
+                  <i style="--score:${siteOpportunityScore(item, index)}%"></i>
+                </div>
                 ${siteRowInput("opportunities", index, "name", item.name || "", "Opportunity")}
+                ${siteRowInput("opportunities", index, "impact", siteOpportunityScore(item, index), "Impact score", "number")}
                 ${siteRowTextarea("opportunities", index, "value", item.value || "", "Design implication")}
                 ${siteSourceControls("opportunities", index, item)}
               </article>
@@ -3205,7 +3505,7 @@ function siteSurveySurface(project) {
       <section class="site-survey-section verification-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">11. Survey verification</span>
+            <span class="mini-label">Evidence verification</span>
             <h3>Trust + Missing Information</h3>
             <p>Every claim should show who uploaded it, what evidence supports it, and whether it is verified, pending, missing, or conflicting.</p>
           </div>
@@ -3226,8 +3526,8 @@ function siteSurveySurface(project) {
       <section class="site-survey-section additional-aspects-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">12. Additional aspects</span>
-            <h3>Custom Site, GIS, Policy, Or Survey Data</h3>
+            <span class="mini-label">Custom intelligence records</span>
+            <h3>Additional Site, GIS, Policy, Or Survey Data</h3>
             <p>Use this when the project needs a data point that does not fit the predefined categories. It still receives a category, source, document type, and verification status.</p>
           </div>
           <button class="add-row-button" data-add-site-row="additionalAspects">Add Additional Aspect</button>
@@ -3247,11 +3547,24 @@ function siteSurveySurface(project) {
       <section class="site-survey-section ai-site-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">13. AI site assistor</span>
-            <h3>From Verified Evidence To Design Implications</h3>
-            <p>The assistor reads the saved forms and source records, then tells the architect what is verified, missing, risky, or ready for design use.</p>
+            <span class="mini-label">Section 11 / AI site advisor</span>
+            <h3>From Verified Evidence To Decisions</h3>
+            <p>The free local ASTRA advisor reads the saved forms and source records, then tells the architect what is verified, missing, risky, ready for design use, likely to delay permitting, or likely to increase cost.</p>
           </div>
           <button class="add-row-button" data-add-site-row="aiInterpretation">Add AI Question</button>
+        </div>
+        <div class="site-advisor-dashboard">
+          <div>
+            <span class="mini-label">Ask ASTRA</span>
+            <textarea data-site-agent-input rows="3" placeholder="Ask about verified evidence, design readiness, policy, sustainability, risk, cost, or next steps."></textarea>
+            <button class="add-row-button" data-site-agent-submit>Run Free Site Advisor</button>
+          </div>
+          <div class="site-advisor-prompts">
+            ${advisorPrompts.map(prompt => `<button type="button" data-site-agent-question="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
+          </div>
+          <div id="siteAdvisorOutput" class="site-advisor-output">
+            <div class="empty-state">ASTRA local advisor is ready. No API key is required for evidence-based guidance.</div>
+          </div>
         </div>
         <div class="site-ai-checks">
           ${assistantFindings.map(item => `
@@ -3274,9 +3587,9 @@ function siteSurveySurface(project) {
 
       <section class="site-survey-section package-panel">
         <div>
-          <span class="mini-label">14. Site Intelligence Package</span>
-          <h3>Final Section Output</h3>
-          <p>The page produces a reusable package for design, sun studies, ASHRAE/material sustainability, zoning, engineering, compliance, and permit review.</p>
+          <span class="mini-label">Section 12 / Site intelligence package</span>
+          <h3>Automated Final Deliverable</h3>
+          <p>The page produces a reusable package for design, sun studies, ASHRAE/material sustainability, zoning, engineering, compliance, permit review, BIM handoff, and ASTRA project memory.</p>
         </div>
         <div class="package-grid">
           ${survey.packageItems.map((item, index) => `
@@ -3287,8 +3600,11 @@ function siteSurveySurface(project) {
           `).join("")}
         </div>
         <div class="download-actions">
-          <button data-download="parcel">Download Site JSON</button>
-          <button data-download="csv">Download Project CSV</button>
+          <button data-download="parcel">PDF-ready Report JSON</button>
+          <button data-download="csv">CSV</button>
+          <button data-download="gis">GIS Package</button>
+          <button data-download="bim">BIM Package</button>
+          <button data-download="astra">ASTRA Project Package</button>
         </div>
       </section>
 
@@ -4158,11 +4474,11 @@ function projectCsv(project) {
     ...state.siteSurvey.environmental.map(item => ["site_environmental", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.utilities.map(item => ["site_utility", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.constraints.map(item => ["site_constraint", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
-    ...state.siteSurvey.opportunities.map(item => ["site_opportunity", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.opportunities.map((item, index) => ["site_opportunity", item.name, `impact ${siteOpportunityScore(item, index)} | ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.sourceFindings.map(item => ["site_source_finding", item.aspect, `${item.category || ""} | ${item.value || ""} | owner: ${item.owner || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.additionalAspects.map(item => ["site_additional_aspect", item.name, `${item.category || ""} | ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.gisFindings.map(item => ["site_gis_finding", item.name, `${item.layerType || ""} | ${item.geometry || ""} | ${item.finding || ""} | used for: ${item.usedFor || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
-    ...state.siteSurvey.hazards.map(item => ["site_hazard", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.hazards.map(item => ["site_hazard", item.name, `${siteRiskSeverity(item)} | ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.sensors.map(item => ["site_sensor", item.name, `${item.sensorType || ""} | ${item.location || ""} | ${item.latestReading || ""} ${item.unit || ""} | ${item.timestamp || ""} | ${item.sourceName || ""}`, item.status || "saved"]),
     ...state.siteSurvey.policyLookups.map(item => ["site_policy_lookup", item.name, `${item.address || ""} | ${item.jurisdiction || ""} | ${item.result || ""} | ${item.sourceUrl || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.evidence.map(item => ["site_evidence", item.name, `${item.owner || ""}: ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
@@ -4241,7 +4557,7 @@ function newSiteSurveyRow(group) {
     environmental: () => ({ name: "Custom site condition", value: "", ...common }),
     utilities: () => ({ name: "Custom utility / infrastructure", value: "", ...common }),
     constraints: () => ({ name: "Custom constraint", value: "", ...common }),
-    opportunities: () => ({ name: "Custom opportunity", value: "", ...common }),
+    opportunities: () => ({ name: "Custom opportunity", impact: 70, value: "", ...common }),
     sourceFindings: () => ({ aspect: "Custom source-backed finding", category: "Other", value: "", owner: "", sourceUrl: "", ...common }),
     additionalAspects: () => ({ name: "Custom additional aspect", category: "Other", value: "", sourceUrl: "", ...common }),
     gisFindings: () => ({
@@ -4258,7 +4574,7 @@ function newSiteSurveyRow(group) {
       verifiedBy: "",
       lastChecked: today
     }),
-    hazards: () => ({ name: "Custom hazard", value: "", ...common }),
+    hazards: () => ({ name: "Custom hazard", severity: "Medium", value: "", ...common }),
     evidence: () => ({ name: "Custom evidence record", owner: "", value: "", ...common }),
     policyLookups: () => ({
       name: "Custom policy lookup",
@@ -4334,6 +4650,26 @@ function bindSimpleProjectPage() {
       if (button.dataset.download === "csv") {
         triggerDownload("hct-project-data.csv", "text/csv", projectCsv(state.project));
       }
+      if (button.dataset.download === "gis") {
+        triggerDownload("astra-gis-package.json", "application/json", JSON.stringify({
+          site: state.project.site,
+          gisLayers: state.project.gisLayers,
+          gisFindings: state.siteSurvey.gisFindings,
+          layerStatus: siteLayerRows(state.siteSurvey)
+        }, null, 2));
+      }
+      if (button.dataset.download === "bim") {
+        triggerDownload("astra-bim-package.json", "application/json", JSON.stringify({
+          project: state.project.project,
+          designModel: state.project.designModel,
+          constraints: state.siteSurvey.constraints,
+          risks: state.siteSurvey.hazards,
+          opportunities: state.siteSurvey.opportunities
+        }, null, 2));
+      }
+      if (button.dataset.download === "astra") {
+        triggerDownload("astra-project-package.json", "application/json", parcelJson(state.project));
+      }
     });
   });
 }
@@ -4390,6 +4726,22 @@ function bindSiteSurveyPage() {
       ];
       persistSiteSurvey();
       render();
+    });
+  });
+
+  document.querySelectorAll("[data-site-agent-question]").forEach(button => {
+    button.addEventListener("click", () => {
+      const question = button.dataset.siteAgentQuestion || "";
+      const input = document.querySelector("[data-site-agent-input]");
+      if (input) input.value = question;
+      askAssistant(question, false);
+    });
+  });
+
+  document.querySelectorAll("[data-site-agent-submit]").forEach(button => {
+    button.addEventListener("click", () => {
+      const input = document.querySelector("[data-site-agent-input]");
+      askAssistant(input?.value || "", false);
     });
   });
 
@@ -4765,9 +5117,9 @@ function renderAnnotations() {
 
 function renderAssistantOutput(response) {
   if (!response) return;
-  el.aiMode.textContent = response.mode.includes("gemini") ? "Gemini + tools" : "Backend mock";
+  el.aiMode.textContent = response.mode.includes("gemini") ? "Gemini + tools" : "ASTRA local";
 
-  el.assistantOutput.innerHTML = `
+  const outputHtml = `
     <div class="answer-box">
       <p>${escapeHtml(response.answer)}</p>
       <div class="meta-row">
@@ -4800,15 +5152,28 @@ function renderAssistantOutput(response) {
         </div>
       `).join("")}
     </div>
+
+    ${(response.recommendedNext || []).length ? `
+      <div class="source-list">
+        <div class="claim-card">
+          <strong>Recommended next actions</strong>
+          <span>${response.recommendedNext.map(item => escapeHtml(item)).join(" / ")}</span>
+        </div>
+      </div>
+    ` : ""}
   `;
 
-  el.assistantOutput.querySelectorAll("[data-source-id]").forEach(card => {
-    card.addEventListener("contextmenu", event => {
-      event.preventDefault();
-      openTraceForSource(card.dataset.sourceId);
-    });
-    card.addEventListener("click", () => {
-      openTraceForSource(card.dataset.sourceId);
+  const outputContainers = [el.assistantOutput, document.getElementById("siteAdvisorOutput")].filter(Boolean);
+  outputContainers.forEach(container => {
+    container.innerHTML = outputHtml;
+    container.querySelectorAll("[data-source-id]").forEach(card => {
+      card.addEventListener("contextmenu", event => {
+        event.preventDefault();
+        openTraceForSource(card.dataset.sourceId);
+      });
+      card.addEventListener("click", () => {
+        openTraceForSource(card.dataset.sourceId);
+      });
     });
   });
 }
@@ -4867,9 +5232,14 @@ function openDrawer(sources, intro, annotation) {
 
 async function askAssistant(question, screenshotMode = false) {
   if (!question.trim()) return;
+  const setAssistantStatus = html => {
+    el.assistantOutput.innerHTML = html;
+    const siteOutput = document.getElementById("siteAdvisorOutput");
+    if (siteOutput) siteOutput.innerHTML = html;
+  };
   el.askButton.disabled = true;
   el.askButton.textContent = "Checking...";
-  el.assistantOutput.innerHTML = `<div class="empty-state">Retrieving project memory, running checks, and preparing annotations.</div>`;
+  setAssistantStatus(`<div class="empty-state">Retrieving project memory, running evidence checks, and preparing source-linked guidance.</div>`);
 
   try {
     const response = await fetch("/api/ask", {
@@ -4879,6 +5249,7 @@ async function askAssistant(question, screenshotMode = false) {
         question,
         section: sectionById(state.activeSection).title,
         selectedElement: state.project.designModel.selectedElement,
+        siteSurvey: state.siteSurvey,
         screenshotMode
       })
     });
@@ -4892,7 +5263,7 @@ async function askAssistant(question, screenshotMode = false) {
     renderAnnotations();
     await refreshProject();
   } catch (error) {
-    el.assistantOutput.innerHTML = `<div class="empty-state">Assistant error: ${escapeHtml(error.message)}</div>`;
+    setAssistantStatus(`<div class="empty-state">Assistant error: ${escapeHtml(error.message)}</div>`);
   } finally {
     el.askButton.disabled = false;
     el.askButton.textContent = "Ask Assistor";

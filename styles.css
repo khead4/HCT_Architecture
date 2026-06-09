@@ -3420,6 +3420,294 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   accent-color: rgba(190,205,130,.95);
 }
 
+.site-command-grid,
+.site-workflow-band,
+.site-goal-grid,
+.site-kpi-grid,
+.evidence-category-grid,
+.gis-layer-status-grid,
+.risk-dashboard-grid,
+.digital-twin-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.site-command-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.site-command-grid article,
+.site-kpi-grid article,
+.evidence-category-grid article,
+.gis-layer-status-grid article,
+.risk-dashboard-grid article,
+.digital-twin-grid article,
+.policy-interpretation-card,
+.site-advisor-dashboard {
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.018)),
+    rgba(0,0,0,.42);
+  padding: 14px;
+}
+
+.site-command-grid article {
+  min-height: 118px;
+  display: grid;
+  align-content: space-between;
+  border-top: 3px solid rgba(62,182,194,.7);
+}
+
+.site-command-grid span,
+.site-kpi-grid span,
+.evidence-category-grid span,
+.gis-layer-status-grid span,
+.risk-dashboard-grid span,
+.digital-twin-grid span,
+.opportunity-score span,
+.site-advisor-prompts button {
+  color: rgba(190,205,130,.9);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.site-command-grid strong {
+  color: rgba(255,255,255,.95);
+  font-size: 34px;
+  font-weight: 620;
+  line-height: 1;
+}
+
+.site-command-grid p,
+.site-kpi-grid p,
+.evidence-category-grid p,
+.risk-dashboard-grid p,
+.digital-twin-grid p,
+.policy-interpretation-card p {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.66);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.site-workflow-band {
+  grid-template-columns: repeat(10, minmax(96px, 1fr));
+  overflow-x: auto;
+  min-height: 112px;
+  align-items: stretch;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  background: rgba(0,0,0,.24);
+  padding: 10px;
+  padding-bottom: 12px;
+}
+
+.site-workflow-band div {
+  min-height: 86px;
+  min-width: 118px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,.04);
+  padding: 12px;
+}
+
+.site-workflow-band div.done {
+  border-color: rgba(112,176,116,.36);
+  background: rgba(112,176,116,.08);
+}
+
+.site-workflow-band div.active {
+  border-color: rgba(62,182,194,.48);
+  background: rgba(62,182,194,.1);
+}
+
+.site-workflow-band div.next {
+  border-color: rgba(214,169,94,.38);
+  background: rgba(214,169,94,.08);
+}
+
+.site-workflow-band span {
+  color: rgba(255,255,255,.48);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.site-workflow-band strong {
+  display: block;
+  margin-top: 10px;
+  color: rgba(255,255,255,.84);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.site-goal-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.site-goal-grid span {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(62,182,194,.26);
+  border-radius: 999px;
+  background: rgba(62,182,194,.08);
+  color: rgba(222,248,250,.94);
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 760;
+  text-align: center;
+}
+
+.site-kpi-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.site-kpi-grid strong,
+.digital-twin-grid strong,
+.policy-interpretation-card strong {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255,255,255,.9);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.evidence-category-grid,
+.gis-layer-status-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.gis-layer-status-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.evidence-category-grid article,
+.gis-layer-status-grid article,
+.digital-twin-grid article {
+  min-height: 88px;
+}
+
+.evidence-category-grid article.verified,
+.gis-layer-status-grid article.active,
+.digital-twin-grid article.active,
+.digital-twin-grid article.verified {
+  border-color: rgba(112,176,116,.32);
+  background: rgba(112,176,116,.08);
+}
+
+.evidence-category-grid article.missing,
+.gis-layer-status-grid article.missing,
+.digital-twin-grid article.missing,
+.digital-twin-grid article.not-connected {
+  border-color: rgba(216,106,82,.34);
+  background: rgba(216,106,82,.08);
+}
+
+.policy-interpretation-card {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+  border-left: 3px solid rgba(214,169,94,.72);
+}
+
+.risk-dashboard-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.risk-dashboard-grid article {
+  min-height: 150px;
+  border-top: 3px solid rgba(62,182,194,.6);
+}
+
+.risk-dashboard-grid article.high {
+  border-top-color: rgba(216,106,82,.88);
+}
+
+.risk-dashboard-grid article.medium {
+  border-top-color: rgba(214,169,94,.88);
+}
+
+.risk-dashboard-grid em {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 9px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 999px;
+  color: rgba(255,255,255,.68);
+  padding: 5px 8px;
+  font-size: 10px;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.digital-twin-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.opportunity-score {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.opportunity-score strong {
+  color: rgba(255,255,255,.94);
+  font-size: 24px;
+  font-weight: 640;
+}
+
+.opportunity-score i {
+  grid-column: 1 / -1;
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(62,182,194,.9) var(--score), rgba(255,255,255,.12) var(--score));
+}
+
+.site-advisor-dashboard {
+  display: grid;
+  grid-template-columns: minmax(260px, .9fr) minmax(220px, .8fr) minmax(320px, 1.2fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.site-advisor-dashboard textarea {
+  min-height: 112px;
+  margin-bottom: 10px;
+}
+
+.site-advisor-prompts {
+  display: grid;
+  gap: 8px;
+}
+
+.site-advisor-prompts button {
+  min-height: 42px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  color: rgba(255,255,255,.82);
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.site-advisor-prompts button:hover {
+  border-color: rgba(62,182,194,.55);
+  background: rgba(62,182,194,.09);
+}
+
+.site-advisor-output {
+  min-height: 100%;
+}
+
 .client-brief-workspace {
   --brief-section-gap: 6rem;
   --brief-column-gap: clamp(20px, 2vw, 28px);
@@ -4372,6 +4660,32 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   .precedent-building-list,
   .adjacency-list {
     grid-template-columns: 1fr;
+  }
+
+  .site-survey-hero,
+  .site-command-grid,
+  .site-intake-grid,
+  .site-goal-grid,
+  .site-kpi-grid,
+  .evidence-category-grid,
+  .gis-layer-status-grid,
+  .site-map-grid,
+  .environment-grid,
+  .utility-review-grid,
+  .risk-dashboard-grid,
+  .digital-twin-grid,
+  .constraint-opportunity-panel,
+  .evidence-register,
+  .site-ai-question-grid,
+  .site-ai-checks,
+  .package-grid,
+  .policy-interpretation-card,
+  .site-advisor-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .site-workflow-band {
+    grid-template-columns: repeat(10, minmax(150px, 1fr));
   }
 }
 

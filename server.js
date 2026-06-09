@@ -385,6 +385,81 @@ function answerSite(project) {
   };
 }
 
+function payloadSiteSurvey(payload) {
+  return payload && typeof payload.siteSurvey === "object" ? payload.siteSurvey : {};
+}
+
+function payloadRecords(survey) {
+  return [
+    ...(survey.sourceFindings || []),
+    ...(survey.gisFindings || []),
+    ...(survey.evidence || []),
+    ...(survey.hazards || []),
+    ...(survey.policyLookups || []),
+    ...(survey.uploads || [])
+  ];
+}
+
+function verifiedStatus(status) {
+  return ["verified", "active", "source linked", "approved"].includes(String(status || "").toLowerCase());
+}
+
+function riskSeverity(item) {
+  if (item.severity) return item.severity;
+  const status = String(item.status || "").toLowerCase();
+  const text = `${item.name || ""} ${item.value || ""}`.toLowerCase();
+  if (status.includes("missing") || text.includes("soil") || text.includes("flood")) return "High";
+  if (status.includes("needs") || status.includes("pending") || status.includes("conflict")) return "Medium";
+  return "Low";
+}
+
+function opportunityScore(item, index) {
+  const fallback = [95, 90, 85, 82, 80, 76][index % 6];
+  const score = Number(item.impact ?? fallback);
+  return Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : fallback;
+}
+
+function answerAstraSiteAdvisor(project, payload) {
+  const survey = payloadSiteSurvey(payload);
+  const records = payloadRecords(survey);
+  const verified = records.filter(item => verifiedStatus(item.status));
+  const needsReview = records.filter(item => String(item.status || "").toLowerCase().includes("review") || String(item.status || "").toLowerCase().includes("pending"));
+  const missing = records.filter(item => String(item.status || "").toLowerCase().includes("missing"));
+  const highRisks = (survey.hazards || []).filter(item => riskSeverity(item).toLowerCase() === "high");
+  const opportunities = (survey.opportunities || []).map((item, index) => ({
+    name: item.name || "Site opportunity",
+    score: opportunityScore(item, index)
+  })).sort((a, b) => b.score - a.score);
+  const setback = byRuleType(project, "front_setback");
+  const height = byRuleType(project, "height_limit");
+  const topOpportunities = opportunities.slice(0, 4).map(item => `${item.name} ${item.score}`).join(", ") || "solar orientation, views, stormwater reuse, passive cooling";
+  const missingNames = missing.slice(0, 4).map(item => item.name || item.aspect || "unnamed record").join(", ") || "geotechnical report, utility capacity, official zoning source, current sensor readings";
+  const riskNames = highRisks.slice(0, 4).map(item => item.name).join(", ") || "flooding, soil unknowns, utility conflict";
+
+  return {
+    mode: "astra_free_local_site_agent",
+    answer: `ASTRA can support early site-based decisions now, but it should label them as feasibility guidance until missing evidence is closed. Verified or active records: ${verified.length}. Records needing review: ${needsReview.length}. Missing records: ${missing.length}. Design can move forward on orientation, early massing zones, risk visibility, and sustainability strategy. Consultant review should stay open for ${missingNames}. Highest watchlist items: ${riskNames}. Strongest design opportunities are ${topOpportunities}.`,
+    confidence: missing.length || needsReview.length ? "medium" : "high",
+    claims: [
+      { id: "claim-astra-evidence-readiness", type: "project_memory", text: `${verified.length} submitted site evidence records are verified or active.`, sourceIds: ["survey-001"] },
+      { id: "claim-astra-missing-evidence", type: "needs_review", text: `Missing or review-needed records should stay out of permit-ready claims: ${missingNames}.`, sourceIds: ["survey-001"] },
+      { id: "claim-astra-opportunities", type: "ai_interpretation", text: `Top opportunity scores: ${topOpportunities}.`, sourceIds: ["gis-views-001", "sun-004"] },
+      { id: "claim-astra-policy-watch", type: "verified_fact", text: "Setback and height rules remain active compliance checks.", sourceIds: [setback.id, height.id] }
+    ],
+    selfCheck: selfCheck([
+      { label: "Free local agent", status: "pass", detail: "No API key is required; deterministic project memory checks are used." },
+      { label: "Evidence reviewed", status: "pass", detail: `${records.length} submitted site records were included.` },
+      { label: "Missing information", status: missing.length ? "needs_review" : "pass", detail: missing.length ? missingNames : "No submitted records are marked missing." },
+      { label: "Consultant boundary", status: "pass", detail: "Geotechnical, civil utility capacity, and permit conclusions remain review items." }
+    ]),
+    annotations: [
+      annotation("anno-astra-site-ready", "site-advisor", "medium", "current_design_state", "Design-ready with evidence gaps tracked", { x: 24, y: 26, w: 52, h: 50 }, ["survey-001", setback.id, height.id, "gis-views-001"], "site_advisor")
+    ],
+    sources: [sourceFromSite(project), sourceFromRule(setback), sourceFromRule(height), sourceFromAnalysis(project, "sunStudy")],
+    recommendedNext: ["Upload missing evidence", "Verify policy lookup", "Request consultant review", "Export Site Intelligence Package"]
+  };
+}
+
 function answerGeneral(project, question, screenshotMode) {
   const sources = [
     sourceFromClient(project, "client-goal-daylight"),
@@ -437,6 +512,9 @@ function deterministicAssistant(project, payload) {
   if (question.includes("material") || question.includes("sku") || question.includes("wood") || question.includes("timber") || question.includes("procure")) {
     return answerMaterials(project);
   }
+  if (question.includes("verified") || question.includes("missing") || question.includes("consultant") || question.includes("designed today") || question.includes("next action") || question.includes("opportun") || question.includes("permit") || question.includes("delay") || question.includes("cost") || question.includes("sustainability") || question.includes("advisor") || question.includes("package")) {
+    return answerAstraSiteAdvisor(project, payload);
+  }
   if (question.includes("site") || question.includes("soil") || question.includes("slope") || question.includes("gis") || question.includes("underground") || question.includes("flood")) {
     return answerSite(project);
   }
@@ -452,7 +530,8 @@ function compactContext(project, payload) {
     verifiedRules: project.verifiedRules,
     designModel: project.designModel,
     analysisResults: project.analysisResults,
-    gisLayers: project.gisLayers
+    gisLayers: project.gisLayers,
+    siteSurvey: payload.siteSurvey || null
   };
 }
 
