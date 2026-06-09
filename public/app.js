@@ -2428,6 +2428,296 @@ function finalizationHandoffMarkup(project) {
   `;
 }
 
+function surveyUploadItems() {
+  return [
+    ["Boundary survey", "Required", "Verified parcel limits and bearings"],
+    ["Topographic survey", "Required", "Contours, elevations, spot grades, and slope logic"],
+    ["Utility locate", "Required", "Water, stormwater, electrical, sewer, gas, and service entries"],
+    ["Easement exhibit", "Review", "Access, drainage, utility, and conservation restrictions"],
+    ["Existing structures", "Review", "Demolition, reuse, clearance, and conflict documentation"],
+    ["Tree / vegetation survey", "Optional", "Protected trees, buffers, canopy, and landscape assets"],
+    ["Drainage notes", "Required", "Runoff direction, low points, swales, and flooding observations"],
+    ["Site photos / field notes", "Required", "On-site observations, access issues, and visual evidence"]
+  ];
+}
+
+function siteConstraintItems(project) {
+  const front = project.verifiedRules.find(rule => rule.ruleType === "front_setback");
+  const side = project.verifiedRules.find(rule => rule.ruleType === "side_setback");
+  const height = project.verifiedRules.find(rule => rule.ruleType === "height_limit");
+  return [
+    ["Setbacks", front && side ? `${front.value} ft front / ${side.value} ft side` : "Needs zoning confirmation", "source linked"],
+    ["Slope limits", `${project.site.averageSlopePercent}% average slope toward ${project.site.slopeDirection}`, "verified"],
+    ["Flood risk", project.gisLayers.find(layer => layer.id.includes("flood"))?.finding || "No flood layer loaded", "GIS"],
+    ["Utility conflicts", project.site.utilities.join(", "), "field check"],
+    ["Height", height ? `${height.value} ft limit before variance` : "Needs zoning confirmation", "source linked"],
+    ["Soil/geotechnical", project.site.soilNote, "needs engineer"]
+  ];
+}
+
+function siteOpportunityItems(project) {
+  return [
+    ["Building placement", "Use the verified slope and stormwater path to avoid placing the primary mass in the low western flow area."],
+    ["Solar orientation", "Southwest orientation supports daylight goals but should be paired with shading and envelope review."],
+    ["Views to preserve", project.gisLayers.find(layer => layer.id.includes("views"))?.finding || "View layer pending."],
+    ["Natural ventilation", "Tree line and open edges can be studied for seasonal wind buffering and cross-ventilation."],
+    ["Landscape strategy", project.gisLayers.find(layer => layer.id.includes("vegetation"))?.finding || "Vegetation layer pending."],
+    ["Stormwater reuse", "Rainwater and landscape systems can connect client sustainability goals to hydrology findings."]
+  ];
+}
+
+function surveyEvidenceRegister(project) {
+  return [
+    ["Survey dataset", "Land Surveyor", project.site.verificationStatus, `Parcel area ${project.site.parcelAreaSqFt.toLocaleString()} sq ft`],
+    ["Utility review", "Surveyor / civil", "verified", project.site.utilities.join(", ")],
+    ...project.gisLayers.map(layer => [layer.name, "GIS Analyst", layer.status, layer.finding]),
+    ...project.verifiedRules.slice(0, 3).map(rule => [rule.section, rule.verifiedBy || "Reviewer", rule.verificationStatus, rule.exactText])
+  ];
+}
+
+function siteQuestionAnswerRows(project) {
+  return [
+    ["What matters most?", "Slope, stormwater movement, utilities, view corridor, vegetation, and setback/height rules are the major early decision drivers."],
+    ["What risks should be noticed?", "Front setback, height limit, stormwater flow path, slope-driven foundation cost, and unknown geotechnical assumptions."],
+    ["What opportunities influence design?", "Landscape integration, daylight orientation, west/southwest views, passive design, and rainwater-supported planting."],
+    ["What is missing?", "Detailed geotechnical report, final utility capacity, easement confirmation, and surveyor-reviewed drainage documentation."],
+    ["What can be decided now?", "Initial site response, likely placement zones, information gaps, and which constraints must be protected in concept design."],
+    ["What should wait?", "Foundation strategy, final grading, exact service entry design, and permit-ready compliance claims."]
+  ];
+}
+
+function siteSurveySurface(project) {
+  const constraints = siteConstraintItems(project);
+  const opportunities = siteOpportunityItems(project);
+  const evidence = surveyEvidenceRegister(project);
+  const questions = siteQuestionAnswerRows(project);
+
+  return `
+    <div class="surface-pad site-survey-workspace">
+      <header class="site-survey-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Site intelligence module</span>
+          <h3>Site + Survey Intelligence</h3>
+          <p>Collect, verify, organize, and interpret site evidence so survey, GIS, utilities, environmental conditions, risks, and opportunities become usable project memory.</p>
+        </div>
+        <div class="site-output-card">
+          <span>Output</span>
+          <strong>Site Intelligence Package</strong>
+          <p>Survey facts, GIS layers, environmental conditions, constraints, opportunities, missing information, and recommended next actions.</p>
+        </div>
+      </header>
+
+      <section class="site-survey-section site-intake-panel">
+        <div>
+          <span class="mini-label">1. Site intake</span>
+          <h3>Project Location Foundation</h3>
+          <p>Basic location and ownership information anchors every survey, GIS, code, and design decision that follows.</p>
+        </div>
+        <div class="site-intake-grid">
+          <label><span>Project name</span><input value="${escapeHtml(project.project.name)}"></label>
+          <label><span>Parcel / address</span><input value="${escapeHtml(project.project.location)}"></label>
+          <label><span>Site size</span><input value="${escapeHtml(project.site.parcelAreaSqFt.toLocaleString())} sq ft"></label>
+          <label><span>Property owner / client</span><input value="Residential client / research review"></label>
+          <label><span>Project type</span><input value="Residential prototype"></label>
+          <label><span>Current land use</span><input value="Demo residential parcel"></label>
+          <label><span>Desired future use</span><input value="Daylight-rich low-energy residence"></label>
+          <label class="wide-field"><span>Architect / client notes</span><textarea rows="3">Preserve landscape connection, daylight, and clear design rationale while tracking site risk and regulatory constraints.</textarea></label>
+        </div>
+      </section>
+
+      <section class="site-survey-section survey-upload-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">2. Survey upload</span>
+            <h3>Evidence Intake</h3>
+            <p>Surveyor and project team upload the source material that gives later AI interpretations a traceable basis.</p>
+          </div>
+          <label class="site-upload-control">
+            <span>Upload survey evidence</span>
+            <input type="file" multiple>
+          </label>
+        </div>
+        <div class="survey-upload-grid">
+          ${surveyUploadItems().map(item => `
+            <article>
+              <strong>${escapeHtml(item[0])}</strong>
+              <span>${escapeHtml(item[1])}</span>
+              <p>${escapeHtml(item[2])}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section gis-context-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">3. GIS context</span>
+            <h3>Parcel + Spatial Conditions</h3>
+            <p>Connect the surveyed parcel to zoning, floodplain, soils, slope, hydrology, transportation, and adjacent land-use context.</p>
+          </div>
+          <div class="map-status">${escapeHtml(project.site.verifiedBy)} verified</div>
+        </div>
+        <div class="site-map-grid">
+          <div class="simple-map-wrap">
+            ${projectMapMarkup(project)}
+          </div>
+          <div class="site-layer-stack">
+            ${project.gisLayers.map(layer => `
+              <article>
+                <span><i class="status-dot"></i>${escapeHtml(layer.status)}</span>
+                <strong>${escapeHtml(layer.name)}</strong>
+                <p>${escapeHtml(layer.finding)}</p>
+              </article>
+            `).join("")}
+            <article>
+              <span><i class="status-dot"></i>verified</span>
+              <strong>Slope + topography</strong>
+              <p>${escapeHtml(project.site.averageSlopePercent)}% average slope toward ${escapeHtml(project.site.slopeDirection)}.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="site-survey-section environmental-panel">
+        <span class="mini-label">4. Environmental conditions</span>
+        <h3>Physical Site Behavior</h3>
+        <div class="environment-grid">
+          ${[
+            ["Sun path", "Southwest orientation improves afternoon daylight but increases late-day heat gain risk."],
+            ["Shadow patterns", "Study future massing shadows before committing to outdoor rooms and glazing."],
+            ["Prevailing wind", "Use tree buffer and openings to evaluate ventilation and wind protection."],
+            ["Noise sources", "Map road access and neighboring uses before locating private sleeping areas."],
+            ["Heat island risk", "Balance hardscape, planting, and material choices in the site response."],
+            ["Water runoff", "Western low point intersects a medium-risk stormwater flow path."],
+            ["Vegetation cover", "Northern tree line can provide seasonal wind buffering."],
+            ["Climate zone", "Cold-climate assumptions should inform envelope, glazing, and passive design choices."]
+          ].map(item => `
+            <article>
+              <strong>${escapeHtml(item[0])}</strong>
+              <p>${escapeHtml(item[1])}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section utilities-panel">
+        <span class="mini-label">5. Utility + infrastructure review</span>
+        <h3>Existing Service Conditions</h3>
+        <div class="utility-review-grid">
+          ${[
+            ["Water connection", "water-east", "verified"],
+            ["Sewer connection", "capacity pending", "needs review"],
+            ["Stormwater system", "stormwater-west", "verified"],
+            ["Electrical access", "power-south", "verified"],
+            ["Gas access", "not confirmed", "missing"],
+            ["Internet / fiber", "service availability pending", "needs review"],
+            ["Road access", "southern frontage", "verified"],
+            ["Fire access", "check turning and approach distance", "needs review"],
+            ["Service entry points", "coordinate with massing and utility side", "decision input"]
+          ].map(item => `
+            <div>
+              <strong>${escapeHtml(item[0])}</strong>
+              <span>${escapeHtml(item[1])}</span>
+              <em>${escapeHtml(item[2])}</em>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section constraint-opportunity-panel">
+        <div>
+          <span class="mini-label">6. Site constraints</span>
+          <h3>Design Limits</h3>
+          <div class="constraint-list">
+            ${constraints.map(item => `
+              <article>
+                <strong>${escapeHtml(item[0])}</strong>
+                <p>${escapeHtml(item[1])}</p>
+                <span>${escapeHtml(item[2])}</span>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+        <div>
+          <span class="mini-label">7. Site opportunities</span>
+          <h3>Design Possibilities</h3>
+          <div class="opportunity-list">
+            ${opportunities.map(item => `
+              <article>
+                <strong>${escapeHtml(item[0])}</strong>
+                <p>${escapeHtml(item[1])}</p>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="site-survey-section verification-panel">
+        <div>
+          <span class="mini-label">8. Survey verification</span>
+          <h3>Trust + Missing Information</h3>
+          <p>Every claim should show who uploaded it, what evidence supports it, and whether it is verified, pending, missing, or conflicting.</p>
+        </div>
+        <div class="evidence-register">
+          ${evidence.map(item => `
+            <div>
+              <strong>${escapeHtml(item[0])}</strong>
+              <span>${escapeHtml(item[1])}</span>
+              <em>${escapeHtml(item[2])}</em>
+              <p>${escapeHtml(item[3])}</p>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section ai-site-panel">
+        <div>
+          <span class="mini-label">9. AI site interpretation</span>
+          <h3>From Evidence To Design Implications</h3>
+          <p>This is the HCT layer: the system does not only store survey data; it interprets what matters, what is uncertain, and what decision becomes possible.</p>
+        </div>
+        <div class="site-ai-question-grid">
+          ${questions.map(item => `
+            <article>
+              <strong>${escapeHtml(item[0])}</strong>
+              <p>${escapeHtml(item[1])}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section package-panel">
+        <div>
+          <span class="mini-label">10. Site Intelligence Package</span>
+          <h3>Final Section Output</h3>
+          <p>The page produces a reusable package for design, sun studies, ASHRAE/material sustainability, zoning, engineering, compliance, and permit review.</p>
+        </div>
+        <div class="package-grid">
+          ${[
+            "Site summary",
+            "Survey summary",
+            "GIS summary",
+            "Environmental summary",
+            "Constraints",
+            "Opportunities",
+            "Risks",
+            "Missing information",
+            "Design implications",
+            "Recommended next actions"
+          ].map(item => `<span>${escapeHtml(item)}</span>`).join("")}
+        </div>
+        <div class="download-actions">
+          <button data-download="parcel">Download Site JSON</button>
+          <button data-download="csv">Download Project CSV</button>
+        </div>
+      </section>
+
+      <div id="annotationLayer" class="annotation-layer"></div>
+    </div>
+  `;
+}
+
 function projectPageSurface(project, section) {
   return `
     <div class="surface-pad simple-project-page ${section.id === "finalization" ? "has-finalization" : ""}">
@@ -3129,6 +3419,8 @@ function renderSurface() {
     ? journeySurface(project)
     : state.activeSection === "clientele"
     ? clientSurface(project)
+    : state.activeSection === "survey"
+    ? siteSurveySurface(project)
     : projectPageSurface(project, section);
   document.getElementById("visualWorkspace").innerHTML = html;
   el.annotationLayer = document.getElementById("annotationLayer");
