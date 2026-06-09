@@ -189,6 +189,27 @@ const riskRegisterOptions = ["Steep site", "Floodplain", "Limited budget", "Hist
 const roomPriorityOptions = ["Critical", "Important", "Optional", "Future Phase"];
 const sensitivityOptions = ["Low", "Medium", "High"];
 const expansionOptions = ["Likely", "Possible", "None"];
+const siteDocumentTypeOptions = [
+  "Boundary Survey",
+  "Topographic Survey",
+  "ALTA / NSPS Survey",
+  "Utility Locate",
+  "Easement Exhibit",
+  "GIS Layer",
+  "LiDAR / Elevation",
+  "Environmental Report",
+  "Soil / Geotechnical",
+  "Sensor / IoT Feed",
+  "Zoning Policy",
+  "Building Code",
+  "Field Note",
+  "Photo Evidence",
+  "Other"
+];
+const siteVerificationStatusOptions = ["unverified", "needs review", "verified", "conflict", "missing", "active", "pending lookup"];
+const sourceConfidenceOptions = ["Low", "Medium", "High", "Verified"];
+const sensorTypeOptions = ["Moisture", "Temperature", "Humidity", "Noise", "Air Quality", "Water Level", "Movement", "Solar", "Wind", "Other"];
+const policySourceOptions = ["Municipal zoning map", "Parcel database", "Policy PDF", "GIS layer", "Manual reviewer entry", "Other"];
 
 function initialProjectDiscovery() {
   return {
@@ -497,7 +518,36 @@ function initialSiteSurvey() {
       projectType: "Residential prototype",
       currentLandUse: "Demo residential parcel",
       desiredFutureUse: "Daylight-rich low-energy residence",
-      architectNotes: "Preserve landscape connection, daylight, and clear design rationale while tracking site risk and regulatory constraints."
+      architectNotes: "Preserve landscape connection, daylight, and clear design rationale while tracking site risk and regulatory constraints.",
+      surveyorName: "",
+      surveyorCompany: "",
+      surveyDate: "",
+      verifiedBy: "",
+      sourceConfidence: "Medium",
+      uploadDocumentType: "Topographic Survey",
+      uploadOtherDocumentType: "",
+      uploadSourceName: "",
+      uploadUploadedBy: "",
+      uploadVerificationStatus: "unverified",
+      benchmarkDatum: "Pending surveyor confirmation",
+      minElevation: "",
+      maxElevation: "",
+      contourInterval: "",
+      averageSlope: "8%",
+      slopeDirection: "north-east",
+      spotElevations: "",
+      existingStructures: "None confirmed",
+      accessNotes: "Southern frontage",
+      easementNotes: "Easements pending confirmation",
+      drainageNotes: "Western low point should be reviewed before placement.",
+      addressLookup: "Demo Parcel, Cold Climate Zone",
+      parcelApn: "",
+      jurisdiction: "Aalborg Municipality",
+      zoningDistrict: "Residential",
+      overlays: "Stormwater flow path, view corridor",
+      policySourceUrl: "",
+      policyLookupStatus: "pending lookup",
+      lastPolicyCheck: ""
     },
     uploads: [],
     environmental: [
@@ -537,12 +587,25 @@ function initialSiteSurvey() {
       { name: "Landscape strategy", value: "Northern tree line can provide seasonal wind buffering." },
       { name: "Stormwater reuse", value: "Rainwater and landscape systems can connect client sustainability goals to hydrology findings." }
     ],
+    hazards: [
+      { name: "Steep site", value: "Average slope should be verified against spot elevations before foundation assumptions.", documentType: "Topographic Survey", sourceName: "Surveyor field record", status: "needs review", verifiedBy: "", lastChecked: "" },
+      { name: "Floodplain / stormwater", value: "Western low point intersects a medium-risk stormwater flow path.", documentType: "GIS Layer", sourceName: "Stormwater overlay", status: "active", verifiedBy: "GIS Analyst", lastChecked: "" },
+      { name: "Unknown soil conditions", value: "Geotechnical report needed before excavation or structural assumptions.", documentType: "Soil / Geotechnical", sourceName: "Pending geotech", status: "missing", verifiedBy: "", lastChecked: "" }
+    ],
+    sensors: [
+      { name: "West low-point moisture", sensorType: "Moisture", location: "Western drainage low point", latestReading: "No live feed connected", unit: "", timestamp: "", status: "missing", sourceName: "Sensor / IoT Feed" },
+      { name: "Boundary noise reading", sensorType: "Noise", location: "Southern frontage", latestReading: "Pending field reading", unit: "dBA", timestamp: "", status: "needs review", sourceName: "Field sensor" }
+    ],
+    policyLookups: [
+      { name: "Zoning district lookup", address: "Demo Parcel, Cold Climate Zone", jurisdiction: "Aalborg Municipality", result: "Residential district assumed until official source is uploaded or linked.", documentType: "Zoning Policy", sourceName: "Manual reviewer entry", sourceUrl: "", status: "pending lookup", lastChecked: "" },
+      { name: "Overlay check", address: "Demo Parcel, Cold Climate Zone", jurisdiction: "Aalborg Municipality", result: "Stormwater and view corridor overlays should be confirmed from GIS/policy source.", documentType: "GIS Layer", sourceName: "GIS overlay", sourceUrl: "", status: "needs review", lastChecked: "" }
+    ],
     evidence: [
-      { name: "Survey dataset", owner: "Land Surveyor", status: "verified", value: "Parcel area 14,520 sq ft" },
-      { name: "Utility review", owner: "Surveyor / civil", status: "verified", value: "water-east, power-south, stormwater-west" },
-      { name: "Flood risk overlay", owner: "GIS Analyst", status: "active", value: "Western low point intersects a medium-risk stormwater flow path." },
-      { name: "Primary view corridor", owner: "GIS Analyst", status: "active", value: "Best long view is toward the west/southwest edge of the parcel." },
-      { name: "Existing vegetation", owner: "GIS Analyst", status: "active", value: "Northern tree line can provide seasonal wind buffering." }
+      { name: "Survey dataset", owner: "Land Surveyor", status: "verified", documentType: "Topographic Survey", otherDocumentType: "", sourceName: "Surveyor upload", verifiedBy: "Land Surveyor", lastChecked: "", value: "Parcel area 14,520 sq ft" },
+      { name: "Utility review", owner: "Surveyor / civil", status: "verified", documentType: "Utility Locate", otherDocumentType: "", sourceName: "Utility locate / civil review", verifiedBy: "Surveyor / civil", lastChecked: "", value: "water-east, power-south, stormwater-west" },
+      { name: "Flood risk overlay", owner: "GIS Analyst", status: "active", documentType: "GIS Layer", otherDocumentType: "", sourceName: "Stormwater overlay", verifiedBy: "GIS Analyst", lastChecked: "", value: "Western low point intersects a medium-risk stormwater flow path." },
+      { name: "Primary view corridor", owner: "GIS Analyst", status: "active", documentType: "GIS Layer", otherDocumentType: "", sourceName: "View corridor layer", verifiedBy: "GIS Analyst", lastChecked: "", value: "Best long view is toward the west/southwest edge of the parcel." },
+      { name: "Existing vegetation", owner: "GIS Analyst", status: "active", documentType: "GIS Layer", otherDocumentType: "", sourceName: "Vegetation layer", verifiedBy: "GIS Analyst", lastChecked: "", value: "Northern tree line can provide seasonal wind buffering." }
     ],
     aiInterpretation: [
       { question: "What matters most?", answer: "Slope, stormwater movement, utilities, view corridor, vegetation, and setback/height rules are the major early decision drivers." },
@@ -560,11 +623,23 @@ function initialSiteSurvey() {
       { name: "Constraints", included: true },
       { name: "Opportunities", included: true },
       { name: "Risks", included: true },
+      { name: "Hazards", included: true },
+      { name: "Sensor updates", included: true },
+      { name: "Policy lookup records", included: true },
+      { name: "Source verification log", included: true },
       { name: "Missing information", included: true },
       { name: "Design implications", included: true },
       { name: "Recommended next actions", included: true }
     ]
   };
+}
+
+function mergeSitePackageItems(baseItems, savedItems) {
+  if (!Array.isArray(savedItems)) return baseItems;
+  const savedByName = new Map(savedItems.map(item => [item.name, item]));
+  const mergedBase = baseItems.map(item => ({ ...item, ...(savedByName.get(item.name) || {}) }));
+  const extraSaved = savedItems.filter(item => !baseItems.some(baseItem => baseItem.name === item.name));
+  return [...mergedBase, ...extraSaved];
 }
 
 function mergeSiteSurvey(saved) {
@@ -579,9 +654,12 @@ function mergeSiteSurvey(saved) {
     utilities: Array.isArray(saved.utilities) ? saved.utilities : base.utilities,
     constraints: Array.isArray(saved.constraints) ? saved.constraints : base.constraints,
     opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : base.opportunities,
+    hazards: Array.isArray(saved.hazards) ? saved.hazards : base.hazards,
+    sensors: Array.isArray(saved.sensors) ? saved.sensors : base.sensors,
+    policyLookups: Array.isArray(saved.policyLookups) ? saved.policyLookups : base.policyLookups,
     evidence: Array.isArray(saved.evidence) ? saved.evidence : base.evidence,
     aiInterpretation: Array.isArray(saved.aiInterpretation) ? saved.aiInterpretation : base.aiInterpretation,
-    packageItems: Array.isArray(saved.packageItems) ? saved.packageItems : base.packageItems
+    packageItems: mergeSitePackageItems(base.packageItems, saved.packageItems)
   };
 }
 
@@ -675,6 +753,144 @@ function listValue(value, fallback = []) {
 
 function uniqueList(values) {
   return Array.from(new Set(values.map(value => String(value || "").trim()).filter(Boolean)));
+}
+
+function optionMarkup(options, selected) {
+  const current = String(selected || "");
+  return options.map(option => `<option value="${escapeHtml(option)}" ${option === current ? "selected" : ""}>${escapeHtml(option)}</option>`).join("");
+}
+
+function siteFieldInput(key, label, type = "text") {
+  return `<label><span>${escapeHtml(label)}</span><input type="${escapeHtml(type)}" data-site-field="${escapeHtml(key)}" value="${escapeHtml(state.siteSurvey.fields[key])}"></label>`;
+}
+
+function siteFieldTextarea(key, label, rows = 3) {
+  return `<label class="wide-field"><span>${escapeHtml(label)}</span><textarea data-site-field="${escapeHtml(key)}" rows="${rows}">${escapeHtml(state.siteSurvey.fields[key])}</textarea></label>`;
+}
+
+function siteFieldSelect(key, label, options) {
+  return `
+    <label>
+      <span>${escapeHtml(label)}</span>
+      <select data-site-field="${escapeHtml(key)}">
+        ${optionMarkup(options, state.siteSurvey.fields[key])}
+      </select>
+    </label>
+  `;
+}
+
+function siteRowInput(group, index, key, value, label, type = "text") {
+  return `<label><span>${escapeHtml(label)}</span><input type="${escapeHtml(type)}" data-site-row="${escapeHtml(group)}" data-site-index="${index}" data-site-key="${escapeHtml(key)}" value="${escapeHtml(value)}"></label>`;
+}
+
+function siteRowTextarea(group, index, key, value, label, rows = 3) {
+  return `<label class="wide-field"><span>${escapeHtml(label)}</span><textarea data-site-row="${escapeHtml(group)}" data-site-index="${index}" data-site-key="${escapeHtml(key)}" rows="${rows}">${escapeHtml(value)}</textarea></label>`;
+}
+
+function siteRowSelect(group, index, key, value, label, options) {
+  return `
+    <label>
+      <span>${escapeHtml(label)}</span>
+      <select data-site-row="${escapeHtml(group)}" data-site-index="${index}" data-site-key="${escapeHtml(key)}">
+        ${optionMarkup(options, value)}
+      </select>
+    </label>
+  `;
+}
+
+function siteSourceControls(group, index, item, options = siteDocumentTypeOptions) {
+  return `
+    <div class="source-meta-grid">
+      ${siteRowSelect(group, index, "documentType", item.documentType || options[0], "Document type", options)}
+      ${siteRowInput(group, index, "otherDocumentType", item.otherDocumentType || "", "Other document type")}
+      ${siteRowInput(group, index, "sourceName", item.sourceName || "", "Source / document name")}
+      ${siteRowSelect(group, index, "status", item.status || "unverified", "Verification status", siteVerificationStatusOptions)}
+      ${siteRowInput(group, index, "verifiedBy", item.verifiedBy || "", "Verified by")}
+      ${siteRowInput(group, index, "lastChecked", item.lastChecked || "", "Last checked", "date")}
+    </div>
+  `;
+}
+
+function sourceStatusText(item) {
+  const documentType = item.documentType === "Other" && item.otherDocumentType ? item.otherDocumentType : item.documentType;
+  return [documentType, item.sourceName, item.status].filter(Boolean).join(" / ") || "source pending";
+}
+
+function siteSurveyAssistantFindings(survey) {
+  const fields = survey.fields || {};
+  const allEvidence = [
+    ...(survey.evidence || []),
+    ...(survey.hazards || []),
+    ...(survey.policyLookups || []),
+    ...(survey.uploads || [])
+  ];
+  const unverified = allEvidence.filter(item => !["verified", "active"].includes(String(item.status || "").toLowerCase()));
+  const missingDocTypes = allEvidence.filter(item => !item.documentType || (item.documentType === "Other" && !item.otherDocumentType));
+  const missingSources = allEvidence.filter(item => !item.sourceName && !item.name);
+  const missingPolicy = !fields.addressLookup || !fields.jurisdiction || !fields.zoningDistrict || String(fields.policyLookupStatus || "").includes("pending");
+  const missingElevation = !fields.benchmarkDatum || !fields.minElevation || !fields.maxElevation || !fields.contourInterval;
+  const staleSensors = (survey.sensors || []).filter(sensor => !sensor.timestamp || !["verified", "active"].includes(String(sensor.status || "").toLowerCase()));
+  const activeHazards = (survey.hazards || []).filter(hazard => ["active", "needs review", "missing", "conflict"].includes(String(hazard.status || "").toLowerCase()));
+  const uploadedEvidence = survey.uploads?.length || 0;
+
+  return [
+    {
+      level: unverified.length ? "needs review" : "verified",
+      title: "Verification coverage",
+      detail: unverified.length
+        ? `${unverified.length} source record${unverified.length === 1 ? "" : "s"} still need verification or review before the AI should treat them as dependable.`
+        : "All visible source records are marked verified or active."
+    },
+    {
+      level: missingDocTypes.length ? "needs review" : "verified",
+      title: "Document type coverage",
+      detail: missingDocTypes.length
+        ? `${missingDocTypes.length} record${missingDocTypes.length === 1 ? "" : "s"} need a document type or an Other description.`
+        : "Every evidence record has a document/source type."
+    },
+    {
+      level: uploadedEvidence ? "active" : "missing",
+      title: "Uploaded source material",
+      detail: uploadedEvidence
+        ? `${uploadedEvidence} uploaded file record${uploadedEvidence === 1 ? "" : "s"} are stored in project memory metadata.`
+        : "No uploaded source files have been added yet; the page is currently relying on entered records."
+    },
+    {
+      level: missingPolicy ? "needs review" : "verified",
+      title: "Address-based zoning lookup",
+      detail: missingPolicy
+        ? "Address, jurisdiction, zoning district, source URL/document, and lookup status should be confirmed before design compliance claims."
+        : "Policy lookup fields are filled and can be exported as a traceable lookup record."
+    },
+    {
+      level: missingElevation ? "needs review" : "verified",
+      title: "Elevation and topography",
+      detail: missingElevation
+        ? "Benchmark datum, min/max elevation, contour interval, and spot elevations should be completed by the surveyor."
+        : "Elevation fields are filled enough to support early grading and massing discussion."
+    },
+    {
+      level: staleSensors.length ? "needs review" : "active",
+      title: "Sensor / IoT status",
+      detail: staleSensors.length
+        ? `${staleSensors.length} sensor record${staleSensors.length === 1 ? "" : "s"} need a timestamp, current reading, or active verification status.`
+        : "Sensor records have current timestamps and active/verified status."
+    },
+    {
+      level: activeHazards.length ? "attention" : "verified",
+      title: "Design risk watchlist",
+      detail: activeHazards.length
+        ? `${activeHazards.length} hazard${activeHazards.length === 1 ? "" : "s"} should stay visible during design: ${activeHazards.slice(0, 3).map(item => item.name).join(", ")}.`
+        : "No active hazards are currently marked for design attention."
+    },
+    {
+      level: missingSources.length ? "needs review" : "active",
+      title: "AI readiness",
+      detail: missingSources.length
+        ? "The assistant can advise, but source names are still incomplete for some records, so every claim should remain reviewable."
+        : "The assistant has enough named source records to generate traceable next-step guidance."
+    }
+  ];
 }
 
 function normalizeSpaceProfile(space) {
@@ -2607,6 +2823,7 @@ function siteQuestionAnswerRows(project) {
 function siteSurveySurface(project) {
   const survey = state.siteSurvey;
   const fields = survey.fields;
+  const assistantFindings = siteSurveyAssistantFindings(survey);
 
   return `
     <div class="surface-pad site-survey-workspace">
@@ -2631,14 +2848,14 @@ function siteSurveySurface(project) {
           <p>Basic location and ownership information anchors every survey, GIS, code, and design decision that follows.</p>
         </div>
         <div class="site-intake-grid">
-          <label><span>Project name</span><input data-site-field="projectName" value="${escapeHtml(fields.projectName)}"></label>
-          <label><span>Parcel / address</span><input data-site-field="parcelAddress" value="${escapeHtml(fields.parcelAddress)}"></label>
-          <label><span>Site size</span><input data-site-field="siteSize" value="${escapeHtml(fields.siteSize)}"></label>
-          <label><span>Property owner / client</span><input data-site-field="ownerClient" value="${escapeHtml(fields.ownerClient)}"></label>
-          <label><span>Project type</span><input data-site-field="projectType" value="${escapeHtml(fields.projectType)}"></label>
-          <label><span>Current land use</span><input data-site-field="currentLandUse" value="${escapeHtml(fields.currentLandUse)}"></label>
-          <label><span>Desired future use</span><input data-site-field="desiredFutureUse" value="${escapeHtml(fields.desiredFutureUse)}"></label>
-          <label class="wide-field"><span>Architect / client notes</span><textarea data-site-field="architectNotes" rows="3">${escapeHtml(fields.architectNotes)}</textarea></label>
+          ${siteFieldInput("projectName", "Project name")}
+          ${siteFieldInput("parcelAddress", "Parcel / address")}
+          ${siteFieldInput("siteSize", "Site size")}
+          ${siteFieldInput("ownerClient", "Property owner / client")}
+          ${siteFieldInput("projectType", "Project type")}
+          ${siteFieldInput("currentLandUse", "Current land use")}
+          ${siteFieldInput("desiredFutureUse", "Desired future use")}
+          ${siteFieldTextarea("architectNotes", "Architect / client notes")}
         </div>
       </section>
 
@@ -2654,10 +2871,23 @@ function siteSurveySurface(project) {
             <input type="file" multiple data-site-upload>
           </label>
         </div>
+        <div class="site-intake-grid">
+          ${siteFieldSelect("uploadDocumentType", "Document type for upload", siteDocumentTypeOptions)}
+          ${siteFieldInput("uploadOtherDocumentType", "Other document type")}
+          ${siteFieldInput("uploadSourceName", "Source / document name")}
+          ${siteFieldInput("uploadUploadedBy", "Uploaded by")}
+          ${siteFieldSelect("uploadVerificationStatus", "Verification status", siteVerificationStatusOptions)}
+        </div>
         ${survey.uploads.length ? `
-          <div class="uploaded-evidence-list">
-            ${survey.uploads.map(file => `
-              <span>${escapeHtml(file.name)} <em>${escapeHtml(file.type || "file")}</em></span>
+          <div class="uploaded-evidence-list uploaded-evidence-cards">
+            ${survey.uploads.map((file, index) => `
+              <article>
+                ${siteRowInput("uploads", index, "name", file.name || "", "File / source name")}
+                ${siteRowInput("uploads", index, "type", file.type || "file", "File type")}
+                ${siteRowInput("uploads", index, "uploadedBy", file.uploadedBy || "", "Uploaded by")}
+                ${siteSourceControls("uploads", index, file)}
+                <p>${escapeHtml(file.size ? `${file.size} bytes` : "Metadata saved. Browser file content is not retained after upload.")}</p>
+              </article>
             `).join("")}
           </div>
         ` : ""}
@@ -2672,14 +2902,67 @@ function siteSurveySurface(project) {
         </div>
       </section>
 
+      <section class="site-survey-section surveyor-verification-panel">
+        <div>
+          <span class="mini-label">3. Land surveyor verification</span>
+          <h3>Human Verification + Elevation Form</h3>
+          <p>The surveyor can enter field-confirmed information, source confidence, benchmark datum, elevation range, contours, and site notes before the AI treats them as design inputs.</p>
+        </div>
+        <div class="site-intake-grid">
+          ${siteFieldInput("surveyorName", "Surveyor name")}
+          ${siteFieldInput("surveyorCompany", "Company / license")}
+          ${siteFieldInput("surveyDate", "Survey date", "date")}
+          ${siteFieldInput("verifiedBy", "Verified by")}
+          ${siteFieldSelect("sourceConfidence", "Source confidence", sourceConfidenceOptions)}
+          ${siteFieldInput("benchmarkDatum", "Benchmark datum")}
+          ${siteFieldInput("minElevation", "Minimum elevation")}
+          ${siteFieldInput("maxElevation", "Maximum elevation")}
+          ${siteFieldInput("contourInterval", "Contour interval")}
+          ${siteFieldInput("averageSlope", "Average slope")}
+          ${siteFieldInput("slopeDirection", "Slope direction")}
+          ${siteFieldTextarea("spotElevations", "Spot elevations / field notes")}
+          ${siteFieldTextarea("existingStructures", "Existing structures")}
+          ${siteFieldTextarea("accessNotes", "Access notes")}
+          ${siteFieldTextarea("easementNotes", "Easements / encumbrances")}
+          ${siteFieldTextarea("drainageNotes", "Drainage / hydrology notes")}
+        </div>
+      </section>
+
       <section class="site-survey-section gis-context-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">3. GIS context</span>
+            <span class="mini-label">4. GIS + policy lookup</span>
             <h3>Parcel + Spatial Conditions</h3>
             <p>Connect the surveyed parcel to zoning, floodplain, soils, slope, hydrology, transportation, and adjacent land-use context.</p>
           </div>
           <div class="map-status">${escapeHtml(project.site.verifiedBy)} verified</div>
+        </div>
+        <div class="site-intake-grid">
+          ${siteFieldInput("addressLookup", "Lookup address")}
+          ${siteFieldInput("parcelApn", "Parcel / APN")}
+          ${siteFieldInput("jurisdiction", "Jurisdiction")}
+          ${siteFieldInput("zoningDistrict", "Zoning district")}
+          ${siteFieldTextarea("overlays", "Known overlays")}
+          ${siteFieldInput("policySourceUrl", "Policy source URL / reference")}
+          ${siteFieldSelect("policyLookupStatus", "Lookup status", siteVerificationStatusOptions)}
+          ${siteFieldInput("lastPolicyCheck", "Last policy check", "date")}
+        </div>
+        <div class="site-section-actions">
+          <button class="add-row-button" data-policy-lookup-create>Create Lookup Record From Address</button>
+          <button class="add-row-button" data-add-site-row="policyLookups">Add Custom Policy Record</button>
+        </div>
+        <div class="site-ai-question-grid policy-record-grid">
+          ${survey.policyLookups.map((item, index) => `
+            <article>
+              ${siteRowInput("policyLookups", index, "name", item.name || "", "Policy / lookup name")}
+              ${siteRowInput("policyLookups", index, "address", item.address || "", "Address")}
+              ${siteRowInput("policyLookups", index, "jurisdiction", item.jurisdiction || "", "Jurisdiction")}
+              ${siteRowTextarea("policyLookups", index, "result", item.result || "", "Lookup result / rule found")}
+              ${siteRowSelect("policyLookups", index, "sourceName", item.sourceName || "Manual reviewer entry", "Lookup source type", policySourceOptions)}
+              ${siteRowInput("policyLookups", index, "sourceUrl", item.sourceUrl || "", "Source URL / citation")}
+              ${siteSourceControls("policyLookups", index, item)}
+            </article>
+          `).join("")}
         </div>
         <div class="site-map-grid">
           <div class="simple-map-wrap">
@@ -2703,54 +2986,123 @@ function siteSurveySurface(project) {
       </section>
 
       <section class="site-survey-section environmental-panel">
-        <span class="mini-label">4. Environmental conditions</span>
-        <h3>Physical Site Behavior</h3>
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">5. Environmental conditions</span>
+            <h3>Physical Site Behavior</h3>
+            <p>Record sun, wind, hydrology, vegetation, climate, views, noise, and other environmental conditions with source type and verification status.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="environmental">Add Custom Condition</button>
+        </div>
         <div class="environment-grid">
           ${survey.environmental.map((item, index) => `
             <article>
-              <input data-site-row="environmental" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
-              <textarea data-site-row="environmental" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
+              ${siteRowInput("environmental", index, "name", item.name || "", "Condition")}
+              ${siteRowTextarea("environmental", index, "value", item.value || "", "Finding")}
+              ${siteSourceControls("environmental", index, item)}
             </article>
           `).join("")}
         </div>
       </section>
 
       <section class="site-survey-section utilities-panel">
-        <span class="mini-label">5. Utility + infrastructure review</span>
-        <h3>Existing Service Conditions</h3>
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">6. Utility + infrastructure review</span>
+            <h3>Existing Service Conditions</h3>
+            <p>Track water, sewer, power, data, fire access, service entries, and any infrastructure uncertainty the surveyor or civil team must verify.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="utilities">Add Custom Utility</button>
+        </div>
         <div class="utility-review-grid">
           ${survey.utilities.map((item, index) => `
             <div>
-              <input data-site-row="utilities" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
-              <input data-site-row="utilities" data-site-index="${index}" data-site-key="value" value="${escapeHtml(item.value)}">
-              <input data-site-row="utilities" data-site-index="${index}" data-site-key="status" value="${escapeHtml(item.status)}">
+              ${siteRowInput("utilities", index, "name", item.name || "", "Utility / infrastructure item")}
+              ${siteRowInput("utilities", index, "value", item.value || "", "Finding")}
+              ${siteSourceControls("utilities", index, item)}
             </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section hazards-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">7. Site hazards + risk register</span>
+            <h3>Verified Risk Watchlist</h3>
+            <p>Hazards become project memory so the AI can monitor them during design, policy review, engineering, and handoff.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="hazards">Add Custom Hazard</button>
+        </div>
+        <div class="site-ai-question-grid hazard-record-grid">
+          ${survey.hazards.map((item, index) => `
+            <article>
+              ${siteRowInput("hazards", index, "name", item.name || "", "Hazard")}
+              ${siteRowTextarea("hazards", index, "value", item.value || "", "Site impact / design concern")}
+              ${siteSourceControls("hazards", index, item)}
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section sensor-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">8. Sensor / IoT updates</span>
+            <h3>Field Readings + Live Update Records</h3>
+            <p>Use this for real-time sensor feeds later, or manual readings now. Each reading stores type, location, value, timestamp, and verification status.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="sensors">Add Sensor Reading</button>
+        </div>
+        <div class="site-ai-question-grid sensor-record-grid">
+          ${survey.sensors.map((item, index) => `
+            <article>
+              ${siteRowInput("sensors", index, "name", item.name || "", "Sensor / reading name")}
+              ${siteRowSelect("sensors", index, "sensorType", item.sensorType || "Other", "Sensor type", sensorTypeOptions)}
+              ${siteRowInput("sensors", index, "location", item.location || "", "Location")}
+              ${siteRowInput("sensors", index, "latestReading", item.latestReading || "", "Latest reading")}
+              ${siteRowInput("sensors", index, "unit", item.unit || "", "Unit")}
+              ${siteRowInput("sensors", index, "timestamp", item.timestamp || "", "Timestamp", "datetime-local")}
+              ${siteRowSelect("sensors", index, "status", item.status || "needs review", "Reading status", siteVerificationStatusOptions)}
+              ${siteRowInput("sensors", index, "sourceName", item.sourceName || "", "Source / sensor feed")}
+            </article>
           `).join("")}
         </div>
       </section>
 
       <section class="site-survey-section constraint-opportunity-panel">
         <div>
-          <span class="mini-label">6. Site constraints</span>
-          <h3>Design Limits</h3>
+          <div class="survey-section-head compact-head">
+            <div>
+              <span class="mini-label">9. Site constraints</span>
+              <h3>Design Limits</h3>
+            </div>
+            <button class="add-row-button" data-add-site-row="constraints">Add Constraint</button>
+          </div>
           <div class="constraint-list">
             ${survey.constraints.map((item, index) => `
               <article>
-                <input data-site-row="constraints" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
-                <textarea data-site-row="constraints" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
-                <input data-site-row="constraints" data-site-index="${index}" data-site-key="status" value="${escapeHtml(item.status)}">
+                ${siteRowInput("constraints", index, "name", item.name || "", "Constraint")}
+                ${siteRowTextarea("constraints", index, "value", item.value || "", "Rule / design limit")}
+                ${siteSourceControls("constraints", index, item)}
               </article>
             `).join("")}
           </div>
         </div>
         <div>
-          <span class="mini-label">7. Site opportunities</span>
-          <h3>Design Possibilities</h3>
+          <div class="survey-section-head compact-head">
+            <div>
+              <span class="mini-label">10. Site opportunities</span>
+              <h3>Design Possibilities</h3>
+            </div>
+            <button class="add-row-button" data-add-site-row="opportunities">Add Opportunity</button>
+          </div>
           <div class="opportunity-list">
             ${survey.opportunities.map((item, index) => `
               <article>
-                <input data-site-row="opportunities" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
-                <textarea data-site-row="opportunities" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
+                ${siteRowInput("opportunities", index, "name", item.name || "", "Opportunity")}
+                ${siteRowTextarea("opportunities", index, "value", item.value || "", "Design implication")}
+                ${siteSourceControls("opportunities", index, item)}
               </article>
             `).join("")}
           </div>
@@ -2758,34 +3110,49 @@ function siteSurveySurface(project) {
       </section>
 
       <section class="site-survey-section verification-panel">
-        <div>
-          <span class="mini-label">8. Survey verification</span>
-          <h3>Trust + Missing Information</h3>
-          <p>Every claim should show who uploaded it, what evidence supports it, and whether it is verified, pending, missing, or conflicting.</p>
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">11. Survey verification</span>
+            <h3>Trust + Missing Information</h3>
+            <p>Every claim should show who uploaded it, what evidence supports it, and whether it is verified, pending, missing, or conflicting.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="evidence">Add Evidence Record</button>
         </div>
         <div class="evidence-register">
           ${survey.evidence.map((item, index) => `
             <div>
-              <input data-site-row="evidence" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
-              <input data-site-row="evidence" data-site-index="${index}" data-site-key="owner" value="${escapeHtml(item.owner)}">
-              <input data-site-row="evidence" data-site-index="${index}" data-site-key="status" value="${escapeHtml(item.status)}">
-              <textarea data-site-row="evidence" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
+              ${siteRowInput("evidence", index, "name", item.name || "", "Evidence / claim")}
+              ${siteRowInput("evidence", index, "owner", item.owner || "", "Owner / responsible role")}
+              ${siteRowTextarea("evidence", index, "value", item.value || "", "Verified fact / missing question")}
+              ${siteSourceControls("evidence", index, item)}
             </div>
           `).join("")}
         </div>
       </section>
 
       <section class="site-survey-section ai-site-panel">
-        <div>
-          <span class="mini-label">9. AI site interpretation</span>
-          <h3>From Evidence To Design Implications</h3>
-          <p>This is the HCT layer: the system does not only store survey data; it interprets what matters, what is uncertain, and what decision becomes possible.</p>
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">12. AI site assistor</span>
+            <h3>From Verified Evidence To Design Implications</h3>
+            <p>The assistor reads the saved forms and source records, then tells the architect what is verified, missing, risky, or ready for design use.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="aiInterpretation">Add AI Question</button>
+        </div>
+        <div class="site-ai-checks">
+          ${assistantFindings.map(item => `
+            <article class="ai-check-card ${escapeHtml(item.level.replace(/\s+/g, "-"))}">
+              <span>${escapeHtml(item.level)}</span>
+              <strong>${escapeHtml(item.title)}</strong>
+              <p>${escapeHtml(item.detail)}</p>
+            </article>
+          `).join("")}
         </div>
         <div class="site-ai-question-grid">
           ${survey.aiInterpretation.map((item, index) => `
             <article>
-              <input data-site-row="aiInterpretation" data-site-index="${index}" data-site-key="question" value="${escapeHtml(item.question)}">
-              <textarea data-site-row="aiInterpretation" data-site-index="${index}" data-site-key="answer" rows="4">${escapeHtml(item.answer)}</textarea>
+              ${siteRowInput("aiInterpretation", index, "question", item.question || "", "Question / check")}
+              ${siteRowTextarea("aiInterpretation", index, "answer", item.answer || "", "AI interpretation / recommended action", 4)}
             </article>
           `).join("")}
         </div>
@@ -2793,7 +3160,7 @@ function siteSurveySurface(project) {
 
       <section class="site-survey-section package-panel">
         <div>
-          <span class="mini-label">10. Site Intelligence Package</span>
+          <span class="mini-label">13. Site Intelligence Package</span>
           <h3>Final Section Output</h3>
           <p>The page produces a reusable package for design, sun studies, ASHRAE/material sustainability, zoning, engineering, compliance, and permit review.</p>
         </div>
@@ -3571,12 +3938,15 @@ function projectCsv(project) {
     ["site", "average_slope_percent", project.site.averageSlopePercent, project.site.verificationStatus],
     ["site", "slope_direction", project.site.slopeDirection, project.site.verificationStatus],
     ...Object.entries(state.siteSurvey.fields).map(([key, value]) => ["site_survey_form", key, value, "saved"]),
-    ...state.siteSurvey.uploads.map(file => ["site_survey_upload", file.name, `${file.type || "file"} | ${file.size || 0} bytes`, file.status || "uploaded"]),
-    ...state.siteSurvey.environmental.map(item => ["site_environmental", item.name, item.value, "saved"]),
-    ...state.siteSurvey.utilities.map(item => ["site_utility", item.name, item.value, item.status || "saved"]),
-    ...state.siteSurvey.constraints.map(item => ["site_constraint", item.name, item.value, item.status || "saved"]),
-    ...state.siteSurvey.opportunities.map(item => ["site_opportunity", item.name, item.value, "saved"]),
-    ...state.siteSurvey.evidence.map(item => ["site_evidence", item.name, `${item.owner || ""}: ${item.value || ""}`, item.status || "saved"]),
+    ...state.siteSurvey.uploads.map(file => ["site_survey_upload", file.name, `${file.type || "file"} | ${file.size || 0} bytes | ${sourceStatusText(file)} | uploaded by: ${file.uploadedBy || ""}`, file.status || "uploaded"]),
+    ...state.siteSurvey.environmental.map(item => ["site_environmental", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.utilities.map(item => ["site_utility", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.constraints.map(item => ["site_constraint", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.opportunities.map(item => ["site_opportunity", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.hazards.map(item => ["site_hazard", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.sensors.map(item => ["site_sensor", item.name, `${item.sensorType || ""} | ${item.location || ""} | ${item.latestReading || ""} ${item.unit || ""} | ${item.timestamp || ""} | ${item.sourceName || ""}`, item.status || "saved"]),
+    ...state.siteSurvey.policyLookups.map(item => ["site_policy_lookup", item.name, `${item.address || ""} | ${item.jurisdiction || ""} | ${item.result || ""} | ${item.sourceUrl || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.evidence.map(item => ["site_evidence", item.name, `${item.owner || ""}: ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.aiInterpretation.map(item => ["site_ai_interpretation", item.question, item.answer, "saved"]),
     ...state.siteSurvey.packageItems.map(item => ["site_package_item", item.name, item.included ? "included" : "excluded", "saved"]),
     ...state.programSpaces.flatMap(space => [
@@ -3637,6 +4007,76 @@ function triggerDownload(filename, mimeType, content) {
   URL.revokeObjectURL(url);
 }
 
+function newSiteSurveyRow(group) {
+  const today = new Date().toISOString().slice(0, 10);
+  const common = {
+    documentType: "Field Note",
+    otherDocumentType: "",
+    sourceName: "",
+    status: "unverified",
+    verifiedBy: "",
+    lastChecked: today
+  };
+
+  const factories = {
+    environmental: () => ({ name: "Custom site condition", value: "", ...common }),
+    utilities: () => ({ name: "Custom utility / infrastructure", value: "", ...common }),
+    constraints: () => ({ name: "Custom constraint", value: "", ...common }),
+    opportunities: () => ({ name: "Custom opportunity", value: "", ...common }),
+    hazards: () => ({ name: "Custom hazard", value: "", ...common }),
+    evidence: () => ({ name: "Custom evidence record", owner: "", value: "", ...common }),
+    policyLookups: () => ({
+      name: "Custom policy lookup",
+      address: state.siteSurvey.fields.addressLookup || "",
+      jurisdiction: state.siteSurvey.fields.jurisdiction || "",
+      result: "",
+      sourceUrl: state.siteSurvey.fields.policySourceUrl || "",
+      documentType: "Zoning Policy",
+      otherDocumentType: "",
+      sourceName: "Manual reviewer entry",
+      status: "pending lookup",
+      verifiedBy: "",
+      lastChecked: today
+    }),
+    sensors: () => ({
+      name: "Custom sensor reading",
+      sensorType: "Other",
+      location: "",
+      latestReading: "",
+      unit: "",
+      timestamp: "",
+      status: "needs review",
+      sourceName: "Sensor / IoT Feed"
+    }),
+    aiInterpretation: () => ({
+      question: "What should the architect check next?",
+      answer: "Complete the missing source and verification fields before treating this item as design-ready."
+    })
+  };
+
+  return factories[group] ? factories[group]() : { name: "Custom record", value: "", ...common };
+}
+
+function createPolicyLookupRecordFromFields() {
+  const fields = state.siteSurvey.fields;
+  return {
+    name: "Address-based zoning lookup",
+    address: fields.addressLookup || fields.parcelAddress || "",
+    jurisdiction: fields.jurisdiction || "",
+    result: [
+      fields.zoningDistrict ? `Zoning district: ${fields.zoningDistrict}` : "",
+      fields.overlays ? `Overlays: ${fields.overlays}` : ""
+    ].filter(Boolean).join("\n"),
+    documentType: "Zoning Policy",
+    otherDocumentType: "",
+    sourceName: "Manual reviewer entry",
+    sourceUrl: fields.policySourceUrl || "",
+    status: fields.policyLookupStatus || "pending lookup",
+    verifiedBy: fields.verifiedBy || "",
+    lastChecked: fields.lastPolicyCheck || new Date().toISOString().slice(0, 10)
+  };
+}
+
 function bindSimpleProjectPage() {
   document.querySelectorAll("[data-section='dashboard']").forEach(button => {
     button.addEventListener("click", () => {
@@ -3660,15 +4100,21 @@ function bindSimpleProjectPage() {
 }
 
 function bindSiteSurveyPage() {
+  const bindValueControl = (input, handler) => {
+    ["input", "change"].forEach(eventName => {
+      input.addEventListener(eventName, handler);
+    });
+  };
+
   document.querySelectorAll("[data-site-field]").forEach(input => {
-    input.addEventListener("input", () => {
+    bindValueControl(input, () => {
       state.siteSurvey.fields[input.dataset.siteField] = input.value;
       persistSiteSurvey();
     });
   });
 
   document.querySelectorAll("[data-site-row]").forEach(input => {
-    input.addEventListener("input", () => {
+    bindValueControl(input, () => {
       const group = input.dataset.siteRow;
       const index = Number(input.dataset.siteIndex);
       const key = input.dataset.siteKey;
@@ -3687,6 +4133,27 @@ function bindSiteSurveyPage() {
     });
   });
 
+  document.querySelectorAll("[data-add-site-row]").forEach(button => {
+    button.addEventListener("click", () => {
+      const group = button.dataset.addSiteRow;
+      if (!Array.isArray(state.siteSurvey[group])) state.siteSurvey[group] = [];
+      state.siteSurvey[group].push(newSiteSurveyRow(group));
+      persistSiteSurvey();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-policy-lookup-create]").forEach(button => {
+    button.addEventListener("click", () => {
+      state.siteSurvey.policyLookups = [
+        createPolicyLookupRecordFromFields(),
+        ...(Array.isArray(state.siteSurvey.policyLookups) ? state.siteSurvey.policyLookups : [])
+      ];
+      persistSiteSurvey();
+      render();
+    });
+  });
+
   const uploadInput = document.querySelector("[data-site-upload]");
   if (uploadInput) {
     uploadInput.addEventListener("change", () => {
@@ -3694,8 +4161,14 @@ function bindSiteSurveyPage() {
         name: file.name,
         size: file.size,
         type: file.type || "file",
+        documentType: state.siteSurvey.fields.uploadDocumentType || "Other",
+        otherDocumentType: state.siteSurvey.fields.uploadOtherDocumentType || "",
+        sourceName: state.siteSurvey.fields.uploadSourceName || file.name,
+        uploadedBy: state.siteSurvey.fields.uploadUploadedBy || "",
         uploadedAt: new Date().toISOString(),
-        status: "uploaded"
+        status: state.siteSurvey.fields.uploadVerificationStatus || "unverified",
+        verifiedBy: state.siteSurvey.fields.verifiedBy || "",
+        lastChecked: new Date().toISOString().slice(0, 10)
       }));
       state.siteSurvey.uploads = uniqueList([
         ...state.siteSurvey.uploads.map(file => JSON.stringify(file)),

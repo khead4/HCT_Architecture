@@ -2986,7 +2986,8 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
 }
 
 .site-intake-grid input,
-.site-intake-grid textarea {
+.site-intake-grid textarea,
+.site-intake-grid select {
   width: 100%;
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 8px;
@@ -3004,9 +3005,31 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
 }
 
 .site-intake-grid input:focus,
-.site-intake-grid textarea:focus {
+.site-intake-grid textarea:focus,
+.site-intake-grid select:focus {
   border-color: rgba(190,205,130,.7);
   box-shadow: 0 0 0 3px rgba(190,205,130,.12);
+}
+
+.site-intake-grid select,
+.source-meta-grid select,
+.sensor-record-grid select,
+.policy-record-grid select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(222,235,164,.9) 50%),
+    linear-gradient(135deg, rgba(222,235,164,.9) 50%, transparent 50%),
+    linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.025));
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%,
+    0 0;
+  background-size:
+    5px 5px,
+    5px 5px,
+    100% 100%;
+  background-repeat: no-repeat;
+  padding-right: 34px;
 }
 
 .site-upload-control {
@@ -3035,7 +3058,8 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
 .constraint-list article,
 .opportunity-list article,
 .site-layer-stack article,
-.site-ai-question-grid article {
+.site-ai-question-grid article,
+.uploaded-evidence-cards article {
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 8px;
   background: rgba(255,255,255,.045);
@@ -3055,17 +3079,55 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   line-height: 1.25;
 }
 
+.environment-grid label,
+.utility-review-grid label,
+.constraint-list label,
+.opportunity-list label,
+.evidence-register label,
+.site-ai-question-grid label,
+.source-meta-grid label,
+.uploaded-evidence-cards label {
+  display: grid;
+  gap: 6px;
+}
+
+.environment-grid label > span,
+.utility-review-grid label > span,
+.constraint-list label > span,
+.opportunity-list label > span,
+.evidence-register label > span,
+.site-ai-question-grid label > span,
+.source-meta-grid label > span,
+.uploaded-evidence-cards label > span {
+  color: rgba(255,255,255,.58);
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
 .environment-grid input,
 .environment-grid textarea,
+.environment-grid select,
 .utility-review-grid input,
+.utility-review-grid select,
 .constraint-list input,
 .constraint-list textarea,
+.constraint-list select,
 .opportunity-list input,
 .opportunity-list textarea,
+.opportunity-list select,
 .evidence-register input,
 .evidence-register textarea,
+.evidence-register select,
 .site-ai-question-grid input,
-.site-ai-question-grid textarea {
+.site-ai-question-grid textarea,
+.site-ai-question-grid select,
+.uploaded-evidence-cards input,
+.uploaded-evidence-cards textarea,
+.uploaded-evidence-cards select,
+.source-meta-grid input,
+.source-meta-grid select {
   width: 100%;
   border: 1px solid rgba(255,255,255,.11);
   border-radius: 8px;
@@ -3080,22 +3142,33 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
 .constraint-list textarea,
 .opportunity-list textarea,
 .evidence-register textarea,
-.site-ai-question-grid textarea {
+.site-ai-question-grid textarea,
+.uploaded-evidence-cards textarea {
   margin-top: 8px;
   resize: vertical;
 }
 
 .environment-grid input:focus,
 .environment-grid textarea:focus,
+.environment-grid select:focus,
 .utility-review-grid input:focus,
+.utility-review-grid select:focus,
 .constraint-list input:focus,
 .constraint-list textarea:focus,
+.constraint-list select:focus,
 .opportunity-list input:focus,
 .opportunity-list textarea:focus,
+.opportunity-list select:focus,
 .evidence-register input:focus,
 .evidence-register textarea:focus,
+.evidence-register select:focus,
 .site-ai-question-grid input:focus,
-.site-ai-question-grid textarea:focus {
+.site-ai-question-grid textarea:focus,
+.site-ai-question-grid select:focus,
+.uploaded-evidence-cards input:focus,
+.uploaded-evidence-cards select:focus,
+.source-meta-grid input:focus,
+.source-meta-grid select:focus {
   border-color: rgba(190,205,130,.68);
   box-shadow: 0 0 0 3px rgba(190,205,130,.1);
 }
@@ -3123,6 +3196,17 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   gap: 8px;
 }
 
+.uploaded-evidence-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.uploaded-evidence-cards article {
+  display: grid;
+  gap: 10px;
+}
+
 .uploaded-evidence-list span {
   display: inline-flex;
   align-items: center;
@@ -3141,6 +3225,47 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   font-style: normal;
   font-size: 10px;
   text-transform: uppercase;
+}
+
+.source-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-top: 10px;
+}
+
+.source-meta-grid .wide-field {
+  grid-column: 1 / -1;
+}
+
+.site-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.add-row-button {
+  border: 1px solid rgba(190,205,130,.32);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(190,205,130,.16), rgba(62,182,194,.08)),
+    rgba(0,0,0,.38);
+  color: rgba(255,255,255,.9);
+  padding: 10px 13px;
+  font: 780 12px/1 var(--sans);
+  cursor: pointer;
+}
+
+.add-row-button:hover {
+  border-color: rgba(222,235,164,.74);
+  transform: translateY(-1px);
+}
+
+.compact-head {
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .site-map-grid {
@@ -3212,6 +3337,69 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
 
 .site-ai-question-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.site-ai-checks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ai-check-card {
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+    rgba(0,0,0,.4);
+  padding: 14px;
+}
+
+.ai-check-card span {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  color: rgba(255,255,255,.72);
+  padding: 5px 8px;
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.ai-check-card strong {
+  display: block;
+  margin-top: 10px;
+  color: rgba(255,255,255,.94);
+  font-size: 15px;
+  font-weight: 760;
+  line-height: 1.18;
+}
+
+.ai-check-card p {
+  font-size: 13px;
+}
+
+.ai-check-card.verified span {
+  border-color: rgba(113,220,160,.28);
+  color: rgba(166,244,198,.92);
+}
+
+.ai-check-card.active span {
+  border-color: rgba(62,182,194,.32);
+  color: rgba(185,238,244,.95);
+}
+
+.ai-check-card.needs-review span,
+.ai-check-card.attention span {
+  border-color: rgba(214,169,74,.38);
+  color: rgba(245,212,154,.95);
+}
+
+.ai-check-card.missing span,
+.ai-check-card.conflict span {
+  border-color: rgba(244,114,114,.34);
+  color: rgba(255,190,190,.95);
 }
 
 .package-grid label {
@@ -5941,14 +6129,20 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
   .survey-upload-grid,
   .environment-grid,
   .utility-review-grid,
-  .package-grid {
+  .package-grid,
+  .source-meta-grid,
+  .uploaded-evidence-cards,
+  .site-ai-checks {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .site-map-grid,
   .constraint-opportunity-panel,
   .evidence-register,
-  .site-ai-question-grid {
+  .site-ai-question-grid,
+  .policy-record-grid,
+  .hazard-record-grid,
+  .sensor-record-grid {
     grid-template-columns: 1fr;
   }
 
@@ -5980,7 +6174,10 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
   .survey-upload-grid,
   .environment-grid,
   .utility-review-grid,
-  .package-grid {
+  .package-grid,
+  .source-meta-grid,
+  .uploaded-evidence-cards,
+  .site-ai-checks {
     grid-template-columns: 1fr;
   }
 
