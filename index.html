@@ -1,904 +1,460 @@
-<!DOCTYPE html>
-<!-- saved from url=(0027)http://localhost:4177/?v=79 -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HCT Project-Aware AI Prototype</title>
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body data-active-section="dashboard" data-auth-view="">
-    <div class="app-shell">
-      <aside class="sidebar" aria-label="Project sections">
-        <div class="brand-block">
-          <div class="brand-mark">HC</div>
-          <div>
-            <div class="brand-title">HCT Assistor</div>
-            <div class="brand-subtitle">Project-aware prototype</div>
-          </div>
-        </div>
-
-        <nav id="sectionNav" class="section-nav">
-      <button class="section-link active" data-section="dashboard" title="Project Flow Guide">
-        <span class="section-index">00</span>
-        <span>
-          <strong>Project Flow Guide</strong>
-          <span>All stages</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="clientele" title="Clientele / Project Brief">
-        <span class="section-index">01</span>
-        <span>
-          <strong>Clientele / Project Brief</strong>
-          <span>Project definition</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="survey" title="Site + Survey Intelligence">
-        <span class="section-index">02</span>
-        <span>
-          <strong>Site + Survey Intelligence</strong>
-          <span>Site understanding</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="data" title="Data Storage / CSV">
-        <span class="section-index">03</span>
-        <span>
-          <strong>Data Storage / CSV</strong>
-          <span>Data organization</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="policy" title="Zoning + Policy Intelligence">
-        <span class="section-index">04</span>
-        <span>
-          <strong>Zoning + Policy Intelligence</strong>
-          <span>Regulatory understanding</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="gis" title="ArcGIS / Spatial Mapping">
-        <span class="section-index">05</span>
-        <span>
-          <strong>ArcGIS / Spatial Mapping</strong>
-          <span>Spatial intelligence</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="design" title="CAD / Rhino Design Workspace">
-        <span class="section-index">06</span>
-        <span>
-          <strong>CAD / Rhino Design Workspace</strong>
-          <span>Concept design</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="sun" title="Sun Studies">
-        <span class="section-index">07</span>
-        <span>
-          <strong>Sun Studies</strong>
-          <span>Environmental placement</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="ashrae" title="ASHRAE / Material Sustainability">
-        <span class="section-index">08</span>
-        <span>
-          <strong>ASHRAE / Material Sustainability</strong>
-          <span>Material sustainability</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="lumion" title="Lumion Visualization">
-        <span class="section-index">09</span>
-        <span>
-          <strong>Lumion Visualization</strong>
-          <span>Visual communication</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="finalization" title="Finalization / Engineering Handoff">
-        <span class="section-index">10</span>
-        <span>
-          <strong>Finalization / Engineering Handoff</strong>
-          <span>Pre-engineering package</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="engineering" title="Engineering Review">
-        <span class="section-index">11</span>
-        <span>
-          <strong>Engineering Review</strong>
-          <span>Technical coordination</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="permit" title="Permit / Code Review">
-        <span class="section-index">12</span>
-        <span>
-          <strong>Permit / Code Review</strong>
-          <span>Approval readiness</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="notes" title="Notes / Ideation">
-        <span class="section-index">13</span>
-        <span>
-          <strong>Notes / Ideation</strong>
-          <span>Creative reasoning</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="archive" title="AI Transcript / Reasoning Archive">
-        <span class="section-index">14</span>
-        <span>
-          <strong>AI Transcript / Reasoning Archive</strong>
-          <span>All stages</span>
-        </span>
-      </button>
-    
-      <button class="section-link " data-section="case-study" title="Case Study Generator">
-        <span class="section-index">15</span>
-        <span>
-          <strong>Case Study Generator</strong>
-          <span>Narrative output</span>
-        </span>
-      </button>
-    </nav>
-
-        <div class="sidebar-footer">
-          <div class="mini-label">Current prototype</div>
-          <div id="projectPhase" class="phase-pill">Early schematic design</div>
-        </div>
-      </aside>
-
-      <main class="main">
-        <header class="topbar">
-          <div>
-            <div id="projectName" class="project-name">Aalborg HCT Residential Prototype</div>
-            <div id="projectMeta" class="project-meta">Demo Parcel, Cold Climate Zone | Early schematic design</div>
-          </div>
-          <div class="top-actions">
-            <button id="homeButton" class="primary-button">Project Guide</button>
-            <button id="loginButton" class="secondary-button">Log in</button>
-          </div>
-        </header>
-
-        <section class="status-strip" aria-label="Project status">
-          <div>
-            <span class="status-label">Current</span>
-            <strong id="currentSection">CAD / Rhino Design Workspace</strong>
-          </div>
-          <div>
-            <span class="status-label">Last completed</span>
-            <strong id="lastCompleted">ArcGIS / Spatial Mapping</strong>
-          </div>
-          <div>
-            <span class="status-label">Critical</span>
-            <strong id="criticalCount">2</strong>
-          </div>
-          <div>
-            <span class="status-label">Memory</span>
-            <strong id="memoryCount">12 records</strong>
-          </div>
-        </section>
-
-        <section class="workspace">
-          <div class="work-column">
-            <section class="module-panel">
-              <div class="module-header">
-                <div>
-                  <h1 id="activeSectionTitle">Project Flow Guide</h1>
-                  <p id="activeSectionDescription">Clickable user flow for entering the correct project workspace.</p>
-                </div>
-                <div id="sectionBadge" class="section-badge">All stages</div>
-              </div>
-
-              <div id="sectionDetails" class="section-details">
-    <div class="section-card">
-      <h3>Process Goal</h3>
-      <ul>
-        <li>Choose the phase or page the user needs.</li>
-      </ul>
-    </div>
-  
-    <div class="section-card">
-      <h3>User Steps</h3>
-      <ul>
-        <li>Read flow state</li><li>Select a phase</li><li>Enter page</li>
-      </ul>
-    </div>
-  
-    <div class="section-card">
-      <h3>AI Role</h3>
-      <ul>
-        <li>Recommends the next phase</li><li>Marks active priority</li><li>Stays out of the home screen</li>
-      </ul>
-    </div>
-  
-    <div class="section-card">
-      <h3>Current Alerts</h3>
-      <ul>
-        <li>Front distance: 14 ft against 20 ft rule</li><li>Model height: 39 ft against 35 ft rule</li><li>Glazing: 34% south facade</li>
-      </ul>
-    </div>
-  </div>
-            </section>
-
-            <section class="module-panel">
-              <div class="module-header compact">
-                <div>
-                  <h2 id="workspaceTitle">Project Flow Guide</h2>
-                  <p id="workspaceDescription">Choose a phase to enter its page.</p>
-                </div>
-                <div id="canvasMode" class="canvas-mode">Flow navigation</div>
-              </div>
-
-              <div class="visual-workspace" id="visualWorkspace" aria-label="Design visualization">
-    <div class="surface-pad dashboard-flow role-home">
-      
-    <div class="entry-actions" aria-label="Account actions">
-      
-      <button class="entry-login" data-open-auth="login">Log in</button>
-    </div>
-  
-      <div class="role-shell">
-        <header class="role-home-header">
-          <span class="journey-eyebrow">Start with the user</span>
-          <h1>Select your workflow.</h1>
-        </header>
-
-        <div class="role-grid" aria-label="Choose role">
-          
-            <button class="role-card role-client" data-role="client">
-              <span class="role-visual role-symbol-client" aria-hidden="true">
-      <svg class="role-icon role-icon-client" viewBox="0 0 96 72" focusable="false">
-        <circle class="role-icon-fill" cx="48" cy="25" r="13"></circle>
-        <path class="role-icon-fill" d="M24 60c3-16 45-16 48 0z"></path>
-        <path class="role-icon-accent" d="M33 55c8-8 22-8 30 0"></path>
-        <path class="role-icon-soft" d="M39 26h18"></path>
-      </svg>
-    </span>
-              <span class="role-name">Project Intent</span>
-              <strong>Client</strong>
-              <p>Review the project in plain language: goals, site, concept, decisions, and final downloads.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Goals</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Site</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">Context</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Concept</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">Daylight</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">06</span>
-              <span class="role-mini-label">Visuals</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">07</span>
-              <span class="role-mini-label">Approve</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">08</span>
-              <span class="role-mini-label">Decisions</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">09</span>
-              <span class="role-mini-label">Package</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-            <button class="role-card role-surveyor" data-role="surveyor">
-              <span class="role-visual role-symbol-surveyor" aria-hidden="true">
-      <svg class="role-icon role-icon-surveyor" viewBox="0 0 96 72" focusable="false">
-        <path class="role-icon-accent" d="M48 18v16M48 34 32 58M48 34l16 24M38 58h20"></path>
-        <path class="role-icon-stroke" d="M24 30h48"></path>
-        <path class="role-icon-soft" d="M28 26v8M38 26v8M48 26v8M58 26v8M68 26v8"></path>
-        <circle class="role-icon-accent-fill" cx="48" cy="17" r="5"></circle>
-        <path class="role-icon-fill" d="M36 14h24v8H36z"></path>
-      </svg>
-    </span>
-              <span class="role-name">Site Verification</span>
-              <strong>Land Surveyor</strong>
-              <p>Verify boundaries, field measurements, utilities, slope, easements, and survey deliverables.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Field</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Boundary</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">Rules</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Records</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">Deliver</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-            <button class="role-card role-gis" data-role="gis">
-              <span class="role-visual role-symbol-gis" aria-hidden="true">
-      <svg class="role-icon role-icon-gis" viewBox="0 0 96 72" focusable="false">
-        <path class="role-icon-fill" d="m15 22 20-7 26 8 20-7v38l-20 7-26-8-20 7z"></path>
-        <path class="role-icon-soft" d="M35 15v38M61 23v38M23 32l10-4M43 30l10 3M68 34l7-3M24 48l10-3M43 47l10 3"></path>
-        <path class="role-icon-accent" d="M63 18c0-8 13-8 13 0 0 7-6.5 15-6.5 15S63 25 63 18z"></path>
-        <circle class="role-icon-accent-fill" cx="69.5" cy="18" r="2.4"></circle>
-      </svg>
-    </span>
-              <span class="role-name">Spatial Intelligence</span>
-              <strong>GIS Analyst</strong>
-              <p>Prepare reliable project data, mapped layers, policy geography, and downloadable parcel/CSV outputs.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Data</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Survey</span>
-            </span>
-          
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">Layers</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Rules</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">Design Fit</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">06</span>
-              <span class="role-mini-label">Evidence</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">07</span>
-              <span class="role-mini-label">Export</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-            <button class="role-card role-planner" data-role="planner">
-              <span class="role-visual role-symbol-planner" aria-hidden="true">
-      <svg class="role-icon role-icon-planner" viewBox="0 0 96 72" focusable="false">
-        <path class="role-icon-fill" d="M26 12h44v48H26z"></path>
-        <path class="role-icon-soft" d="M38 24h22M38 36h22M38 48h22"></path>
-        <path class="role-icon-accent" d="m27 26 5 5 9-11M27 38l5 5 9-11M27 50l5 5 9-11"></path>
-        <path class="role-icon-soft" d="M39 12c1-5 17-5 18 0"></path>
-      </svg>
-    </span>
-              <span class="role-name">Policy Strategy</span>
-              <strong>Planner</strong>
-              <p>Check source-grounded rules, mapped constraints, code conflicts, and permit readiness.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Intake</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Parcel</span>
-            </span>
-          
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">Policy</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Map</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">Design</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">06</span>
-              <span class="role-mini-label">Technical</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">07</span>
-              <span class="role-mini-label">Compliance</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">08</span>
-              <span class="role-mini-label">Evidence</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">09</span>
-              <span class="role-mini-label">Narrative</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-            <button class="role-card role-architect" data-role="architect">
-              <span class="role-visual role-symbol-architect" aria-hidden="true">
-      <svg class="role-icon role-icon-architect" viewBox="0 0 96 72" focusable="false">
-        <path class="role-icon-fill" d="M18 13h60v46H18z"></path>
-        <path class="role-icon-soft" d="M27 13v46M39 13v46M51 13v46M63 13v46M18 24h60M18 36h60M18 48h60"></path>
-        <path class="role-icon-accent" d="M28 50V25h18v12h21v13z"></path>
-        <path class="role-icon-accent" d="M46 25v12M57 37v13M36 25v8M28 42h11M48 50h8"></path>
-        <path class="role-icon-stroke" d="M14 63h68M78 59l5 4-5 4M18 59l-5 4 5 4"></path>
-      </svg>
-    </span>
-              <span class="role-name">Design Direction</span>
-              <strong>Architect</strong>
-              <p>Move from client intent to parcel evidence, policy checks, design review, and exportable outputs.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Brief</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Survey</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">Database</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Policy</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">GIS</span>
-            </span>
-          
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">06</span>
-              <span class="role-mini-label">Design</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">07</span>
-              <span class="role-mini-label">Sun</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">08</span>
-              <span class="role-mini-label">Sustain-<br>ability</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">09</span>
-              <span class="role-mini-label">Visualize</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">10</span>
-              <span class="role-mini-label">Finalize</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">11</span>
-              <span class="role-mini-label">Coordinate</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">12</span>
-              <span class="role-mini-label">Permit</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">13</span>
-              <span class="role-mini-label">Notes</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">14</span>
-              <span class="role-mini-label">Archive</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">15</span>
-              <span class="role-mini-label">Story</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-            <button class="role-card role-engineer" data-role="engineer">
-              <span class="role-visual role-symbol-engineer" aria-hidden="true">
-      <svg class="role-icon role-icon-engineer" viewBox="0 0 96 72" focusable="false">
-        <path class="role-icon-stroke" d="M14 56h68M18 52l30-34 30 34M28 52l20-22 20 22"></path>
-        <path class="role-icon-soft" d="M28 52h40M38 40h20M48 18v38"></path>
-        <path class="role-icon-accent" d="M18 52 48 30 78 52"></path>
-        <circle class="role-icon-accent-fill" cx="48" cy="18" r="4"></circle>
-      </svg>
-    </span>
-              <span class="role-name">Technical Feasibility</span>
-              <strong>Engineer</strong>
-              <p>Move from site facts to model constraints, performance assumptions, technical comments, and exportable evidence.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Handoff</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Survey</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">GIS</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Model</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">Solar</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">06</span>
-              <span class="role-mini-label">Sustain-<br>ability</span>
-            </span>
-          
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">07</span>
-              <span class="role-mini-label">Review</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">08</span>
-              <span class="role-mini-label">Permit</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">09</span>
-              <span class="role-mini-label">Archive</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-            <button class="role-card role-reviewer" data-role="reviewer">
-              <span class="role-visual role-symbol-reviewer" aria-hidden="true">
-      <svg class="role-icon role-icon-reviewer" viewBox="0 0 96 72" focusable="false">
-        <path class="role-icon-fill" d="M24 12h42l8 8v40H24z"></path>
-        <path class="role-icon-soft" d="M65 12v10h9M34 27h24M34 38h20M34 49h16"></path>
-        <path class="role-icon-accent" d="M61 49 73 37l7 7-12 12-10 3z"></path>
-        <path class="role-icon-accent" d="m26 43 7 7 14-18"></path>
-      </svg>
-    </span>
-              <span class="role-name">Standards Review</span>
-              <strong>Reviewer</strong>
-              <p>Review plans against zoning, code, safety, accessibility, completeness, and submission standards.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Intake</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Parcel</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">Standards</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Map</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">Plans</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">06</span>
-              <span class="role-mini-label">Technical</span>
-            </span>
-          
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">07</span>
-              <span class="role-mini-label">Corrections</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">08</span>
-              <span class="role-mini-label">Record</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">09</span>
-              <span class="role-mini-label">Closeout</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-            <button class="role-card role-inspector" data-role="inspector">
-              <span class="role-visual role-symbol-inspector" aria-hidden="true">
-      <svg class="role-icon role-icon-inspector" viewBox="0 0 96 72" focusable="false">
-        <path class="role-icon-fill" d="M25 14h42v48H25z"></path>
-        <path class="role-icon-soft" d="M38 24h18M38 35h15M38 46h11"></path>
-        <path class="role-icon-accent" d="M30 25l4 4 8-10M30 36l4 4 8-10"></path>
-        <circle class="role-icon-stroke" cx="63" cy="46" r="10"></circle>
-        <path class="role-icon-accent" d="m70 53 9 9"></path>
-        <path class="role-icon-soft" d="M39 14c1-5 13-5 14 0"></path>
-      </svg>
-    </span>
-              <span class="role-name">Field Compliance</span>
-              <strong>Inspector</strong>
-              <p>Verify site conditions, construction status, field issues, inspection notes, and closeout evidence.</p>
-              
-    <span class="role-hover-map" aria-hidden="true">
-      <span class="role-hover-kicker">Workflow preview</span>
-      <span class="role-mini-grid">
-        
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">01</span>
-              <span class="role-mini-label">Assignment</span>
-            </span>
-          
-            <span class="role-mini-step active ">
-              <span class="role-mini-number">02</span>
-              <span class="role-mini-label">Site</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">03</span>
-              <span class="role-mini-label">Context</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">04</span>
-              <span class="role-mini-label">Standards</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">05</span>
-              <span class="role-mini-label">Technical</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">06</span>
-              <span class="role-mini-label">Corrections</span>
-            </span>
-          
-            <span class="role-mini-step  ">
-              <span class="role-mini-number">07</span>
-              <span class="role-mini-label">Field Notes</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">08</span>
-              <span class="role-mini-label">Record</span>
-            </span>
-          
-            <span class="role-mini-step  row-end">
-              <span class="role-mini-number">09</span>
-              <span class="role-mini-label">Closeout</span>
-            </span>
-          
-      </span>
-    </span>
-  
-            </button>
-          
-          <div class="role-card role-about-card" aria-label="About the workflow">
-            <span class="role-name">About the workflow</span>
-            <strong>One System</strong>
-            <div class="about-statement" aria-label="Every role enters one connected system with the right steps, tools, and decisions in one place.">
-              <span class="about-line about-soft">Every role enters</span>
-              <span class="about-line about-focus">one connected system</span>
-              <span class="about-line about-soft">with the right <em>steps</em>, <em>tools</em>,</span>
-              <span class="about-line about-close">and <em>decisions</em> in one place.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="annotationLayer" class="annotation-layer"></div>
-    </div>
-  </div>
-            </section>
-
-            <section class="module-panel">
-              <div class="module-header compact">
-                <div>
-                  <h2>External App Connectors</h2>
-                  <p>Mock integration layer showing how tools would feed project memory.</p>
-                </div>
-              </div>
-              <div id="integrations" class="integration-grid">
-    <div class="integration-card">
-      <strong><span class="status-dot"></span>ArcGIS</strong>
-      <p>Spatial layers and parcel context</p>
-      <p class="mini-label">mock-connected</p>
-    </div>
-  
-    <div class="integration-card">
-      <strong><span class="status-dot"></span>Rhino / Grasshopper</strong>
-      <p>Design geometry and model observation</p>
-      <p class="mini-label">mock-connected</p>
-    </div>
-  
-    <div class="integration-card">
-      <strong><span class="status-dot"></span>ASHRAE / EnergyPlus</strong>
-      <p>Performance and comfort assumptions</p>
-      <p class="mini-label">mock-connected</p>
-    </div>
-  
-    <div class="integration-card">
-      <strong><span class="status-dot"></span>Lumion</strong>
-      <p>Visual review and material atmosphere</p>
-      <p class="mini-label">mock-connected</p>
-    </div>
-  
-    <div class="integration-card">
-      <strong><span class="status-dot"></span>Material / SKU Database</strong>
-      <p>Product matching and cost/performance data</p>
-      <p class="mini-label">mock-connected</p>
-    </div>
-  
-    <div class="integration-card">
-      <strong><span class="status-dot"></span>Permit Checklist</strong>
-      <p>Submission completeness and review issues</p>
-      <p class="mini-label">mock-connected</p>
-    </div>
-  </div>
-            </section>
-          </div>
-
-          <aside class="assistant-panel" aria-label="AI assistant">
-            <div class="assistant-header">
-              <div>
-                <h2 id="assistantTitle">Project Flow Guide Assistor</h2>
-                <p id="assistantDescription">Available after entering a project page.</p>
-              </div>
-              <span id="aiMode" class="mode-chip">Mock</span>
-            </div>
-
-            <div class="quick-prompts">
-              <button data-question="Can I move the building closer to the street?">Check setback</button>
-              <button data-question="Should I add more windows on the south facade?">Glazing advice</button>
-              <button data-question="Is the building too tall for this zone?">Check height</button>
-              <button data-question="Which Lumion view best communicates the approved design direction?">Lumion review</button>
-              <button data-question="What site issues affect partial underground placement?">Site logic</button>
-            </div>
-
-            <label class="field-label" for="questionInput">Architect question</label>
-            <textarea id="questionInput" rows="4" placeholder="Ask about design, policy, site, physics, sustainability, or visual direction."></textarea>
-            <button id="askButton" class="primary-button full">Ask Assistor</button>
-
-            <div id="assistantOutput" class="assistant-output">
-              <div class="empty-state">
-                Ask a question to generate a source-linked answer, self-checks, and visual annotations.
-              </div>
-            </div>
-          </aside>
-        </section>
-      </main>
-
-      <aside id="sourceDrawer" class="source-drawer" aria-label="Source trace">
-        <div class="drawer-header">
-          <div>
-            <h2>Source Trace</h2>
-            <p id="traceIntro">Right-click an annotation or source card.</p>
-          </div>
-          <button id="closeDrawer" class="icon-button" title="Close source trace">Close</button>
-        </div>
-        <div id="sourceTraceBody" class="source-trace-body"></div>
-      </aside>
-    </div>
-
-    <script src="app.js.download"></script>
-  
-
-</body></html>
+{
+  "project": {
+    "id": "hct-demo-001",
+    "name": "Aalborg HCT Residential Prototype",
+    "location": "Demo Parcel, Cold Climate Zone",
+    "phase": "Early schematic design",
+    "currentSection": "CAD / Rhino Design Workspace",
+    "lastCompleted": "ArcGIS / Spatial Mapping"
+  },
+  "clientIntent": {
+    "sourceId": "client-brief-001",
+    "summary": "The client wants a warm, open, Scandinavian-inspired residence with strong daylight, low energy demand, natural materials, and a clear relationship to the landscape.",
+    "priorities": [
+      {
+        "id": "client-goal-daylight",
+        "label": "Natural daylight",
+        "weight": "high",
+        "source": "Client Brief, Question 4"
+      },
+      {
+        "id": "client-goal-energy",
+        "label": "Low energy cost",
+        "weight": "high",
+        "source": "Client Brief, Question 7"
+      },
+      {
+        "id": "client-goal-natural-materials",
+        "label": "Natural material palette",
+        "weight": "medium",
+        "source": "Client Brief, Reference Board"
+      },
+      {
+        "id": "client-goal-budget",
+        "label": "Budget awareness",
+        "weight": "high",
+        "source": "Client Brief, Budget Boundary"
+      }
+    ],
+    "constraints": [
+      "Total project cost should remain near the early target budget.",
+      "Interior spaces should feel open without excessive heat loss.",
+      "Material choices should support a natural visual style."
+    ]
+  },
+  "site": {
+    "sourceId": "survey-001",
+    "parcelAreaSqFt": 14520,
+    "frontBoundary": "south",
+    "slopeDirection": "north-east",
+    "averageSlopePercent": 8,
+    "soilNote": "Moderate bearing capacity. Deeper excavation should be reviewed by civil/structural consultants.",
+    "utilities": [
+      "water-east",
+      "power-south",
+      "stormwater-west"
+    ],
+    "verifiedBy": "Land Surveyor",
+    "verificationStatus": "verified"
+  },
+  "gisLayers": [
+    {
+      "id": "gis-flood-001",
+      "name": "Flood risk overlay",
+      "status": "active",
+      "finding": "Western low point intersects a medium-risk stormwater flow path.",
+      "source": "GIS Analyst Layer Stack, Flood Overlay"
+    },
+    {
+      "id": "gis-views-001",
+      "name": "Primary view corridor",
+      "status": "active",
+      "finding": "Best long view is toward the west/southwest edge of the parcel.",
+      "source": "Custom Research Layer, Site Visit Notes"
+    },
+    {
+      "id": "gis-vegetation-001",
+      "name": "Existing vegetation",
+      "status": "active",
+      "finding": "Northern tree line can provide seasonal wind buffering.",
+      "source": "ArcGIS Vegetation Layer"
+    }
+  ],
+  "verifiedRules": [
+    {
+      "id": "rule-front-setback",
+      "ruleType": "front_setback",
+      "zone": "R-1 Demo Residential",
+      "value": 20,
+      "unit": "ft",
+      "sourceTitle": "Demo City Zoning Ordinance",
+      "section": "5.3.2 Residential Setbacks",
+      "page": 42,
+      "exactText": "Minimum front yard setback in the R-1 residential district shall be 20 feet from the front property line.",
+      "verificationStatus": "verified",
+      "verifiedBy": "Planner / Policy Reviewer"
+    },
+    {
+      "id": "rule-side-setback",
+      "ruleType": "side_setback",
+      "zone": "R-1 Demo Residential",
+      "value": 10,
+      "unit": "ft",
+      "sourceTitle": "Demo City Zoning Ordinance",
+      "section": "5.3.2 Residential Setbacks",
+      "page": 42,
+      "exactText": "Minimum side yard setback in the R-1 residential district shall be 10 feet.",
+      "verificationStatus": "verified",
+      "verifiedBy": "Planner / Policy Reviewer"
+    },
+    {
+      "id": "rule-height-limit",
+      "ruleType": "height_limit",
+      "zone": "R-1 Demo Residential",
+      "value": 35,
+      "unit": "ft",
+      "sourceTitle": "Demo City Zoning Ordinance",
+      "section": "5.4.1 Building Height",
+      "page": 45,
+      "exactText": "Principal structures in the R-1 residential district shall not exceed 35 feet in building height unless a variance is granted.",
+      "verificationStatus": "verified",
+      "verifiedBy": "Zoning Administrator"
+    },
+    {
+      "id": "rule-solar-incentive",
+      "ruleType": "incentive",
+      "zone": "All residential zones",
+      "value": "solar-ready envelope",
+      "unit": "policy",
+      "sourceTitle": "Demo Sustainable Building Incentive Guide",
+      "section": "2.1 Solar-Ready Residential Incentives",
+      "page": 12,
+      "exactText": "Projects demonstrating solar-ready roof area and passive design measures may qualify for expedited sustainability review.",
+      "verificationStatus": "needs_review",
+      "verifiedBy": null
+    }
+  ],
+  "designModel": {
+    "id": "model-version-004",
+    "name": "Concept Massing V4",
+    "heightFt": 39,
+    "frontDistanceFt": 14,
+    "sideDistanceFt": 12,
+    "orientation": "southwest",
+    "southGlazingPercent": 34,
+    "openSpacePercent": 46,
+    "foundationDepthFt": 5,
+    "materialIntent": "light timber, mineral plaster, triple-pane glazing",
+    "selectedElement": "south-facade"
+  },
+  "analysisResults": {
+    "sunStudy": {
+      "id": "sun-004",
+      "summary": "Southwest orientation improves afternoon daylight but increases late-day heat gain risk.",
+      "daylightScore": 82,
+      "glareRisk": "medium",
+      "sourceTitle": "Sun Study Result V4"
+    },
+    "ashrae": {
+      "id": "ashrae-004",
+      "summary": "Cooling demand increased after glazing expansion. Triple-pane glazing and exterior shading reduce modeled risk.",
+      "coolingImpactPercent": 7,
+      "envelopeRisk": "medium",
+      "sourceTitle": "ASHRAE / Sustainability Result V4"
+    },
+    "carbon": {
+      "id": "carbon-004",
+      "summary": "Timber structure lowers embodied carbon compared with conventional steel framing in the demo assumptions.",
+      "embodiedCarbonChange": "-14%",
+      "sourceTitle": "Material Carbon Comparison V2"
+    }
+  },
+  "integrations": [
+    {
+      "id": "arcgis",
+      "name": "ArcGIS",
+      "status": "mock-connected",
+      "purpose": "Spatial layers and parcel context"
+    },
+    {
+      "id": "rhino",
+      "name": "Rhino / Grasshopper",
+      "status": "mock-connected",
+      "purpose": "Design geometry and model observation"
+    },
+    {
+      "id": "ashrae",
+      "name": "ASHRAE / EnergyPlus",
+      "status": "mock-connected",
+      "purpose": "Performance and comfort assumptions"
+    },
+    {
+      "id": "lumion",
+      "name": "Lumion",
+      "status": "mock-connected",
+      "purpose": "Visual review and material atmosphere"
+    },
+    {
+      "id": "materials",
+      "name": "Material / SKU Database",
+      "status": "mock-connected",
+      "purpose": "Product matching and cost/performance data"
+    },
+    {
+      "id": "permit",
+      "name": "Permit Checklist",
+      "status": "mock-connected",
+      "purpose": "Submission completeness and review issues"
+    }
+  ],
+  "aiTranscript": [
+    {
+      "id": "msg-2e2e7633-b43b-4bf9-a8a5-480c1bbb2ed8",
+      "timestamp": "2026-06-07T15:56:13.507Z",
+      "section": "Clientele / Project Brief",
+      "question": "Use screenshot fallback to provide visual design advice for the current workspace.",
+      "screenshotMode": true,
+      "answer": "I checked the active project memory against your question. The strongest current issues are the front setback conflict, the height limit conflict, and the south glazing performance tradeoff. If you are asking about a visual design choice, I can annotate the current design canvas as an advisory critique. If you are asking about code, physics, or policy, I will only state a fact when the source or calculation is available.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "survey-001",
+        "rule-front-setback",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-general-attention"
+      ],
+      "recommendedNext": [
+        "Zoning + Policy Intelligence",
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis"
+      ]
+    },
+    {
+      "id": "msg-46113c14-ed6b-4818-8cb8-f567fee669d1",
+      "timestamp": "2026-06-07T15:43:52.183Z",
+      "section": "CAD / Rhino Design Workspace",
+      "question": "Use screenshot fallback to provide visual design advice for the current workspace.",
+      "screenshotMode": true,
+      "answer": "I checked the active project memory against your question. The strongest current issues are the front setback conflict, the height limit conflict, and the south glazing performance tradeoff. If you are asking about a visual design choice, I can annotate the current design canvas as an advisory critique. If you are asking about code, physics, or policy, I will only state a fact when the source or calculation is available.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "survey-001",
+        "rule-front-setback",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-general-attention"
+      ],
+      "recommendedNext": [
+        "Zoning + Policy Intelligence",
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis"
+      ]
+    },
+    {
+      "id": "msg-0b41dba6-739d-4a68-b361-cd5d5e4fefa9",
+      "timestamp": "2026-06-07T15:16:31.272Z",
+      "section": "policy",
+      "question": "Check the front setback and explain where the answer came from.",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-bf43f586-a5c5-4129-852c-29bb0b818654",
+      "timestamp": "2026-06-07T15:12:07.433Z",
+      "section": "Permit / Code Review",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-a225d7fc-d738-4533-9aeb-4416dda220e4",
+      "timestamp": "2026-06-07T14:48:11.775Z",
+      "section": "Lumion Visualization",
+      "question": "Should I add more windows on the south facade?",
+      "screenshotMode": true,
+      "answer": "The south facade glazing supports the client's high-priority daylight goal, but it also creates a performance tradeoff. The current model shows 34% south-facing glazing. The sun study reports strong daylight with medium glare risk, and the ASHRAE result notes a 7% cooling-demand increase after glazing expansion. Consider exterior shading, higher-performance glazing, or a more balanced window rhythm rather than simply adding more glass.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "sun-004",
+        "ashrae-004"
+      ],
+      "annotationIds": [
+        "anno-south-glazing"
+      ],
+      "recommendedNext": [
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis",
+        "Materials / SKU / Procurement"
+      ]
+    },
+    {
+      "id": "msg-9dc21e50-f854-4272-85ed-929023a36488",
+      "timestamp": "2026-06-07T14:47:28.224Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-c024b1d3-eaa4-4338-8f1c-1898027948ea",
+      "timestamp": "2026-06-07T14:46:47.457Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-99c88053-84cd-40c5-bd65-816e0b615346",
+      "timestamp": "2026-06-07T14:46:12.615Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-190b0aad-4719-4682-b5cf-00ee7ae0d363",
+      "timestamp": "2026-06-07T14:45:12.086Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-58ce3f8c-60e2-4014-81a8-850ac769260c",
+      "timestamp": "2026-06-07T14:44:10.596Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-2b38ded2-f8bf-41b6-b98f-3a53c2aa5179",
+      "timestamp": "2026-06-07T14:42:44.492Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-75f4008f-bbf6-4ecd-912f-2db4c19d9c53",
+      "timestamp": "2026-06-07T14:41:12.356Z",
+      "section": "CAD / Rhino Design Workspace",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    }
+  ]
+}
