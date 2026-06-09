@@ -3055,6 +3055,51 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   line-height: 1.25;
 }
 
+.environment-grid input,
+.environment-grid textarea,
+.utility-review-grid input,
+.constraint-list input,
+.constraint-list textarea,
+.opportunity-list input,
+.opportunity-list textarea,
+.evidence-register input,
+.evidence-register textarea,
+.site-ai-question-grid input,
+.site-ai-question-grid textarea {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 8px;
+  background: rgba(0,0,0,.34);
+  color: rgba(255,255,255,.88);
+  padding: 9px 10px;
+  font: 650 13px/1.35 var(--sans);
+  outline: none;
+}
+
+.environment-grid textarea,
+.constraint-list textarea,
+.opportunity-list textarea,
+.evidence-register textarea,
+.site-ai-question-grid textarea {
+  margin-top: 8px;
+  resize: vertical;
+}
+
+.environment-grid input:focus,
+.environment-grid textarea:focus,
+.utility-review-grid input:focus,
+.constraint-list input:focus,
+.constraint-list textarea:focus,
+.opportunity-list input:focus,
+.opportunity-list textarea:focus,
+.evidence-register input:focus,
+.evidence-register textarea:focus,
+.site-ai-question-grid input:focus,
+.site-ai-question-grid textarea:focus {
+  border-color: rgba(190,205,130,.68);
+  box-shadow: 0 0 0 3px rgba(190,205,130,.1);
+}
+
 .survey-upload-grid span,
 .constraint-list span,
 .site-layer-stack span {
@@ -3069,6 +3114,32 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   padding: 5px 8px;
   font-size: 10px;
   font-weight: 760;
+  text-transform: uppercase;
+}
+
+.uploaded-evidence-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.uploaded-evidence-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(190,205,130,.24);
+  border-radius: 999px;
+  background: rgba(190,205,130,.075);
+  color: rgba(255,255,255,.84);
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.uploaded-evidence-list em {
+  color: rgba(222,235,164,.9);
+  font-style: normal;
+  font-size: 10px;
   text-transform: uppercase;
 }
 
@@ -3143,10 +3214,11 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.package-grid span {
+.package-grid label {
   min-height: 42px;
   display: flex;
   align-items: center;
+  gap: 8px;
   border: 1px solid rgba(255,255,255,.11);
   border-radius: 999px;
   background: rgba(255,255,255,.055);
@@ -3154,6 +3226,10 @@ body:not([data-active-section="dashboard"]) .visual-workspace {
   padding: 8px 12px;
   font-size: 13px;
   font-weight: 720;
+}
+
+.package-grid input {
+  accent-color: rgba(190,205,130,.95);
 }
 
 .client-brief-workspace {

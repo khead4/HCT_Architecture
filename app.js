@@ -487,6 +487,113 @@ function initialProgramSpaces() {
   ];
 }
 
+function initialSiteSurvey() {
+  return {
+    fields: {
+      projectName: "Aalborg HCT Residential Prototype",
+      parcelAddress: "Demo Parcel, Cold Climate Zone",
+      siteSize: "14,520 sq ft",
+      ownerClient: "Residential client / research review",
+      projectType: "Residential prototype",
+      currentLandUse: "Demo residential parcel",
+      desiredFutureUse: "Daylight-rich low-energy residence",
+      architectNotes: "Preserve landscape connection, daylight, and clear design rationale while tracking site risk and regulatory constraints."
+    },
+    uploads: [],
+    environmental: [
+      { name: "Sun path", value: "Southwest orientation improves afternoon daylight but increases late-day heat gain risk." },
+      { name: "Shadow patterns", value: "Study future massing shadows before committing to outdoor rooms and glazing." },
+      { name: "Prevailing wind", value: "Use tree buffer and openings to evaluate ventilation and wind protection." },
+      { name: "Noise sources", value: "Map road access and neighboring uses before locating private sleeping areas." },
+      { name: "Heat island risk", value: "Balance hardscape, planting, and material choices in the site response." },
+      { name: "Water runoff", value: "Western low point intersects a medium-risk stormwater flow path." },
+      { name: "Vegetation cover", value: "Northern tree line can provide seasonal wind buffering." },
+      { name: "Climate zone", value: "Cold-climate assumptions should inform envelope, glazing, and passive design choices." }
+    ],
+    utilities: [
+      { name: "Water connection", value: "water-east", status: "verified" },
+      { name: "Sewer connection", value: "capacity pending", status: "needs review" },
+      { name: "Stormwater system", value: "stormwater-west", status: "verified" },
+      { name: "Electrical access", value: "power-south", status: "verified" },
+      { name: "Gas access", value: "not confirmed", status: "missing" },
+      { name: "Internet / fiber", value: "service availability pending", status: "needs review" },
+      { name: "Road access", value: "southern frontage", status: "verified" },
+      { name: "Fire access", value: "check turning and approach distance", status: "needs review" },
+      { name: "Service entry points", value: "coordinate with massing and utility side", status: "decision input" }
+    ],
+    constraints: [
+      { name: "Setbacks", value: "20 ft front / 10 ft side", status: "source linked" },
+      { name: "Slope limits", value: "8% average slope toward north-east", status: "verified" },
+      { name: "Flood risk", value: "Western low point intersects a medium-risk stormwater flow path.", status: "GIS" },
+      { name: "Utility conflicts", value: "water-east, power-south, stormwater-west", status: "field check" },
+      { name: "Height", value: "35 ft limit before variance", status: "source linked" },
+      { name: "Soil/geotechnical", value: "Moderate bearing capacity. Deeper excavation should be reviewed by civil/structural consultants.", status: "needs engineer" }
+    ],
+    opportunities: [
+      { name: "Building placement", value: "Use the verified slope and stormwater path to avoid placing the primary mass in the low western flow area." },
+      { name: "Solar orientation", value: "Southwest orientation supports daylight goals but should be paired with shading and envelope review." },
+      { name: "Views to preserve", value: "Best long view is toward the west/southwest edge of the parcel." },
+      { name: "Natural ventilation", value: "Tree line and open edges can be studied for seasonal wind buffering and cross-ventilation." },
+      { name: "Landscape strategy", value: "Northern tree line can provide seasonal wind buffering." },
+      { name: "Stormwater reuse", value: "Rainwater and landscape systems can connect client sustainability goals to hydrology findings." }
+    ],
+    evidence: [
+      { name: "Survey dataset", owner: "Land Surveyor", status: "verified", value: "Parcel area 14,520 sq ft" },
+      { name: "Utility review", owner: "Surveyor / civil", status: "verified", value: "water-east, power-south, stormwater-west" },
+      { name: "Flood risk overlay", owner: "GIS Analyst", status: "active", value: "Western low point intersects a medium-risk stormwater flow path." },
+      { name: "Primary view corridor", owner: "GIS Analyst", status: "active", value: "Best long view is toward the west/southwest edge of the parcel." },
+      { name: "Existing vegetation", owner: "GIS Analyst", status: "active", value: "Northern tree line can provide seasonal wind buffering." }
+    ],
+    aiInterpretation: [
+      { question: "What matters most?", answer: "Slope, stormwater movement, utilities, view corridor, vegetation, and setback/height rules are the major early decision drivers." },
+      { question: "What risks should be noticed?", answer: "Front setback, height limit, stormwater flow path, slope-driven foundation cost, and unknown geotechnical assumptions." },
+      { question: "What opportunities influence design?", answer: "Landscape integration, daylight orientation, west/southwest views, passive design, and rainwater-supported planting." },
+      { question: "What is missing?", answer: "Detailed geotechnical report, final utility capacity, easement confirmation, and surveyor-reviewed drainage documentation." },
+      { question: "What can be decided now?", answer: "Initial site response, likely placement zones, information gaps, and which constraints must be protected in concept design." },
+      { question: "What should wait?", answer: "Foundation strategy, final grading, exact service entry design, and permit-ready compliance claims." }
+    ],
+    packageItems: [
+      { name: "Site summary", included: true },
+      { name: "Survey summary", included: true },
+      { name: "GIS summary", included: true },
+      { name: "Environmental summary", included: true },
+      { name: "Constraints", included: true },
+      { name: "Opportunities", included: true },
+      { name: "Risks", included: true },
+      { name: "Missing information", included: true },
+      { name: "Design implications", included: true },
+      { name: "Recommended next actions", included: true }
+    ]
+  };
+}
+
+function mergeSiteSurvey(saved) {
+  const base = initialSiteSurvey();
+  if (!saved || typeof saved !== "object") return base;
+  return {
+    ...base,
+    ...saved,
+    fields: { ...base.fields, ...(saved.fields || {}) },
+    uploads: Array.isArray(saved.uploads) ? saved.uploads : base.uploads,
+    environmental: Array.isArray(saved.environmental) ? saved.environmental : base.environmental,
+    utilities: Array.isArray(saved.utilities) ? saved.utilities : base.utilities,
+    constraints: Array.isArray(saved.constraints) ? saved.constraints : base.constraints,
+    opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : base.opportunities,
+    evidence: Array.isArray(saved.evidence) ? saved.evidence : base.evidence,
+    aiInterpretation: Array.isArray(saved.aiInterpretation) ? saved.aiInterpretation : base.aiInterpretation,
+    packageItems: Array.isArray(saved.packageItems) ? saved.packageItems : base.packageItems
+  };
+}
+
+function loadSiteSurvey() {
+  try {
+    if (typeof localStorage === "undefined") return initialSiteSurvey();
+    return mergeSiteSurvey(JSON.parse(localStorage.getItem("hct-site-survey") || "null"));
+  } catch (error) {
+    return initialSiteSurvey();
+  }
+}
+
 const state = {
   project: null,
   activeSection: "dashboard",
@@ -495,6 +602,7 @@ const state = {
   programSpaces: initialProgramSpaces(),
   spaceDraft: { category: "room", type: "Bedroom" },
   projectDiscovery: initialProjectDiscovery(),
+  siteSurvey: loadSiteSurvey(),
   selectedProgramSpaceId: "program-primary-bedroom",
   authView: null,
   joinType: "freelance",
@@ -533,6 +641,16 @@ const el = {
   homeButton: document.getElementById("homeButton"),
   loginButton: document.getElementById("loginButton")
 };
+
+function persistSiteSurvey() {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("hct-site-survey", JSON.stringify(state.siteSurvey));
+    }
+  } catch (error) {
+    // Local persistence is a convenience for the prototype; exports still carry the current state.
+  }
+}
 
 function sectionById(id) {
   return sections.find(section => section.id === id) || sections[0];
@@ -2487,10 +2605,8 @@ function siteQuestionAnswerRows(project) {
 }
 
 function siteSurveySurface(project) {
-  const constraints = siteConstraintItems(project);
-  const opportunities = siteOpportunityItems(project);
-  const evidence = surveyEvidenceRegister(project);
-  const questions = siteQuestionAnswerRows(project);
+  const survey = state.siteSurvey;
+  const fields = survey.fields;
 
   return `
     <div class="surface-pad site-survey-workspace">
@@ -2515,14 +2631,14 @@ function siteSurveySurface(project) {
           <p>Basic location and ownership information anchors every survey, GIS, code, and design decision that follows.</p>
         </div>
         <div class="site-intake-grid">
-          <label><span>Project name</span><input value="${escapeHtml(project.project.name)}"></label>
-          <label><span>Parcel / address</span><input value="${escapeHtml(project.project.location)}"></label>
-          <label><span>Site size</span><input value="${escapeHtml(project.site.parcelAreaSqFt.toLocaleString())} sq ft"></label>
-          <label><span>Property owner / client</span><input value="Residential client / research review"></label>
-          <label><span>Project type</span><input value="Residential prototype"></label>
-          <label><span>Current land use</span><input value="Demo residential parcel"></label>
-          <label><span>Desired future use</span><input value="Daylight-rich low-energy residence"></label>
-          <label class="wide-field"><span>Architect / client notes</span><textarea rows="3">Preserve landscape connection, daylight, and clear design rationale while tracking site risk and regulatory constraints.</textarea></label>
+          <label><span>Project name</span><input data-site-field="projectName" value="${escapeHtml(fields.projectName)}"></label>
+          <label><span>Parcel / address</span><input data-site-field="parcelAddress" value="${escapeHtml(fields.parcelAddress)}"></label>
+          <label><span>Site size</span><input data-site-field="siteSize" value="${escapeHtml(fields.siteSize)}"></label>
+          <label><span>Property owner / client</span><input data-site-field="ownerClient" value="${escapeHtml(fields.ownerClient)}"></label>
+          <label><span>Project type</span><input data-site-field="projectType" value="${escapeHtml(fields.projectType)}"></label>
+          <label><span>Current land use</span><input data-site-field="currentLandUse" value="${escapeHtml(fields.currentLandUse)}"></label>
+          <label><span>Desired future use</span><input data-site-field="desiredFutureUse" value="${escapeHtml(fields.desiredFutureUse)}"></label>
+          <label class="wide-field"><span>Architect / client notes</span><textarea data-site-field="architectNotes" rows="3">${escapeHtml(fields.architectNotes)}</textarea></label>
         </div>
       </section>
 
@@ -2535,9 +2651,16 @@ function siteSurveySurface(project) {
           </div>
           <label class="site-upload-control">
             <span>Upload survey evidence</span>
-            <input type="file" multiple>
+            <input type="file" multiple data-site-upload>
           </label>
         </div>
+        ${survey.uploads.length ? `
+          <div class="uploaded-evidence-list">
+            ${survey.uploads.map(file => `
+              <span>${escapeHtml(file.name)} <em>${escapeHtml(file.type || "file")}</em></span>
+            `).join("")}
+          </div>
+        ` : ""}
         <div class="survey-upload-grid">
           ${surveyUploadItems().map(item => `
             <article>
@@ -2583,19 +2706,10 @@ function siteSurveySurface(project) {
         <span class="mini-label">4. Environmental conditions</span>
         <h3>Physical Site Behavior</h3>
         <div class="environment-grid">
-          ${[
-            ["Sun path", "Southwest orientation improves afternoon daylight but increases late-day heat gain risk."],
-            ["Shadow patterns", "Study future massing shadows before committing to outdoor rooms and glazing."],
-            ["Prevailing wind", "Use tree buffer and openings to evaluate ventilation and wind protection."],
-            ["Noise sources", "Map road access and neighboring uses before locating private sleeping areas."],
-            ["Heat island risk", "Balance hardscape, planting, and material choices in the site response."],
-            ["Water runoff", "Western low point intersects a medium-risk stormwater flow path."],
-            ["Vegetation cover", "Northern tree line can provide seasonal wind buffering."],
-            ["Climate zone", "Cold-climate assumptions should inform envelope, glazing, and passive design choices."]
-          ].map(item => `
+          ${survey.environmental.map((item, index) => `
             <article>
-              <strong>${escapeHtml(item[0])}</strong>
-              <p>${escapeHtml(item[1])}</p>
+              <input data-site-row="environmental" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
+              <textarea data-site-row="environmental" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
             </article>
           `).join("")}
         </div>
@@ -2605,21 +2719,11 @@ function siteSurveySurface(project) {
         <span class="mini-label">5. Utility + infrastructure review</span>
         <h3>Existing Service Conditions</h3>
         <div class="utility-review-grid">
-          ${[
-            ["Water connection", "water-east", "verified"],
-            ["Sewer connection", "capacity pending", "needs review"],
-            ["Stormwater system", "stormwater-west", "verified"],
-            ["Electrical access", "power-south", "verified"],
-            ["Gas access", "not confirmed", "missing"],
-            ["Internet / fiber", "service availability pending", "needs review"],
-            ["Road access", "southern frontage", "verified"],
-            ["Fire access", "check turning and approach distance", "needs review"],
-            ["Service entry points", "coordinate with massing and utility side", "decision input"]
-          ].map(item => `
+          ${survey.utilities.map((item, index) => `
             <div>
-              <strong>${escapeHtml(item[0])}</strong>
-              <span>${escapeHtml(item[1])}</span>
-              <em>${escapeHtml(item[2])}</em>
+              <input data-site-row="utilities" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
+              <input data-site-row="utilities" data-site-index="${index}" data-site-key="value" value="${escapeHtml(item.value)}">
+              <input data-site-row="utilities" data-site-index="${index}" data-site-key="status" value="${escapeHtml(item.status)}">
             </div>
           `).join("")}
         </div>
@@ -2630,11 +2734,11 @@ function siteSurveySurface(project) {
           <span class="mini-label">6. Site constraints</span>
           <h3>Design Limits</h3>
           <div class="constraint-list">
-            ${constraints.map(item => `
+            ${survey.constraints.map((item, index) => `
               <article>
-                <strong>${escapeHtml(item[0])}</strong>
-                <p>${escapeHtml(item[1])}</p>
-                <span>${escapeHtml(item[2])}</span>
+                <input data-site-row="constraints" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
+                <textarea data-site-row="constraints" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
+                <input data-site-row="constraints" data-site-index="${index}" data-site-key="status" value="${escapeHtml(item.status)}">
               </article>
             `).join("")}
           </div>
@@ -2643,10 +2747,10 @@ function siteSurveySurface(project) {
           <span class="mini-label">7. Site opportunities</span>
           <h3>Design Possibilities</h3>
           <div class="opportunity-list">
-            ${opportunities.map(item => `
+            ${survey.opportunities.map((item, index) => `
               <article>
-                <strong>${escapeHtml(item[0])}</strong>
-                <p>${escapeHtml(item[1])}</p>
+                <input data-site-row="opportunities" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
+                <textarea data-site-row="opportunities" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
               </article>
             `).join("")}
           </div>
@@ -2660,12 +2764,12 @@ function siteSurveySurface(project) {
           <p>Every claim should show who uploaded it, what evidence supports it, and whether it is verified, pending, missing, or conflicting.</p>
         </div>
         <div class="evidence-register">
-          ${evidence.map(item => `
+          ${survey.evidence.map((item, index) => `
             <div>
-              <strong>${escapeHtml(item[0])}</strong>
-              <span>${escapeHtml(item[1])}</span>
-              <em>${escapeHtml(item[2])}</em>
-              <p>${escapeHtml(item[3])}</p>
+              <input data-site-row="evidence" data-site-index="${index}" data-site-key="name" value="${escapeHtml(item.name)}">
+              <input data-site-row="evidence" data-site-index="${index}" data-site-key="owner" value="${escapeHtml(item.owner)}">
+              <input data-site-row="evidence" data-site-index="${index}" data-site-key="status" value="${escapeHtml(item.status)}">
+              <textarea data-site-row="evidence" data-site-index="${index}" data-site-key="value" rows="3">${escapeHtml(item.value)}</textarea>
             </div>
           `).join("")}
         </div>
@@ -2678,10 +2782,10 @@ function siteSurveySurface(project) {
           <p>This is the HCT layer: the system does not only store survey data; it interprets what matters, what is uncertain, and what decision becomes possible.</p>
         </div>
         <div class="site-ai-question-grid">
-          ${questions.map(item => `
+          ${survey.aiInterpretation.map((item, index) => `
             <article>
-              <strong>${escapeHtml(item[0])}</strong>
-              <p>${escapeHtml(item[1])}</p>
+              <input data-site-row="aiInterpretation" data-site-index="${index}" data-site-key="question" value="${escapeHtml(item.question)}">
+              <textarea data-site-row="aiInterpretation" data-site-index="${index}" data-site-key="answer" rows="4">${escapeHtml(item.answer)}</textarea>
             </article>
           `).join("")}
         </div>
@@ -2694,18 +2798,12 @@ function siteSurveySurface(project) {
           <p>The page produces a reusable package for design, sun studies, ASHRAE/material sustainability, zoning, engineering, compliance, and permit review.</p>
         </div>
         <div class="package-grid">
-          ${[
-            "Site summary",
-            "Survey summary",
-            "GIS summary",
-            "Environmental summary",
-            "Constraints",
-            "Opportunities",
-            "Risks",
-            "Missing information",
-            "Design implications",
-            "Recommended next actions"
-          ].map(item => `<span>${escapeHtml(item)}</span>`).join("")}
+          ${survey.packageItems.map((item, index) => `
+            <label>
+              <input type="checkbox" data-site-package="${index}" ${item.included ? "checked" : ""}>
+              <span>${escapeHtml(item.name)}</span>
+            </label>
+          `).join("")}
         </div>
         <div class="download-actions">
           <button data-download="parcel">Download Site JSON</button>
@@ -3426,6 +3524,7 @@ function renderSurface() {
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
+  if (state.activeSection === "survey") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
@@ -3471,6 +3570,15 @@ function projectCsv(project) {
     ["site", "parcel_area_sq_ft", project.site.parcelAreaSqFt, project.site.verificationStatus],
     ["site", "average_slope_percent", project.site.averageSlopePercent, project.site.verificationStatus],
     ["site", "slope_direction", project.site.slopeDirection, project.site.verificationStatus],
+    ...Object.entries(state.siteSurvey.fields).map(([key, value]) => ["site_survey_form", key, value, "saved"]),
+    ...state.siteSurvey.uploads.map(file => ["site_survey_upload", file.name, `${file.type || "file"} | ${file.size || 0} bytes`, file.status || "uploaded"]),
+    ...state.siteSurvey.environmental.map(item => ["site_environmental", item.name, item.value, "saved"]),
+    ...state.siteSurvey.utilities.map(item => ["site_utility", item.name, item.value, item.status || "saved"]),
+    ...state.siteSurvey.constraints.map(item => ["site_constraint", item.name, item.value, item.status || "saved"]),
+    ...state.siteSurvey.opportunities.map(item => ["site_opportunity", item.name, item.value, "saved"]),
+    ...state.siteSurvey.evidence.map(item => ["site_evidence", item.name, `${item.owner || ""}: ${item.value || ""}`, item.status || "saved"]),
+    ...state.siteSurvey.aiInterpretation.map(item => ["site_ai_interpretation", item.question, item.answer, "saved"]),
+    ...state.siteSurvey.packageItems.map(item => ["site_package_item", item.name, item.included ? "included" : "excluded", "saved"]),
     ...state.programSpaces.flatMap(space => [
       ["program_space", space.name, `${space.area} sq ft`, "saved"],
       ["program_purpose", space.name, space.purpose, "saved"],
@@ -3508,6 +3616,7 @@ function parcelJson(project) {
     project: project.project,
     clientIntent: project.clientIntent,
     projectDiscovery: state.projectDiscovery,
+    siteSurvey: state.siteSurvey,
     programSpaces: state.programSpaces,
     site: project.site,
     gisLayers: project.gisLayers,
@@ -3548,6 +3657,54 @@ function bindSimpleProjectPage() {
       }
     });
   });
+}
+
+function bindSiteSurveyPage() {
+  document.querySelectorAll("[data-site-field]").forEach(input => {
+    input.addEventListener("input", () => {
+      state.siteSurvey.fields[input.dataset.siteField] = input.value;
+      persistSiteSurvey();
+    });
+  });
+
+  document.querySelectorAll("[data-site-row]").forEach(input => {
+    input.addEventListener("input", () => {
+      const group = input.dataset.siteRow;
+      const index = Number(input.dataset.siteIndex);
+      const key = input.dataset.siteKey;
+      if (!Array.isArray(state.siteSurvey[group]) || !state.siteSurvey[group][index]) return;
+      state.siteSurvey[group][index][key] = input.value;
+      persistSiteSurvey();
+    });
+  });
+
+  document.querySelectorAll("[data-site-package]").forEach(input => {
+    input.addEventListener("change", () => {
+      const index = Number(input.dataset.sitePackage);
+      if (!state.siteSurvey.packageItems[index]) return;
+      state.siteSurvey.packageItems[index].included = input.checked;
+      persistSiteSurvey();
+    });
+  });
+
+  const uploadInput = document.querySelector("[data-site-upload]");
+  if (uploadInput) {
+    uploadInput.addEventListener("change", () => {
+      const uploaded = Array.from(uploadInput.files || []).map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type || "file",
+        uploadedAt: new Date().toISOString(),
+        status: "uploaded"
+      }));
+      state.siteSurvey.uploads = uniqueList([
+        ...state.siteSurvey.uploads.map(file => JSON.stringify(file)),
+        ...uploaded.map(file => JSON.stringify(file))
+      ]).map(item => JSON.parse(item));
+      persistSiteSurvey();
+      render();
+    });
+  }
 }
 
 function bindClientBriefPage() {
