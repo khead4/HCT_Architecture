@@ -1,0 +1,460 @@
+{
+  "project": {
+    "id": "hct-demo-001",
+    "name": "Aalborg HCT Residential Prototype",
+    "location": "Demo Parcel, Cold Climate Zone",
+    "phase": "Early schematic design",
+    "currentSection": "CAD / Rhino Design Workspace",
+    "lastCompleted": "ArcGIS / Spatial Mapping"
+  },
+  "clientIntent": {
+    "sourceId": "client-brief-001",
+    "summary": "The client wants a warm, open, Scandinavian-inspired residence with strong daylight, low energy demand, natural materials, and a clear relationship to the landscape.",
+    "priorities": [
+      {
+        "id": "client-goal-daylight",
+        "label": "Natural daylight",
+        "weight": "high",
+        "source": "Client Brief, Question 4"
+      },
+      {
+        "id": "client-goal-energy",
+        "label": "Low energy cost",
+        "weight": "high",
+        "source": "Client Brief, Question 7"
+      },
+      {
+        "id": "client-goal-natural-materials",
+        "label": "Natural material palette",
+        "weight": "medium",
+        "source": "Client Brief, Reference Board"
+      },
+      {
+        "id": "client-goal-budget",
+        "label": "Budget awareness",
+        "weight": "high",
+        "source": "Client Brief, Budget Boundary"
+      }
+    ],
+    "constraints": [
+      "Total project cost should remain near the early target budget.",
+      "Interior spaces should feel open without excessive heat loss.",
+      "Material choices should support a natural visual style."
+    ]
+  },
+  "site": {
+    "sourceId": "survey-001",
+    "parcelAreaSqFt": 14520,
+    "frontBoundary": "south",
+    "slopeDirection": "north-east",
+    "averageSlopePercent": 8,
+    "soilNote": "Moderate bearing capacity. Deeper excavation should be reviewed by civil/structural consultants.",
+    "utilities": [
+      "water-east",
+      "power-south",
+      "stormwater-west"
+    ],
+    "verifiedBy": "Land Surveyor",
+    "verificationStatus": "verified"
+  },
+  "gisLayers": [
+    {
+      "id": "gis-flood-001",
+      "name": "Flood risk overlay",
+      "status": "active",
+      "finding": "Western low point intersects a medium-risk stormwater flow path.",
+      "source": "GIS Analyst Layer Stack, Flood Overlay"
+    },
+    {
+      "id": "gis-views-001",
+      "name": "Primary view corridor",
+      "status": "active",
+      "finding": "Best long view is toward the west/southwest edge of the parcel.",
+      "source": "Custom Research Layer, Site Visit Notes"
+    },
+    {
+      "id": "gis-vegetation-001",
+      "name": "Existing vegetation",
+      "status": "active",
+      "finding": "Northern tree line can provide seasonal wind buffering.",
+      "source": "ArcGIS Vegetation Layer"
+    }
+  ],
+  "verifiedRules": [
+    {
+      "id": "rule-front-setback",
+      "ruleType": "front_setback",
+      "zone": "R-1 Demo Residential",
+      "value": 20,
+      "unit": "ft",
+      "sourceTitle": "Demo City Zoning Ordinance",
+      "section": "5.3.2 Residential Setbacks",
+      "page": 42,
+      "exactText": "Minimum front yard setback in the R-1 residential district shall be 20 feet from the front property line.",
+      "verificationStatus": "verified",
+      "verifiedBy": "Planner / Policy Reviewer"
+    },
+    {
+      "id": "rule-side-setback",
+      "ruleType": "side_setback",
+      "zone": "R-1 Demo Residential",
+      "value": 10,
+      "unit": "ft",
+      "sourceTitle": "Demo City Zoning Ordinance",
+      "section": "5.3.2 Residential Setbacks",
+      "page": 42,
+      "exactText": "Minimum side yard setback in the R-1 residential district shall be 10 feet.",
+      "verificationStatus": "verified",
+      "verifiedBy": "Planner / Policy Reviewer"
+    },
+    {
+      "id": "rule-height-limit",
+      "ruleType": "height_limit",
+      "zone": "R-1 Demo Residential",
+      "value": 35,
+      "unit": "ft",
+      "sourceTitle": "Demo City Zoning Ordinance",
+      "section": "5.4.1 Building Height",
+      "page": 45,
+      "exactText": "Principal structures in the R-1 residential district shall not exceed 35 feet in building height unless a variance is granted.",
+      "verificationStatus": "verified",
+      "verifiedBy": "Zoning Administrator"
+    },
+    {
+      "id": "rule-solar-incentive",
+      "ruleType": "incentive",
+      "zone": "All residential zones",
+      "value": "solar-ready envelope",
+      "unit": "policy",
+      "sourceTitle": "Demo Sustainable Building Incentive Guide",
+      "section": "2.1 Solar-Ready Residential Incentives",
+      "page": 12,
+      "exactText": "Projects demonstrating solar-ready roof area and passive design measures may qualify for expedited sustainability review.",
+      "verificationStatus": "needs_review",
+      "verifiedBy": null
+    }
+  ],
+  "designModel": {
+    "id": "model-version-004",
+    "name": "Concept Massing V4",
+    "heightFt": 39,
+    "frontDistanceFt": 14,
+    "sideDistanceFt": 12,
+    "orientation": "southwest",
+    "southGlazingPercent": 34,
+    "openSpacePercent": 46,
+    "foundationDepthFt": 5,
+    "materialIntent": "light timber, mineral plaster, triple-pane glazing",
+    "selectedElement": "south-facade"
+  },
+  "analysisResults": {
+    "sunStudy": {
+      "id": "sun-004",
+      "summary": "Southwest orientation improves afternoon daylight but increases late-day heat gain risk.",
+      "daylightScore": 82,
+      "glareRisk": "medium",
+      "sourceTitle": "Sun Study Result V4"
+    },
+    "ashrae": {
+      "id": "ashrae-004",
+      "summary": "Cooling demand increased after glazing expansion. Triple-pane glazing and exterior shading reduce modeled risk.",
+      "coolingImpactPercent": 7,
+      "envelopeRisk": "medium",
+      "sourceTitle": "ASHRAE / Sustainability Result V4"
+    },
+    "carbon": {
+      "id": "carbon-004",
+      "summary": "Timber structure lowers embodied carbon compared with conventional steel framing in the demo assumptions.",
+      "embodiedCarbonChange": "-14%",
+      "sourceTitle": "Material Carbon Comparison V2"
+    }
+  },
+  "integrations": [
+    {
+      "id": "arcgis",
+      "name": "ArcGIS",
+      "status": "mock-connected",
+      "purpose": "Spatial layers and parcel context"
+    },
+    {
+      "id": "rhino",
+      "name": "Rhino / Grasshopper",
+      "status": "mock-connected",
+      "purpose": "Design geometry and model observation"
+    },
+    {
+      "id": "ashrae",
+      "name": "ASHRAE / EnergyPlus",
+      "status": "mock-connected",
+      "purpose": "Performance and comfort assumptions"
+    },
+    {
+      "id": "lumion",
+      "name": "Lumion",
+      "status": "mock-connected",
+      "purpose": "Visual review and material atmosphere"
+    },
+    {
+      "id": "materials",
+      "name": "Material / SKU Database",
+      "status": "mock-connected",
+      "purpose": "Product matching and cost/performance data"
+    },
+    {
+      "id": "permit",
+      "name": "Permit Checklist",
+      "status": "mock-connected",
+      "purpose": "Submission completeness and review issues"
+    }
+  ],
+  "aiTranscript": [
+    {
+      "id": "msg-2e2e7633-b43b-4bf9-a8a5-480c1bbb2ed8",
+      "timestamp": "2026-06-07T15:56:13.507Z",
+      "section": "Clientele / Project Brief",
+      "question": "Use screenshot fallback to provide visual design advice for the current workspace.",
+      "screenshotMode": true,
+      "answer": "I checked the active project memory against your question. The strongest current issues are the front setback conflict, the height limit conflict, and the south glazing performance tradeoff. If you are asking about a visual design choice, I can annotate the current design canvas as an advisory critique. If you are asking about code, physics, or policy, I will only state a fact when the source or calculation is available.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "survey-001",
+        "rule-front-setback",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-general-attention"
+      ],
+      "recommendedNext": [
+        "Zoning + Policy Intelligence",
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis"
+      ]
+    },
+    {
+      "id": "msg-46113c14-ed6b-4818-8cb8-f567fee669d1",
+      "timestamp": "2026-06-07T15:43:52.183Z",
+      "section": "CAD / Rhino Design Workspace",
+      "question": "Use screenshot fallback to provide visual design advice for the current workspace.",
+      "screenshotMode": true,
+      "answer": "I checked the active project memory against your question. The strongest current issues are the front setback conflict, the height limit conflict, and the south glazing performance tradeoff. If you are asking about a visual design choice, I can annotate the current design canvas as an advisory critique. If you are asking about code, physics, or policy, I will only state a fact when the source or calculation is available.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "survey-001",
+        "rule-front-setback",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-general-attention"
+      ],
+      "recommendedNext": [
+        "Zoning + Policy Intelligence",
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis"
+      ]
+    },
+    {
+      "id": "msg-0b41dba6-739d-4a68-b361-cd5d5e4fefa9",
+      "timestamp": "2026-06-07T15:16:31.272Z",
+      "section": "policy",
+      "question": "Check the front setback and explain where the answer came from.",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-bf43f586-a5c5-4129-852c-29bb0b818654",
+      "timestamp": "2026-06-07T15:12:07.433Z",
+      "section": "Permit / Code Review",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-a225d7fc-d738-4533-9aeb-4416dda220e4",
+      "timestamp": "2026-06-07T14:48:11.775Z",
+      "section": "Lumion Visualization",
+      "question": "Should I add more windows on the south facade?",
+      "screenshotMode": true,
+      "answer": "The south facade glazing supports the client's high-priority daylight goal, but it also creates a performance tradeoff. The current model shows 34% south-facing glazing. The sun study reports strong daylight with medium glare risk, and the ASHRAE result notes a 7% cooling-demand increase after glazing expansion. Consider exterior shading, higher-performance glazing, or a more balanced window rhythm rather than simply adding more glass.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "sun-004",
+        "ashrae-004"
+      ],
+      "annotationIds": [
+        "anno-south-glazing"
+      ],
+      "recommendedNext": [
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis",
+        "Materials / SKU / Procurement"
+      ]
+    },
+    {
+      "id": "msg-9dc21e50-f854-4272-85ed-929023a36488",
+      "timestamp": "2026-06-07T14:47:28.224Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-c024b1d3-eaa4-4338-8f1c-1898027948ea",
+      "timestamp": "2026-06-07T14:46:47.457Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-99c88053-84cd-40c5-bd65-816e0b615346",
+      "timestamp": "2026-06-07T14:46:12.615Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-190b0aad-4719-4682-b5cf-00ee7ae0d363",
+      "timestamp": "2026-06-07T14:45:12.086Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-58ce3f8c-60e2-4014-81a8-850ac769260c",
+      "timestamp": "2026-06-07T14:44:10.596Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-2b38ded2-f8bf-41b6-b98f-3a53c2aa5179",
+      "timestamp": "2026-06-07T14:42:44.492Z",
+      "section": "Dashboard / AI Command Center",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    },
+    {
+      "id": "msg-75f4008f-bbf6-4ecd-912f-2db4c19d9c53",
+      "timestamp": "2026-06-07T14:41:12.356Z",
+      "section": "CAD / Rhino Design Workspace",
+      "question": "Can I move the building closer to the street?",
+      "screenshotMode": false,
+      "answer": "The current building placement appears to violate the verified front setback by 6 ft. The verified rule requires 20 ft, while the current model distance is 14 ft. Move the front edge back, reduce the projection, or check whether a variance or exemption applies.",
+      "confidence": "high",
+      "sourceIds": [
+        "rule-front-setback"
+      ],
+      "annotationIds": [
+        "anno-front-setback"
+      ],
+      "recommendedNext": [
+        "CAD / Rhino Design Workspace",
+        "Zoning + Policy Intelligence",
+        "Permit / Code Review"
+      ]
+    }
+  ]
+}

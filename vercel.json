@@ -1,14 +1,9 @@
 {
-  "name": "hct-ai-prototype",
-  "version": "0.2.0",
-  "private": true,
-  "description": "HCT project-aware architectural AI assistor prototype.",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "check": "node --check server.js && node --check api/ask.js && node --check api/project.js && node --check api/decision.js"
-  },
-  "engines": {
-    "node": ">=20"
+  "version": 2,
+  "cleanUrls": true,
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 20
+    }
   }
 }
