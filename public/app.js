@@ -209,7 +209,10 @@ const siteDocumentTypeOptions = [
 const siteVerificationStatusOptions = ["unverified", "needs review", "verified", "conflict", "missing", "active", "pending lookup"];
 const sourceConfidenceOptions = ["Low", "Medium", "High", "Verified"];
 const sensorTypeOptions = ["Moisture", "Temperature", "Humidity", "Noise", "Air Quality", "Water Level", "Movement", "Solar", "Wind", "Other"];
-const policySourceOptions = ["Municipal zoning map", "Parcel database", "Policy PDF", "GIS layer", "Manual reviewer entry", "Other"];
+const policySourceOptions = ["Manual entry", "Manual reviewer entry", "Municipal zoning map", "County parcel viewer", "Parcel database", "ArcGIS REST service", "Policy PDF", "GIS layer", "Uploaded GIS layer", "Other"];
+const siteAspectCategoryOptions = ["Survey", "GIS", "Environmental", "Utilities", "Zoning / Policy", "Hazard", "Sensor", "Access", "Easement", "Other"];
+const gisLayerTypeOptions = ["Parcel boundary", "Zoning district", "Overlay district", "Flood / hydrology", "Topography / contours", "Soils", "Utilities", "Vegetation", "Viewshed", "Transportation", "Environmental constraint", "Custom research"];
+const lookupMethodOptions = ["Manual entry", "Municipal GIS", "County parcel viewer", "ArcGIS REST service", "Uploaded GIS layer", "Policy PDF", "Surveyor entry", "Other"];
 
 function initialProjectDiscovery() {
   return {
@@ -527,6 +530,7 @@ function initialSiteSurvey() {
       uploadDocumentType: "Topographic Survey",
       uploadOtherDocumentType: "",
       uploadSourceName: "",
+      uploadSourceUrl: "",
       uploadUploadedBy: "",
       uploadVerificationStatus: "unverified",
       benchmarkDatum: "Pending surveyor confirmation",
@@ -542,12 +546,21 @@ function initialSiteSurvey() {
       drainageNotes: "Western low point should be reviewed before placement.",
       addressLookup: "Demo Parcel, Cold Climate Zone",
       parcelApn: "",
+      cityCounty: "",
+      stateRegion: "",
+      country: "",
+      latitude: "",
+      longitude: "",
       jurisdiction: "Aalborg Municipality",
       zoningDistrict: "Residential",
+      detectedZoneArea: "R-1 Demo Residential",
       overlays: "Stormwater flow path, view corridor",
       policySourceUrl: "",
       policyLookupStatus: "pending lookup",
-      lastPolicyCheck: ""
+      lastPolicyCheck: "",
+      lookupMethod: "Manual entry",
+      gisSourceUrl: "",
+      gisLookupStatus: "needs review"
     },
     uploads: [],
     environmental: [
@@ -586,6 +599,19 @@ function initialSiteSurvey() {
       { name: "Natural ventilation", value: "Tree line and open edges can be studied for seasonal wind buffering and cross-ventilation." },
       { name: "Landscape strategy", value: "Northern tree line can provide seasonal wind buffering." },
       { name: "Stormwater reuse", value: "Rainwater and landscape systems can connect client sustainability goals to hydrology findings." }
+    ],
+    sourceFindings: [
+      { aspect: "Parcel area", category: "Survey", value: "14,520 sq ft", documentType: "Topographic Survey", otherDocumentType: "", sourceName: "Surveyor upload", sourceUrl: "", owner: "Land Surveyor", status: "verified", verifiedBy: "Land Surveyor", lastChecked: "" },
+      { aspect: "Medium stormwater risk", category: "GIS", value: "Western low point intersects a medium-risk stormwater flow path.", documentType: "GIS Layer", otherDocumentType: "", sourceName: "Stormwater overlay", sourceUrl: "", owner: "GIS Analyst", status: "active", verifiedBy: "GIS Analyst", lastChecked: "" },
+      { aspect: "Residential zone assumption", category: "Zoning / Policy", value: "Residential district must be confirmed with official municipal source.", documentType: "Zoning Policy", otherDocumentType: "", sourceName: "Manual reviewer entry", sourceUrl: "", owner: "Planner / Reviewer", status: "pending lookup", verifiedBy: "", lastChecked: "" }
+    ],
+    additionalAspects: [
+      { name: "Neighbor privacy", category: "Other", value: "Confirm adjacent sight lines before final window placement.", documentType: "Field Note", otherDocumentType: "", sourceName: "Site visit note", sourceUrl: "", status: "needs review", verifiedBy: "", lastChecked: "" }
+    ],
+    gisFindings: [
+      { name: "Parcel boundary", layerType: "Parcel boundary", finding: "Boundary should be checked against the survey baseline before design lock.", geometry: "Parcel polygon", sourceName: "Survey / parcel GIS", sourceUrl: "", status: "needs review", usedFor: "Massing fit, setbacks, parcel export", documentType: "GIS Layer", otherDocumentType: "", verifiedBy: "", lastChecked: "" },
+      { name: "Flood risk overlay", layerType: "Flood / hydrology", finding: "Western low point intersects a medium-risk stormwater flow path.", geometry: "Western site low point", sourceName: "Stormwater overlay", sourceUrl: "", status: "active", usedFor: "Site hazards, grading, stormwater strategy", documentType: "GIS Layer", otherDocumentType: "", verifiedBy: "GIS Analyst", lastChecked: "" },
+      { name: "Primary view corridor", layerType: "Viewshed", finding: "Best long view is toward the west/southwest edge of the parcel.", geometry: "West / southwest view cone", sourceName: "Custom research layer", sourceUrl: "", status: "active", usedFor: "Orientation, glazing, exterior spaces", documentType: "GIS Layer", otherDocumentType: "", verifiedBy: "GIS Analyst", lastChecked: "" }
     ],
     hazards: [
       { name: "Steep site", value: "Average slope should be verified against spot elevations before foundation assumptions.", documentType: "Topographic Survey", sourceName: "Surveyor field record", status: "needs review", verifiedBy: "", lastChecked: "" },
@@ -654,6 +680,9 @@ function mergeSiteSurvey(saved) {
     utilities: Array.isArray(saved.utilities) ? saved.utilities : base.utilities,
     constraints: Array.isArray(saved.constraints) ? saved.constraints : base.constraints,
     opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : base.opportunities,
+    sourceFindings: Array.isArray(saved.sourceFindings) ? saved.sourceFindings : base.sourceFindings,
+    additionalAspects: Array.isArray(saved.additionalAspects) ? saved.additionalAspects : base.additionalAspects,
+    gisFindings: Array.isArray(saved.gisFindings) ? saved.gisFindings : base.gisFindings,
     hazards: Array.isArray(saved.hazards) ? saved.hazards : base.hazards,
     sensors: Array.isArray(saved.sensors) ? saved.sensors : base.sensors,
     policyLookups: Array.isArray(saved.policyLookups) ? saved.policyLookups : base.policyLookups,
@@ -804,6 +833,7 @@ function siteSourceControls(group, index, item, options = siteDocumentTypeOption
       ${siteRowSelect(group, index, "documentType", item.documentType || options[0], "Document type", options)}
       ${siteRowInput(group, index, "otherDocumentType", item.otherDocumentType || "", "Other document type")}
       ${siteRowInput(group, index, "sourceName", item.sourceName || "", "Source / document name")}
+      ${siteRowInput(group, index, "sourceUrl", item.sourceUrl || "", "Source URL / citation")}
       ${siteRowSelect(group, index, "status", item.status || "unverified", "Verification status", siteVerificationStatusOptions)}
       ${siteRowInput(group, index, "verifiedBy", item.verifiedBy || "", "Verified by")}
       ${siteRowInput(group, index, "lastChecked", item.lastChecked || "", "Last checked", "date")}
@@ -813,12 +843,15 @@ function siteSourceControls(group, index, item, options = siteDocumentTypeOption
 
 function sourceStatusText(item) {
   const documentType = item.documentType === "Other" && item.otherDocumentType ? item.otherDocumentType : item.documentType;
-  return [documentType, item.sourceName, item.status].filter(Boolean).join(" / ") || "source pending";
+  return [documentType, item.sourceName, item.sourceUrl, item.status].filter(Boolean).join(" / ") || "source pending";
 }
 
 function siteSurveyAssistantFindings(survey) {
   const fields = survey.fields || {};
   const allEvidence = [
+    ...(survey.sourceFindings || []),
+    ...(survey.additionalAspects || []),
+    ...(survey.gisFindings || []),
     ...(survey.evidence || []),
     ...(survey.hazards || []),
     ...(survey.policyLookups || []),
@@ -2824,6 +2857,17 @@ function siteSurveySurface(project) {
   const survey = state.siteSurvey;
   const fields = survey.fields;
   const assistantFindings = siteSurveyAssistantFindings(survey);
+  const gisFindings = survey.gisFindings?.length ? survey.gisFindings : project.gisLayers.map(layer => ({
+    name: layer.name,
+    layerType: "Custom research",
+    finding: layer.finding,
+    geometry: "",
+    sourceName: layer.source,
+    sourceUrl: "",
+    status: layer.status,
+    usedFor: "Site context",
+    documentType: "GIS Layer"
+  }));
 
   return `
     <div class="surface-pad site-survey-workspace">
@@ -2862,12 +2906,12 @@ function siteSurveySurface(project) {
       <section class="site-survey-section survey-upload-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">2. Survey upload</span>
-            <h3>Evidence Intake</h3>
-            <p>Surveyor and project team upload the source material that gives later AI interpretations a traceable basis.</p>
+            <span class="mini-label">2. Source document intake</span>
+            <h3>Documents, Sources + Extracted Facts</h3>
+            <p>Upload or identify the source, then record the exact site fact, policy fact, GIS condition, or survey value taken from it.</p>
           </div>
           <label class="site-upload-control">
-            <span>Upload survey evidence</span>
+            <span>Upload source document</span>
             <input type="file" multiple data-site-upload>
           </label>
         </div>
@@ -2875,6 +2919,7 @@ function siteSurveySurface(project) {
           ${siteFieldSelect("uploadDocumentType", "Document type for upload", siteDocumentTypeOptions)}
           ${siteFieldInput("uploadOtherDocumentType", "Other document type")}
           ${siteFieldInput("uploadSourceName", "Source / document name")}
+          ${siteFieldInput("uploadSourceUrl", "Source URL / citation")}
           ${siteFieldInput("uploadUploadedBy", "Uploaded by")}
           ${siteFieldSelect("uploadVerificationStatus", "Verification status", siteVerificationStatusOptions)}
         </div>
@@ -2891,6 +2936,25 @@ function siteSurveySurface(project) {
             `).join("")}
           </div>
         ` : ""}
+        <div class="survey-section-head compact-head">
+          <div>
+            <span class="mini-label">Evidence-backed findings</span>
+            <h3>What Was Taken From The Source?</h3>
+            <p>Each row is a claim the system may use later. If it does not have a document type, source, and status, the AI should treat it as uncertain.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="sourceFindings">Add Source-Backed Finding</button>
+        </div>
+        <div class="site-ai-question-grid source-finding-grid">
+          ${survey.sourceFindings.map((item, index) => `
+            <article>
+              ${siteRowInput("sourceFindings", index, "aspect", item.aspect || "", "Aspect / data point")}
+              ${siteRowSelect("sourceFindings", index, "category", item.category || "Other", "Category", siteAspectCategoryOptions)}
+              ${siteRowInput("sourceFindings", index, "owner", item.owner || "", "Responsible role")}
+              ${siteRowTextarea("sourceFindings", index, "value", item.value || "", "Exact finding / extracted value")}
+              ${siteSourceControls("sourceFindings", index, item)}
+            </article>
+          `).join("")}
+        </div>
         <div class="survey-upload-grid">
           ${surveyUploadItems().map(item => `
             <article>
@@ -2940,22 +3004,33 @@ function siteSurveySurface(project) {
         <div class="site-intake-grid">
           ${siteFieldInput("addressLookup", "Lookup address")}
           ${siteFieldInput("parcelApn", "Parcel / APN")}
+          ${siteFieldInput("cityCounty", "City / county")}
+          ${siteFieldInput("stateRegion", "State / region")}
+          ${siteFieldInput("country", "Country")}
+          ${siteFieldInput("latitude", "Latitude")}
+          ${siteFieldInput("longitude", "Longitude")}
           ${siteFieldInput("jurisdiction", "Jurisdiction")}
           ${siteFieldInput("zoningDistrict", "Zoning district")}
+          ${siteFieldInput("detectedZoneArea", "Zone / area")}
+          ${siteFieldSelect("lookupMethod", "Lookup method", lookupMethodOptions)}
           ${siteFieldTextarea("overlays", "Known overlays")}
           ${siteFieldInput("policySourceUrl", "Policy source URL / reference")}
+          ${siteFieldInput("gisSourceUrl", "GIS source URL / service")}
           ${siteFieldSelect("policyLookupStatus", "Lookup status", siteVerificationStatusOptions)}
+          ${siteFieldSelect("gisLookupStatus", "GIS lookup status", siteVerificationStatusOptions)}
           ${siteFieldInput("lastPolicyCheck", "Last policy check", "date")}
         </div>
         <div class="site-section-actions">
           <button class="add-row-button" data-policy-lookup-create>Create Lookup Record From Address</button>
           <button class="add-row-button" data-add-site-row="policyLookups">Add Custom Policy Record</button>
+          <button class="add-row-button" data-add-site-row="gisFindings">Add Custom GIS Finding</button>
         </div>
         <div class="site-ai-question-grid policy-record-grid">
           ${survey.policyLookups.map((item, index) => `
             <article>
               ${siteRowInput("policyLookups", index, "name", item.name || "", "Policy / lookup name")}
               ${siteRowInput("policyLookups", index, "address", item.address || "", "Address")}
+              ${siteRowInput("policyLookups", index, "parcelApn", item.parcelApn || "", "Parcel / APN")}
               ${siteRowInput("policyLookups", index, "jurisdiction", item.jurisdiction || "", "Jurisdiction")}
               ${siteRowTextarea("policyLookups", index, "result", item.result || "", "Lookup result / rule found")}
               ${siteRowSelect("policyLookups", index, "sourceName", item.sourceName || "Manual reviewer entry", "Lookup source type", policySourceOptions)}
@@ -2964,16 +3039,34 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        <div class="survey-section-head compact-head">
+          <div>
+            <span class="mini-label">GIS findings feeding this section</span>
+            <h3>Spatial Data Used By Survey + Policy</h3>
+          </div>
+        </div>
+        <div class="site-ai-question-grid gis-finding-grid">
+          ${gisFindings.map((item, index) => `
+            <article>
+              ${siteRowInput("gisFindings", index, "name", item.name || "", "GIS layer / finding")}
+              ${siteRowSelect("gisFindings", index, "layerType", item.layerType || "Custom research", "Layer type", gisLayerTypeOptions)}
+              ${siteRowTextarea("gisFindings", index, "finding", item.finding || "", "Finding")}
+              ${siteRowInput("gisFindings", index, "geometry", item.geometry || "", "Area / geometry")}
+              ${siteRowTextarea("gisFindings", index, "usedFor", item.usedFor || "", "Used for")}
+              ${siteSourceControls("gisFindings", index, item)}
+            </article>
+          `).join("")}
+        </div>
         <div class="site-map-grid">
           <div class="simple-map-wrap">
             ${projectMapMarkup(project)}
           </div>
           <div class="site-layer-stack">
-            ${project.gisLayers.map(layer => `
+            ${gisFindings.map(layer => `
               <article>
                 <span><i class="status-dot"></i>${escapeHtml(layer.status)}</span>
                 <strong>${escapeHtml(layer.name)}</strong>
-                <p>${escapeHtml(layer.finding)}</p>
+                <p>${escapeHtml(layer.finding || layer.value || "")}</p>
               </article>
             `).join("")}
             <article>
@@ -3130,10 +3223,31 @@ function siteSurveySurface(project) {
         </div>
       </section>
 
+      <section class="site-survey-section additional-aspects-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">12. Additional aspects</span>
+            <h3>Custom Site, GIS, Policy, Or Survey Data</h3>
+            <p>Use this when the project needs a data point that does not fit the predefined categories. It still receives a category, source, document type, and verification status.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="additionalAspects">Add Additional Aspect</button>
+        </div>
+        <div class="site-ai-question-grid additional-aspects-grid">
+          ${survey.additionalAspects.map((item, index) => `
+            <article>
+              ${siteRowInput("additionalAspects", index, "name", item.name || "", "Aspect")}
+              ${siteRowSelect("additionalAspects", index, "category", item.category || "Other", "Category", siteAspectCategoryOptions)}
+              ${siteRowTextarea("additionalAspects", index, "value", item.value || "", "Why it matters / value")}
+              ${siteSourceControls("additionalAspects", index, item)}
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="site-survey-section ai-site-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">12. AI site assistor</span>
+            <span class="mini-label">13. AI site assistor</span>
             <h3>From Verified Evidence To Design Implications</h3>
             <p>The assistor reads the saved forms and source records, then tells the architect what is verified, missing, risky, or ready for design use.</p>
           </div>
@@ -3160,7 +3274,7 @@ function siteSurveySurface(project) {
 
       <section class="site-survey-section package-panel">
         <div>
-          <span class="mini-label">13. Site Intelligence Package</span>
+          <span class="mini-label">14. Site Intelligence Package</span>
           <h3>Final Section Output</h3>
           <p>The page produces a reusable package for design, sun studies, ASHRAE/material sustainability, zoning, engineering, compliance, and permit review.</p>
         </div>
@@ -3724,15 +3838,115 @@ function policySurface(project) {
 }
 
 function gisSurface(project) {
+  const survey = state.siteSurvey;
+  const fields = survey.fields;
+  const gisFindings = survey.gisFindings?.length ? survey.gisFindings : [];
+
   return `
-    <div class="parcel gis-focus">
-      <div class="gis-layer flood-layer">Flood layer</div>
-      <div class="gis-layer view-layer">View corridor</div>
-      <div class="gis-layer vegetation-layer">Tree buffer</div>
-      <div class="map-panel">
-        <h3>Active GIS Layers</h3>
-        ${project.gisLayers.map(layer => `<p><span class="status-dot"></span>${escapeHtml(layer.name)}: ${escapeHtml(layer.finding)}</p>`).join("")}
-      </div>
+    <div class="surface-pad site-survey-workspace gis-workspace">
+      <header class="site-survey-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">GIS analyst workspace</span>
+          <h3>ArcGIS / Spatial Mapping</h3>
+          <p>Find the parcel, identify the correct zone or policy area, record GIS layers, and pass source-linked spatial findings into site survey and policy review.</p>
+        </div>
+        <div class="site-output-card">
+          <span>Output</span>
+          <strong>GIS Source Stack</strong>
+          <p>Parcel location, jurisdiction, zone/area, GIS layer findings, source URLs, and design implications.</p>
+        </div>
+      </header>
+
+      <section class="site-survey-section gis-lookup-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">1. Locate the parcel</span>
+            <h3>Zone / Area Finder</h3>
+            <p>This identifies the city, county, jurisdiction, parcel/APN, coordinates, zone district, overlays, and lookup source needed before policy rules can be trusted.</p>
+          </div>
+          <button class="add-row-button" data-policy-lookup-create>Create Policy Lookup Record</button>
+        </div>
+        <div class="site-intake-grid">
+          ${siteFieldInput("addressLookup", "Address")}
+          ${siteFieldInput("parcelApn", "Parcel / APN")}
+          ${siteFieldInput("cityCounty", "City / county")}
+          ${siteFieldInput("stateRegion", "State / region")}
+          ${siteFieldInput("country", "Country")}
+          ${siteFieldInput("latitude", "Latitude")}
+          ${siteFieldInput("longitude", "Longitude")}
+          ${siteFieldInput("jurisdiction", "Jurisdiction")}
+          ${siteFieldInput("zoningDistrict", "Zoning district")}
+          ${siteFieldInput("detectedZoneArea", "Zone / policy area")}
+          ${siteFieldSelect("lookupMethod", "Lookup method", lookupMethodOptions)}
+          ${siteFieldInput("gisSourceUrl", "GIS source URL / service")}
+          ${siteFieldInput("policySourceUrl", "Policy source URL")}
+          ${siteFieldSelect("gisLookupStatus", "GIS lookup status", siteVerificationStatusOptions)}
+          ${siteFieldSelect("policyLookupStatus", "Policy lookup status", siteVerificationStatusOptions)}
+          ${siteFieldInput("lastPolicyCheck", "Last checked", "date")}
+          ${siteFieldTextarea("overlays", "Overlay districts / mapped areas")}
+        </div>
+      </section>
+
+      <section class="site-survey-section gis-map-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">2. GIS map</span>
+            <h3>Mapped Conditions</h3>
+            <p>The visual map shows the current parcel context while the editable layer stack below records the source-linked findings that become project memory.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="gisFindings">Add GIS Layer / Finding</button>
+        </div>
+        <div class="site-map-grid">
+          <div class="simple-map-wrap">
+            ${projectMapMarkup(project)}
+          </div>
+          <div class="site-layer-stack">
+            ${gisFindings.map(layer => `
+              <article>
+                <span><i class="status-dot"></i>${escapeHtml(layer.status)}</span>
+                <strong>${escapeHtml(layer.name)}</strong>
+                <p>${escapeHtml(layer.finding || "")}</p>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="site-survey-section gis-layer-editor">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">3. Layer findings</span>
+            <h3>Data Found Through GIS</h3>
+            <p>Every spatial finding can be used by the survey page, policy page, design workspace, and final handoff once its source and status are recorded.</p>
+          </div>
+          <button class="add-row-button" data-add-site-row="additionalAspects">Add Related Aspect</button>
+        </div>
+        <div class="site-ai-question-grid gis-finding-grid">
+          ${gisFindings.map((item, index) => `
+            <article>
+              ${siteRowInput("gisFindings", index, "name", item.name || "", "GIS layer / finding")}
+              ${siteRowSelect("gisFindings", index, "layerType", item.layerType || "Custom research", "Layer type", gisLayerTypeOptions)}
+              ${siteRowTextarea("gisFindings", index, "finding", item.finding || "", "Finding")}
+              ${siteRowInput("gisFindings", index, "geometry", item.geometry || "", "Area / geometry")}
+              ${siteRowTextarea("gisFindings", index, "usedFor", item.usedFor || "", "Used for / design implication")}
+              ${siteSourceControls("gisFindings", index, item)}
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="site-survey-section package-panel">
+        <div>
+          <span class="mini-label">4. Connected outputs</span>
+          <h3>Send GIS Data Forward</h3>
+          <p>GIS findings are saved into the same project memory used by Site + Survey Intelligence, Zoning + Policy Intelligence, CAD/Rhino review, and export downloads.</p>
+        </div>
+        <div class="download-actions">
+          <button data-download="parcel">Download Site JSON</button>
+          <button data-download="csv">Download Project CSV</button>
+        </div>
+      </section>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
@@ -3886,12 +4100,14 @@ function renderSurface() {
     ? clientSurface(project)
     : state.activeSection === "survey"
     ? siteSurveySurface(project)
+    : state.activeSection === "gis"
+    ? gisSurface(project)
     : projectPageSurface(project, section);
   document.getElementById("visualWorkspace").innerHTML = html;
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
-  if (state.activeSection === "survey") bindSiteSurveyPage();
+  if (state.activeSection === "survey" || state.activeSection === "gis") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
@@ -3943,6 +4159,9 @@ function projectCsv(project) {
     ...state.siteSurvey.utilities.map(item => ["site_utility", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.constraints.map(item => ["site_constraint", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.opportunities.map(item => ["site_opportunity", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.sourceFindings.map(item => ["site_source_finding", item.aspect, `${item.category || ""} | ${item.value || ""} | owner: ${item.owner || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.additionalAspects.map(item => ["site_additional_aspect", item.name, `${item.category || ""} | ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...state.siteSurvey.gisFindings.map(item => ["site_gis_finding", item.name, `${item.layerType || ""} | ${item.geometry || ""} | ${item.finding || ""} | used for: ${item.usedFor || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.hazards.map(item => ["site_hazard", item.name, `${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.sensors.map(item => ["site_sensor", item.name, `${item.sensorType || ""} | ${item.location || ""} | ${item.latestReading || ""} ${item.unit || ""} | ${item.timestamp || ""} | ${item.sourceName || ""}`, item.status || "saved"]),
     ...state.siteSurvey.policyLookups.map(item => ["site_policy_lookup", item.name, `${item.address || ""} | ${item.jurisdiction || ""} | ${item.result || ""} | ${item.sourceUrl || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
@@ -4023,6 +4242,22 @@ function newSiteSurveyRow(group) {
     utilities: () => ({ name: "Custom utility / infrastructure", value: "", ...common }),
     constraints: () => ({ name: "Custom constraint", value: "", ...common }),
     opportunities: () => ({ name: "Custom opportunity", value: "", ...common }),
+    sourceFindings: () => ({ aspect: "Custom source-backed finding", category: "Other", value: "", owner: "", sourceUrl: "", ...common }),
+    additionalAspects: () => ({ name: "Custom additional aspect", category: "Other", value: "", sourceUrl: "", ...common }),
+    gisFindings: () => ({
+      name: "Custom GIS layer",
+      layerType: "Custom research",
+      finding: "",
+      geometry: "",
+      sourceName: "",
+      sourceUrl: "",
+      status: "needs review",
+      usedFor: "",
+      documentType: "GIS Layer",
+      otherDocumentType: "",
+      verifiedBy: "",
+      lastChecked: today
+    }),
     hazards: () => ({ name: "Custom hazard", value: "", ...common }),
     evidence: () => ({ name: "Custom evidence record", owner: "", value: "", ...common }),
     policyLookups: () => ({
@@ -4062,14 +4297,18 @@ function createPolicyLookupRecordFromFields() {
   return {
     name: "Address-based zoning lookup",
     address: fields.addressLookup || fields.parcelAddress || "",
+    parcelApn: fields.parcelApn || "",
     jurisdiction: fields.jurisdiction || "",
     result: [
+      fields.cityCounty ? `City/county: ${fields.cityCounty}` : "",
+      fields.stateRegion ? `State/region: ${fields.stateRegion}` : "",
       fields.zoningDistrict ? `Zoning district: ${fields.zoningDistrict}` : "",
+      fields.detectedZoneArea ? `Zone / area: ${fields.detectedZoneArea}` : "",
       fields.overlays ? `Overlays: ${fields.overlays}` : ""
     ].filter(Boolean).join("\n"),
     documentType: "Zoning Policy",
     otherDocumentType: "",
-    sourceName: "Manual reviewer entry",
+    sourceName: fields.lookupMethod || "Manual reviewer entry",
     sourceUrl: fields.policySourceUrl || "",
     status: fields.policyLookupStatus || "pending lookup",
     verifiedBy: fields.verifiedBy || "",
@@ -4164,6 +4403,7 @@ function bindSiteSurveyPage() {
         documentType: state.siteSurvey.fields.uploadDocumentType || "Other",
         otherDocumentType: state.siteSurvey.fields.uploadOtherDocumentType || "",
         sourceName: state.siteSurvey.fields.uploadSourceName || file.name,
+        sourceUrl: state.siteSurvey.fields.uploadSourceUrl || "",
         uploadedBy: state.siteSurvey.fields.uploadUploadedBy || "",
         uploadedAt: new Date().toISOString(),
         status: state.siteSurvey.fields.uploadVerificationStatus || "unverified",
