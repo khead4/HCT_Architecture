@@ -8164,6 +8164,51 @@ function lumionSurface(project) {
         </article>
       </section>
 
+      <section class="lumion-app-residence" aria-label="Lumion application workspace">
+        <div class="lumion-app-stage">
+          <div class="lumion-app-window">
+            <div class="lumion-app-toolbar">
+              <span></span><span></span><span></span>
+              <strong>Lumion scene workspace</strong>
+            </div>
+            <div class="lumion-scene-preview">
+              <div class="lumion-preview-sky"></div>
+              <div class="lumion-preview-sun"></div>
+              <div class="lumion-preview-building">
+                <i></i><i></i><i></i>
+              </div>
+              <div class="lumion-preview-ground"></div>
+              <div class="lumion-preview-materials">
+                ${materialRows.slice(0, 4).map(row => `<span>${escapeHtml(row.name || row.scope || "--")}</span>`).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="lumion-app-copy">
+          <span class="mini-label">Application residence</span>
+          <h3>Lumion Lives Here Before The Schedule</h3>
+          <p>This is the dedicated Lumion application area: import the CAD/Rhino massing, stage the scene, test material appearance, check style direction, and send visual decisions back to ASTRA before the material logistics table is exported.</p>
+          <div class="lumion-app-facts">
+            ${[
+              ["Scene", fields.lumionProjectName || "--"],
+              ["Import file", fields.lumionCadFileName || "--"],
+              ["Format", fields.lumionCadFormat || "--"],
+              ["Library", fields.lumionMaterialLibrary || "--"]
+            ].map(row => `
+              <div>
+                <span>${escapeHtml(row[0])}</span>
+                <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+              </div>
+            `).join("")}
+          </div>
+          <div class="lumion-app-actions">
+            <button data-download="lumion-cad">Download CAD .DAE</button>
+            <button data-download="lumion">Download Lumion Brief</button>
+            <button data-download="lumion-schedule-csv">Download Schedule CSV</button>
+          </div>
+        </div>
+      </section>
+
       <section class="lumion-schedule-panel">
         <div class="lumion-schedule-head">
           <div>
