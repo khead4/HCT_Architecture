@@ -272,6 +272,62 @@ button {
   width: 100%;
 }
 
+.to-top-button {
+  position: fixed;
+  left: clamp(16px, 2vw, 28px);
+  bottom: clamp(16px, 2vw, 28px);
+  z-index: 120;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(222,235,164,.46);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(23,79,83,.95), rgba(16,18,15,.95)),
+    #174f53;
+  color: rgba(255,255,255,.94);
+  box-shadow: 0 18px 42px rgba(0,0,0,.24);
+  padding: 10px 16px 10px 13px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity .18s ease, transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.to-top-button.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.to-top-button span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(222,235,164,.18);
+  color: rgba(222,235,164,.98);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.to-top-button strong {
+  font-size: 12px;
+  font-weight: 820;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.to-top-button:hover {
+  border-color: rgba(214,169,94,.86);
+  background:
+    linear-gradient(135deg, rgba(45,111,115,.98), rgba(28,29,24,.98)),
+    #174f53;
+}
+
 .status-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5125,6 +5181,24 @@ body:not([data-active-section="dashboard"]) #questionInput {
   --section-bg-b: rgba(76,82,45,.13);
 }
 
+.data-memory-panel {
+  --section-symbol: "DB";
+  --section-accent: rgba(101,211,222,.9);
+  --section-accent-soft: rgba(101,211,222,.34);
+  --section-accent-bg: rgba(101,211,222,.11);
+  --section-bg-a: rgba(101,211,222,.075);
+  --section-bg-b: rgba(31,77,88,.14);
+}
+
+.data-outcome-panel {
+  --section-symbol: "OUT";
+  --section-accent: rgba(214,169,94,.9);
+  --section-accent-soft: rgba(214,169,94,.34);
+  --section-accent-bg: rgba(214,169,94,.12);
+  --section-bg-a: rgba(214,169,94,.085);
+  --section-bg-b: rgba(94,65,28,.14);
+}
+
 .case-study-library-panel {
   --section-symbol: "CASE";
   --section-accent: rgba(91,167,146,.88);
@@ -5172,6 +5246,128 @@ body:not([data-active-section="dashboard"]) #questionInput {
   padding: clamp(18px, 2vw, 26px);
   text-align: left;
   cursor: pointer;
+}
+
+.data-memory-grid,
+.data-outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 1.8vw, 24px);
+}
+
+.data-outcome-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.data-memory-grid article,
+.data-outcome-grid article {
+  min-height: 236px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-top: 4px solid rgba(101,211,222,.82);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(101,211,222,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.3);
+  padding: clamp(18px, 2vw, 26px);
+}
+
+.data-memory-grid article:nth-child(2),
+.data-outcome-grid article:nth-child(2) {
+  border-top-color: rgba(107,149,217,.86);
+  background:
+    linear-gradient(135deg, rgba(107,149,217,.11), rgba(255,255,255,.018)),
+    rgba(0,0,0,.3);
+}
+
+.data-memory-grid article:nth-child(3),
+.data-outcome-grid article:nth-child(3) {
+  border-top-color: rgba(190,205,130,.86);
+  background:
+    linear-gradient(135deg, rgba(190,205,130,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.3);
+}
+
+.data-memory-grid article:nth-child(4),
+.data-outcome-grid article:nth-child(4) {
+  border-top-color: rgba(214,169,94,.86);
+  background:
+    linear-gradient(135deg, rgba(214,169,94,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.3);
+}
+
+.data-memory-grid article:nth-child(5) {
+  border-top-color: rgba(91,167,146,.86);
+  background:
+    linear-gradient(135deg, rgba(91,167,146,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.3);
+}
+
+.data-memory-grid article:nth-child(6) {
+  border-top-color: rgba(202,107,84,.86);
+  background:
+    linear-gradient(135deg, rgba(202,107,84,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.3);
+}
+
+.data-memory-grid article > span,
+.data-outcome-grid article > span {
+  width: 44px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,.075);
+  color: rgba(222,235,164,.92);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.data-memory-grid strong,
+.data-outcome-grid strong {
+  color: rgba(255,255,255,.95);
+  font-size: clamp(20px, 1.45vw, 27px);
+  line-height: 1.08;
+}
+
+.data-memory-grid div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 10px 12px;
+}
+
+.data-memory-grid b,
+.data-outcome-grid b {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(190,205,130,.86);
+  font-size: 11px;
+  font-weight: 830;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.data-memory-grid em {
+  color: rgba(255,255,255,.86);
+  font-style: normal;
+  font-weight: 750;
+}
+
+.data-memory-grid p,
+.data-outcome-grid p {
+  margin: 0;
+  color: rgba(255,255,255,.66);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .data-export-grid button:nth-child(2) {
@@ -6598,6 +6794,8 @@ body:not([data-active-section="dashboard"]) #questionInput {
   .policy-procedure-grid,
   .policy-agent-panel .site-advisor-prompts,
   .data-export-grid,
+  .data-memory-grid,
+  .data-outcome-grid,
   .case-study-input-grid,
   .case-study-record-grid,
   .arcgis-workbench-grid,
@@ -8419,6 +8617,8 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
   .policy-record-grid,
   .hazard-record-grid,
   .sensor-record-grid,
+  .data-memory-grid,
+  .data-outcome-grid,
   .site-experience-arc {
     grid-template-columns: 1fr;
   }
@@ -8458,6 +8658,21 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
 }
 
 @media (max-width: 760px) {
+  .to-top-button {
+    left: 14px;
+    bottom: 14px;
+    min-height: 46px;
+    padding: 10px;
+  }
+
+  .to-top-button strong {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
   .site-survey-workspace {
     gap: 34px;
     padding: 16px;

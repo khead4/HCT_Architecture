@@ -28,11 +28,11 @@ const sections = [
   },
   {
     id: "data",
-    title: "Data Storage / Case Study Exports",
-    stage: "Structured memory",
+    title: "Database / Data Storage + CSV",
+    stage: "Structured project memory",
     desc: "Store project facts, sustainability metrics, flood strategy, initiative data, custom case studies, and JSON/CSV exports.",
     goal: "Keep project information reusable across GIS, AI, design, reports, case studies, and external tools.",
-    actions: ["Validate fields", "Generate case studies", "Export JSON", "Export CSV"],
+    actions: ["Review saved data", "Generate case studies", "Download JSON", "Download CSV"],
     ai: ["Detects missing data", "Builds case records", "Explains export-ready evidence"]
   },
   {
@@ -900,7 +900,8 @@ const el = {
   closeDrawer: document.getElementById("closeDrawer"),
   aiMode: document.getElementById("aiMode"),
   homeButton: document.getElementById("homeButton"),
-  loginButton: document.getElementById("loginButton")
+  loginButton: document.getElementById("loginButton"),
+  toTopButton: document.getElementById("toTopButton")
 };
 
 function persistSiteSurvey() {
@@ -2136,6 +2137,9 @@ function sectionIdFromTitle(title) {
     ["lumion", "lumion"],
     ["render", "lumion"],
     ["visual", "lumion"],
+    ["database", "data"],
+    ["csv", "data"],
+    ["data", "data"],
     ["final", "finalization"],
     ["handoff", "finalization"],
     ["engineering", "engineering"],
@@ -2941,7 +2945,7 @@ function renumberJourney(stages) {
 roleJourneys.architect.stages = renumberJourney([
   makeJourneyStage("clientele", "Brief", "Capture the client brief, priorities, budget, and design values.", "Start here when the architect needs to understand what the project should become.", ["Customer info", "Priorities"]),
   makeJourneyStage("survey", "Survey", "Review parcel facts, utilities, slope, soil, and boundary conditions.", "Use this before design moves depend on site facts.", ["Parcel", "Survey"]),
-  makeJourneyStage("data", "Data Hub", "Store project facts, sustainability metrics, flood strategy, initiatives, custom case studies, and JSON/CSV exports.", "Use this when information needs to move cleanly between tools or become downloadable project and case-study data.", ["Data", "Cases", "JSON", "CSV"]),
+  makeJourneyStage("data", "Database + CSV", "Store project facts, sustainability metrics, flood strategy, initiatives, custom case studies, and JSON/CSV exports.", "Use this when information needs to move cleanly between tools or become downloadable project and case-study data.", ["Database", "Cases", "JSON", "CSV"]),
   makeJourneyStage("policy", "Policy", "Check zoning, setbacks, height, incentives, and cited policy rules.", "Use this before committing to a massing move that may conflict with code.", ["Rules", "Sources"]),
   makeJourneyStage("gis", "GIS", "Compare mapped layers, overlays, risks, views, and spatial opportunities.", "Use this when design direction depends on where something happens on the parcel.", ["GIS", "Parcel map"]),
   makeJourneyStage("design", "Design", "Develop massing, placement, openings, and the core concept model.", "Use this for the main architectural design workspace.", ["Model", "Map"]),
@@ -2993,7 +2997,7 @@ roleJourneys.planner.stages = renumberJourney([
 ]);
 
 roleJourneys.gis.stages = renumberJourney([
-  makeJourneyStage("data", "Data Hub", "Load parcel records, GIS-ready fields, case studies, and JSON/CSV export values.", "Use this before mapping, exporting, or sharing structured project data.", ["Data", "JSON", "CSV"]),
+  makeJourneyStage("data", "Database + CSV", "Load parcel records, GIS-ready fields, case studies, and JSON/CSV export values.", "Use this before mapping, exporting, or sharing structured project data.", ["Database", "JSON", "CSV"]),
   makeJourneyStage("survey", "Survey", "Confirm survey facts, utilities, slope, and verified site values.", "Use this when GIS layers need a trusted survey baseline.", ["Survey", "Parcel"]),
   makeJourneyStage("gis", "Layers", "Toggle layers, compare overlays, and identify site risks or opportunities.", "Use this for the main spatial analysis workflow.", ["GIS", "Layers"]),
   makeJourneyStage("policy", "Rules", "Connect zoning, overlays, and policy rules to mapped parcel conditions.", "Use this when policy checks need map-backed evidence.", ["Policy", "Map"]),
@@ -5368,23 +5372,129 @@ function dataStorageFactRows(project) {
   ];
 }
 
+function dataCount(value, label = "records") {
+  const count = Number(value || 0);
+  return count ? `${count} ${label}` : "--";
+}
+
+function dataStorageMemoryRows(project) {
+  const survey = state.siteSurvey;
+  const fields = survey.fields || {};
+  const discovery = state.projectDiscovery || {};
+  return [
+    {
+      symbol: "BRF",
+      title: "Client brief + goals",
+      count: dataCount(project.clientIntent.priorities.length + topProjectValues(discovery, 8).length, "items"),
+      stored: discovery.projectName || project.clientIntent.summary || "--",
+      csv: "discovery_* / client_priority",
+      use: "Sets design intent, desired outcome, values, and client-facing case-study language.",
+      status: policyFieldStatus(discovery.projectName || project.clientIntent.summary)
+    },
+    {
+      symbol: "SITE",
+      title: "Site survey facts",
+      count: dataCount(Object.keys(fields).length + (survey.evidence || []).length, "fields"),
+      stored: fields.parcelAddress || fields.addressLookup || project.project.location || "--",
+      csv: "site_survey_form / site_evidence",
+      use: "Keeps address, parcel, survey, source, and verification facts available for every later page.",
+      status: policyFieldStatus(fields.parcelAddress || fields.addressLookup)
+    },
+    {
+      symbol: "GIS",
+      title: "GIS + ArcGIS layers",
+      count: dataCount((survey.gisFindings || []).length + (project.gisLayers || []).length, "layers"),
+      stored: fields.arcgisWebMapId || fields.gisSourceUrl || "--",
+      csv: "site_gis_finding / gis_layer",
+      use: "Carries mapped constraints, ArcGIS references, layer findings, and spatial design implications.",
+      status: fields.gisLookupStatus || policyFieldStatus(fields.arcgisWebMapId || fields.gisSourceUrl)
+    },
+    {
+      symbol: "LAW",
+      title: "Policy + code records",
+      count: dataCount((survey.policyLookups || []).length + (project.verifiedRules || []).length, "records"),
+      stored: fields.detectedZoneArea || fields.zoningDistrict || "--",
+      csv: "site_policy_lookup / policy_rule",
+      use: "Stores zone, overlays, setbacks, sources, reviewer state, and permit-relevant code facts.",
+      status: fields.policyLookupStatus || policyFieldStatus(fields.detectedZoneArea || fields.zoningDistrict)
+    },
+    {
+      symbol: "SUS",
+      title: "Sustainability metrics",
+      count: caseStudyMetricSummary(project, survey) ? "saved" : "--",
+      stored: caseStudyMetricSummary(project, survey) || "--",
+      csv: "success_metric / site_case_study",
+      use: "Feeds ASHRAE, daylight, embodied carbon, stormwater, and low-carbon case-study exports.",
+      status: caseStudyMetricSummary(project, survey) ? "saved" : "missing"
+    },
+    {
+      symbol: "CASE",
+      title: "Case study library",
+      count: dataCount(caseStudyRecords().length, "cases"),
+      stored: caseStudyRecords().map(item => item.title).join(" / ") || "--",
+      csv: "site_case_study",
+      use: "Packages desired outcome, limited flooding, sustainability, initiatives, evidence, and actions.",
+      status: caseStudyRecords().length ? "exportable" : "missing"
+    }
+  ];
+}
+
+function dataCaseStudyOutcomeRows(project) {
+  const fields = state.siteSurvey.fields || {};
+  const survey = state.siteSurvey;
+  const dominantRisk = siteDominantRisk(survey);
+  const topOpportunity = siteTopOpportunity(survey);
+  return [
+    {
+      symbol: "OUT",
+      title: "Desired outcome",
+      fact: fields.desiredFutureUse || state.projectDiscovery.outcomes || project.clientIntent.summary || "--",
+      output: "Desired Outcome Case Study",
+      check: "Shows whether the design direction still matches client goals, constraints, and saved evidence."
+    },
+    {
+      symbol: "FLD",
+      title: "Limited flooding",
+      fact: fields.environmentalHazards || fields.drainageNotes || dominantRisk?.value || "--",
+      output: "Limited Flooding + Resilience Case Study",
+      check: "Connects flood, slope, stormwater, elevation, prevention, and recovery procedures to design moves."
+    },
+    {
+      symbol: "DEV",
+      title: "Initiative development",
+      fact: fields.zoneInitiatives || fields.policySummary || "--",
+      output: "Initiative-Based Development Case Study",
+      check: "Packages incentive, policy, sustainability, and procedure notes for planning or permit review."
+    },
+    {
+      symbol: "MET",
+      title: "Sustainability metrics",
+      fact: caseStudyMetricSummary(project, survey) || topOpportunity?.value || "--",
+      output: "Sustainability Metrics Case Study",
+      check: "Uses energy, carbon, daylight, stormwater, ASHRAE, and material facts without inventing missing values."
+    }
+  ];
+}
+
 function dataStorageSurface(project) {
   const stats = dataStorageStats(project);
   const caseStudies = caseStudyRecords();
+  const memoryRows = dataStorageMemoryRows(project);
+  const outcomeRows = dataCaseStudyOutcomeRows(project);
 
   return `
     <div class="surface-pad site-survey-workspace data-storage-workspace">
       <header class="site-survey-hero data-storage-hero">
         <button class="journey-link" data-section="dashboard">Back to flow</button>
         <div>
-          <span class="mini-label">Data storage / CSV</span>
-          <h3>Project Data + Custom Case Study Exports</h3>
-          <p>Store project facts, sustainability metrics, flood-limitation strategies, policy initiatives, and generated case studies in one exportable system.</p>
+          <span class="mini-label">Database / data storage + CSV</span>
+          <h3>Project Memory, CSV + Case Study Data Hub</h3>
+          <p>Store actual project facts, sustainability metrics, flood-limitation strategies, policy initiatives, ArcGIS data, and generated case studies in one exportable system.</p>
         </div>
         <div class="site-output-card">
           <span>Output</span>
           <strong>JSON + CSV Data Package</strong>
-          <p>${stats.csvRows} CSV rows and ${stats.cases} case-study records are ready for download.</p>
+          <p>${stats.csvRows} CSV rows, ${stats.total} stored records, and ${stats.cases} case-study records are ready for download.</p>
         </div>
       </header>
 
@@ -5408,8 +5518,8 @@ function dataStorageSurface(project) {
           <section class="site-survey-section data-export-panel">
             <div class="survey-section-head">
               <div>
-                <span class="mini-label">1. Export center</span>
-                <h3>Download Stored Data</h3>
+                <span class="mini-label">1. Database export center</span>
+                <h3>Download Stored Project Data</h3>
                 <p>Export the full project package or just the custom case-study library for review, reporting, external databases, or spreadsheet workflows.</p>
               </div>
               <button class="add-row-button" data-case-study-generate>Generate Case Studies From Current Data</button>
@@ -5423,9 +5533,29 @@ function dataStorageSurface(project) {
             ${siteFactGrid(dataStorageFactRows(project), "Data storage facts")}
           </section>
 
+          <section class="site-survey-section data-memory-panel">
+            <div>
+              <span class="mini-label">2. Unified data memory</span>
+              <h3>What Is Saved, What Is Missing, Where It Exports</h3>
+              <p>Each data domain reads from the current project memory. Empty or unverified inputs stay visible as -- so ASTRA can explain gaps instead of fabricating facts.</p>
+            </div>
+            <div class="data-memory-grid">
+              ${memoryRows.map(item => `
+                <article class="${escapeHtml(item.status)}">
+                  <span>${escapeHtml(item.symbol)}</span>
+                  <strong>${escapeHtml(item.title)}</strong>
+                  <div><b>Saved</b><em>${escapeHtml(item.count)}</em></div>
+                  <p><b>Current fact</b>${escapeHtml(siteDisplayValue(item.stored))}</p>
+                  <p><b>CSV field</b>${escapeHtml(item.csv)}</p>
+                  <p>${escapeHtml(item.use)}</p>
+                </article>
+              `).join("")}
+            </div>
+          </section>
+
           <section class="site-survey-section data-generator-panel">
             <div>
-              <span class="mini-label">2. Generator inputs</span>
+              <span class="mini-label">3. Generator inputs</span>
               <h3>Case Study Basis</h3>
               <p>These saved fields are the inputs for custom case studies. Update them, generate again, and the JSON/CSV export will reflect the current project direction.</p>
             </div>
@@ -5442,10 +5572,32 @@ function dataStorageSurface(project) {
             </div>
           </section>
 
+          <section class="site-survey-section data-outcome-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">4. Outcome-based case studies</span>
+                <h3>Generate Cases From Actual Stored Inputs</h3>
+                <p>These cards preview the source facts used for each generated case study. When a fact is missing, the generated record keeps -- until the project data is updated.</p>
+              </div>
+              <button class="add-row-button" data-case-study-generate>Generate Outcome Cases</button>
+            </div>
+            <div class="data-outcome-grid">
+              ${outcomeRows.map(item => `
+                <article>
+                  <span>${escapeHtml(item.symbol)}</span>
+                  <strong>${escapeHtml(item.title)}</strong>
+                  <p><b>Fact used</b>${escapeHtml(siteDisplayValue(item.fact))}</p>
+                  <p><b>Creates</b>${escapeHtml(item.output)}</p>
+                  <p>${escapeHtml(item.check)}</p>
+                </article>
+              `).join("")}
+            </div>
+          </section>
+
           <section class="site-survey-section case-study-library-panel">
             <div class="survey-section-head">
               <div>
-                <span class="mini-label">3. Custom case studies</span>
+                <span class="mini-label">5. Custom case studies</span>
                 <h3>Saved Case Study Library</h3>
                 <p>Each case study is editable and stored with the project, then exported as JSON or CSV for downstream reports and reviews.</p>
               </div>
@@ -5472,7 +5624,7 @@ function dataStorageSurface(project) {
 
           <section class="site-survey-section data-schema-panel">
             <div>
-              <span class="mini-label">4. Storage map</span>
+              <span class="mini-label">6. Storage map</span>
               <h3>What the CSV Contains</h3>
               <p>The export keeps data reusable across AI retrieval, GIS, sustainability review, policy checks, case studies, and reporting.</p>
             </div>
@@ -7242,6 +7394,24 @@ async function refreshProject() {
   renderAdviceHistory();
 }
 
+function activeScrollTop() {
+  const workspace = document.getElementById("visualWorkspace");
+  const pageTop = window.scrollY || document.documentElement.scrollTop || 0;
+  return Math.max(pageTop, workspace?.scrollTop || 0);
+}
+
+function updateToTopButton() {
+  if (!el.toTopButton) return;
+  el.toTopButton.classList.toggle("visible", activeScrollTop() > 220);
+}
+
+function returnToTop() {
+  const workspace = document.getElementById("visualWorkspace");
+  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  workspace?.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  document.querySelector(".main")?.scrollTo?.({ top: 0, left: 0, behavior: "smooth" });
+}
+
 function render() {
   document.body.dataset.activeSection = state.authView ? "dashboard" : state.activeSection;
   document.body.dataset.authView = state.authView || "";
@@ -7252,6 +7422,7 @@ function render() {
   renderIntegrations();
   renderSurface();
   renderAnnotations();
+  updateToTopButton();
 }
 
 async function init() {
@@ -7281,6 +7452,12 @@ async function init() {
   });
 
   el.askButton.addEventListener("click", () => askAssistant(el.questionInput.value, false));
+
+  if (el.toTopButton) {
+    el.toTopButton.addEventListener("click", returnToTop);
+    window.addEventListener("scroll", updateToTopButton, { passive: true });
+    document.getElementById("visualWorkspace")?.addEventListener("scroll", updateToTopButton, { passive: true });
+  }
 
   el.questionInput.addEventListener("keydown", event => {
     if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
