@@ -5972,7 +5972,7 @@ function gisSurface(project) {
             <h3>Zone / Area Finder</h3>
             <p>This identifies the city, county, jurisdiction, parcel/APN, coordinates, zone district, overlays, and lookup source needed before policy rules can be trusted.</p>
           </div>
-          <button class="add-row-button" data-policy-lookup-create>Create Policy Lookup Record</button>
+          <button class="add-row-button" type="button" data-download="policy-lookup-csv">Create Policy Lookup Record</button>
         </div>
         <div class="site-intake-grid">
           ${siteFieldInput("addressLookup", "Address")}
@@ -6429,6 +6429,93 @@ function projectCsv(project) {
   return rows.map(row => row.map(csvValue).join(",")).join("\n");
 }
 
+function policyLookupCsv() {
+  const fields = state.siteSurvey.fields || {};
+  const draftRecord = createPolicyLookupRecordFromFields();
+  const savedRecords = Array.isArray(state.siteSurvey.policyLookups) ? state.siteSurvey.policyLookups : [];
+  const rows = [
+    [
+      "record_type",
+      "name",
+      "address",
+      "parcel_apn",
+      "city_county",
+      "state_region",
+      "country",
+      "latitude",
+      "longitude",
+      "jurisdiction",
+      "zoning_district",
+      "zone_policy_area",
+      "overlays",
+      "lookup_method",
+      "gis_source_url",
+      "policy_source_url",
+      "gis_lookup_status",
+      "policy_lookup_status",
+      "lookup_result",
+      "source_name",
+      "source_url",
+      "status",
+      "verified_by",
+      "last_checked"
+    ],
+    [
+      "current_lookup_form",
+      draftRecord.name,
+      draftRecord.address,
+      draftRecord.parcelApn,
+      fields.cityCounty,
+      fields.stateRegion,
+      fields.country,
+      fields.latitude,
+      fields.longitude,
+      draftRecord.jurisdiction,
+      fields.zoningDistrict,
+      fields.detectedZoneArea,
+      fields.overlays,
+      fields.lookupMethod,
+      fields.gisSourceUrl,
+      fields.policySourceUrl,
+      fields.gisLookupStatus,
+      fields.policyLookupStatus,
+      draftRecord.result,
+      draftRecord.sourceName,
+      draftRecord.sourceUrl,
+      draftRecord.status,
+      draftRecord.verifiedBy,
+      draftRecord.lastChecked
+    ],
+    ...savedRecords.map(item => [
+      "saved_policy_lookup",
+      item.name,
+      item.address,
+      item.parcelApn,
+      "",
+      "",
+      "",
+      "",
+      "",
+      item.jurisdiction,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      item.result,
+      item.sourceName,
+      item.sourceUrl,
+      item.status,
+      item.verifiedBy,
+      item.lastChecked
+    ])
+  ];
+  return rows.map(row => row.map(value => csvValue(value || "--")).join(",")).join("\n");
+}
+
 function parcelJson(project) {
   return JSON.stringify({
     project: project.project,
@@ -6497,6 +6584,9 @@ function downloadByKind(kind) {
   }
   if (kind === "csv") {
     triggerDownload("hct-project-data.csv", "text/csv", projectCsv(state.project));
+  }
+  if (kind === "policy-lookup-csv") {
+    triggerDownload("astra-policy-lookup-record.csv", "text/csv", policyLookupCsv());
   }
   if (kind === "case-json") {
     triggerDownload("astra-case-studies.json", "application/json", caseStudyJson(state.project));
