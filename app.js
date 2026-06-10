@@ -46,12 +46,12 @@ const sections = [
   },
   {
     id: "gis",
-    title: "ArcGIS / Spatial Mapping",
+    title: "ArcGIS Pro / Spatial Mapping",
     stage: "Spatial intelligence",
-    desc: "GIS layers, custom research layers, site context, risks, and opportunities.",
-    goal: "Understand the site as a layered spatial system.",
-    actions: ["Toggle layers", "Compare overlays", "Annotate placement", "Publish map findings"],
-    ai: ["Interprets overlaps", "Links layers", "Suggests placement reviews"]
+    desc: "ArcGIS web maps, ArcGIS Pro project handoff, GIS layers, site context, risks, and opportunities.",
+    goal: "Understand the site as a layered spatial system connected to ArcGIS Pro and web map evidence.",
+    actions: ["Embed ArcGIS map", "Track Pro package", "Compare overlays", "Publish map findings"],
+    ai: ["Interprets overlaps", "Links ArcGIS layers", "Suggests placement reviews"]
   },
   {
     id: "design",
@@ -591,6 +591,17 @@ function initialSiteSurvey() {
       lookupMethod: "Manual entry",
       gisSourceUrl: "Demo GIS layer stack: parcel, stormwater, viewshed, vegetation",
       gisLookupStatus: "active",
+      arcgisPortalUrl: "https://www.arcgis.com",
+      arcgisWebMapId: "",
+      arcgisEmbedUrl: "",
+      arcgisFeatureServiceUrl: "",
+      arcgisSceneUrl: "",
+      arcgisProProjectName: "Aalborg HCT Site Intelligence.aprx",
+      arcgisProProjectPath: "",
+      arcgisProPackageName: "astra-site-intelligence.ppkx",
+      arcgisCoordinateSystem: "WGS 84 / Web Mercator auxiliary sphere",
+      arcgisLayerSyncStatus: "not connected",
+      arcgisProWorkflow: "Open the exported ArcGIS Pro handoff JSON, add saved feature service or GIS package layers to the Pro project, then publish a web map or paste its embed URL here.",
       evidenceStrictness: "Balanced",
       riskTolerance: "Conservative",
       opportunityThreshold: "75",
@@ -5084,6 +5095,83 @@ function policyHazardRows(survey) {
   }));
 }
 
+function safeExternalMapUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  try {
+    const url = new URL(text);
+    return ["https:", "http:"].includes(url.protocol) ? url.href : "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function arcgisPortalBase(fields) {
+  const portal = safeExternalMapUrl(fields.arcgisPortalUrl) || "https://www.arcgis.com/";
+  return portal.replace(/\/+$/, "");
+}
+
+function arcgisEmbedUrl(fields) {
+  const explicit = safeExternalMapUrl(fields.arcgisEmbedUrl);
+  if (explicit) return explicit;
+  const webMapId = String(fields.arcgisWebMapId || "").trim();
+  if (!webMapId) return "";
+  return `${arcgisPortalBase(fields)}/apps/Embed/index.html?webmap=${encodeURIComponent(webMapId)}&legend=true&details=true&zoom=true&scale=true&disable_scroll=true`;
+}
+
+function arcgisMapViewerUrl(fields) {
+  const webMapId = String(fields.arcgisWebMapId || "").trim();
+  const base = arcgisPortalBase(fields);
+  return webMapId
+    ? `${base}/apps/mapviewer/index.html?webmap=${encodeURIComponent(webMapId)}`
+    : `${base}/apps/mapviewer/index.html`;
+}
+
+function arcgisProHandoffPackage(project) {
+  const survey = state.siteSurvey;
+  const fields = survey.fields || {};
+  return {
+    exportedAt: new Date().toISOString(),
+    intent: "ArcGIS Pro handoff from ASTRA GIS Intelligence",
+    note: "ArcGIS Pro is a desktop application, so this package stores the Pro project metadata, source layers, and web map references used by the browser workspace.",
+    project: {
+      name: project.project.name,
+      location: project.project.location,
+      phase: project.project.phase
+    },
+    arcgis: {
+      portalUrl: fields.arcgisPortalUrl || "",
+      webMapId: fields.arcgisWebMapId || "",
+      embedUrl: arcgisEmbedUrl(fields),
+      mapViewerUrl: arcgisMapViewerUrl(fields),
+      featureServiceUrl: fields.arcgisFeatureServiceUrl || "",
+      sceneUrl: fields.arcgisSceneUrl || "",
+      proProjectName: fields.arcgisProProjectName || "",
+      proProjectPath: fields.arcgisProProjectPath || "",
+      proPackageName: fields.arcgisProPackageName || "",
+      coordinateSystem: fields.arcgisCoordinateSystem || "",
+      layerSyncStatus: fields.arcgisLayerSyncStatus || "",
+      workflow: fields.arcgisProWorkflow || ""
+    },
+    parcel: {
+      address: fields.addressLookup || fields.parcelAddress || "",
+      parcelApn: fields.parcelApn || "",
+      jurisdiction: fields.jurisdiction || "",
+      zoningDistrict: fields.zoningDistrict || "",
+      detectedZoneArea: fields.detectedZoneArea || "",
+      latitude: fields.latitude || "",
+      longitude: fields.longitude || "",
+      overlays: fields.overlays || ""
+    },
+    site: project.site,
+    gisLayers: project.gisLayers,
+    gisFindings: survey.gisFindings || [],
+    policyLookups: survey.policyLookups || [],
+    hazards: survey.hazards || [],
+    opportunities: survey.opportunities || []
+  };
+}
+
 function caseStudyRecords() {
   return Array.isArray(state.siteSurvey.caseStudies) ? state.siteSurvey.caseStudies : [];
 }
@@ -5642,6 +5730,8 @@ function gisSurface(project) {
   const survey = state.siteSurvey;
   const fields = survey.fields;
   const gisFindings = survey.gisFindings?.length ? survey.gisFindings : [];
+  const embedUrl = arcgisEmbedUrl(fields);
+  const mapViewerUrl = arcgisMapViewerUrl(fields);
 
   return `
     <div class="surface-pad site-survey-workspace gis-workspace">
@@ -5649,13 +5739,13 @@ function gisSurface(project) {
         <button class="journey-link" data-section="dashboard">Back to flow</button>
         <div>
           <span class="mini-label">GIS analyst workspace</span>
-          <h3>ArcGIS / Spatial Mapping</h3>
-          <p>Find the parcel, identify the correct zone or policy area, record GIS layers, and pass source-linked spatial findings into site survey and policy review.</p>
+          <h3>ArcGIS Pro / Spatial Mapping</h3>
+          <p>Embed an ArcGIS web map, track ArcGIS Pro project/package metadata, identify the correct zone or policy area, and pass source-linked spatial findings into site survey and policy review.</p>
         </div>
         <div class="site-output-card">
           <span>Output</span>
-          <strong>GIS Source Stack</strong>
-          <p>Parcel location, jurisdiction, zone/area, GIS layer findings, source URLs, and design implications.</p>
+          <strong>ArcGIS Pro Handoff</strong>
+          <p>Portal, web map, feature service, Pro project/package, GIS layer findings, source URLs, and design implications.</p>
         </div>
       </header>
 
@@ -5689,10 +5779,73 @@ function gisSurface(project) {
         </div>
       </section>
 
+      <section class="site-survey-section gis-arcgis-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">2. ArcGIS Pro connection</span>
+            <h3>Embedded ArcGIS Web Map + Pro Handoff</h3>
+            <p>ArcGIS Pro itself is a desktop application, so the browser embeds the ArcGIS web map or Enterprise portal view while storing the ArcGIS Pro project and package metadata needed for handoff.</p>
+          </div>
+          <a class="add-row-button arcgis-open-link" href="${escapeHtml(mapViewerUrl)}" target="_blank" rel="noopener noreferrer">Open ArcGIS Map Viewer</a>
+        </div>
+        ${siteSubsectionIntro("PRO", "ArcGIS source and project metadata", "Paste a Web Map ID or ArcGIS embed URL to load the live ArcGIS map here. Use the Pro fields to keep the .aprx, .ppkx, feature service, and coordinate system tied to ASTRA project memory.")}
+        <div class="arcgis-workbench-grid">
+          <div class="arcgis-frame-shell">
+            ${embedUrl ? `
+              <iframe
+                title="ArcGIS embedded web map"
+                src="${escapeHtml(embedUrl)}"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox">
+              </iframe>
+            ` : `
+              <div class="arcgis-empty-state">
+                <span class="mini-label">ArcGIS map not connected</span>
+                <strong>Paste an ArcGIS embed URL or Web Map ID</strong>
+                <p>The local parcel diagram remains available below. Once a web map is linked, this frame becomes the live ArcGIS viewer for layers, parcels, overlays, and policy geography.</p>
+              </div>
+            `}
+          </div>
+          <div class="site-intake-grid arcgis-config-grid">
+            ${siteFieldInput("arcgisPortalUrl", "ArcGIS portal / organization URL")}
+            ${siteFieldInput("arcgisWebMapId", "ArcGIS web map ID")}
+            ${siteFieldInput("arcgisEmbedUrl", "ArcGIS embed URL")}
+            ${siteFieldInput("arcgisFeatureServiceUrl", "Feature service URL")}
+            ${siteFieldInput("arcgisSceneUrl", "Scene / 3D web scene URL")}
+            ${siteFieldInput("arcgisProProjectName", "ArcGIS Pro project name")}
+            ${siteFieldInput("arcgisProProjectPath", "ArcGIS Pro .aprx path / reference")}
+            ${siteFieldInput("arcgisProPackageName", "ArcGIS Pro package name")}
+            ${siteFieldInput("arcgisCoordinateSystem", "Coordinate system")}
+            ${siteFieldSelect("arcgisLayerSyncStatus", "ArcGIS layer sync status", ["not connected", "draft", "linked", "active", "needs review", "source linked", "verified"])}
+            ${siteFieldTextarea("arcgisProWorkflow", "ArcGIS Pro workflow / handoff notes", 4)}
+          </div>
+        </div>
+        <div class="arcgis-handoff-grid">
+          ${[
+            ["Portal", fields.arcgisPortalUrl || "--"],
+            ["Web map", fields.arcgisWebMapId || "--"],
+            ["Feature service", fields.arcgisFeatureServiceUrl || "--"],
+            ["Pro package", fields.arcgisProPackageName || "--"],
+            ["Coordinate system", fields.arcgisCoordinateSystem || "--"],
+            ["Sync status", fields.arcgisLayerSyncStatus || "--"]
+          ].map(item => `
+            <article>
+              <span>${escapeHtml(item[0])}</span>
+              <strong>${escapeHtml(siteDisplayValue(item[1]))}</strong>
+            </article>
+          `).join("")}
+        </div>
+        <div class="download-actions">
+          <button data-download="arcgis-pro">Download ArcGIS Pro Handoff JSON</button>
+          <button data-download="gis">Download GIS Package JSON</button>
+        </div>
+      </section>
+
       <section class="site-survey-section gis-map-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">2. GIS map</span>
+            <span class="mini-label">3. GIS map</span>
             <h3>Mapped Conditions</h3>
             <p>The visual map shows the current parcel context while the editable layer stack below records the source-linked findings that become project memory.</p>
           </div>
@@ -5717,7 +5870,7 @@ function gisSurface(project) {
       <section class="site-survey-section gis-layer-editor">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">3. Layer findings</span>
+            <span class="mini-label">4. Layer findings</span>
             <h3>Data Found Through GIS</h3>
             <p>Every spatial finding can be used by the survey page, policy page, design workspace, and final handoff once its source and status are recorded.</p>
           </div>
@@ -5739,11 +5892,13 @@ function gisSurface(project) {
 
       <section class="site-survey-section package-panel">
         <div>
-          <span class="mini-label">4. Connected outputs</span>
+          <span class="mini-label">5. Connected outputs</span>
           <h3>Send GIS Data Forward</h3>
-          <p>GIS findings are saved into the same project memory used by Site + Survey Intelligence, Zoning + Policy Intelligence, CAD/Rhino review, and export downloads.</p>
+          <p>ArcGIS, GIS findings, and Pro handoff data are saved into the same project memory used by Site + Survey Intelligence, Zoning + Policy Intelligence, CAD/Rhino review, and export downloads.</p>
         </div>
         <div class="download-actions">
+          <button data-download="arcgis-pro">Download ArcGIS Pro Handoff</button>
+          <button data-download="gis">Download GIS Package</button>
           <button data-download="parcel">Download Site JSON</button>
           <button data-download="csv">Download Project CSV</button>
         </div>
@@ -6171,8 +6326,12 @@ function bindSimpleProjectPage() {
           site: state.project.site,
           gisLayers: state.project.gisLayers,
           gisFindings: state.siteSurvey.gisFindings,
-          layerStatus: siteLayerRows(state.siteSurvey)
+          layerStatus: siteLayerRows(state.siteSurvey),
+          arcgis: arcgisProHandoffPackage(state.project).arcgis
         }, null, 2));
+      }
+      if (button.dataset.download === "arcgis-pro") {
+        triggerDownload("astra-arcgis-pro-handoff.json", "application/json", JSON.stringify(arcgisProHandoffPackage(state.project), null, 2));
       }
       if (button.dataset.download === "bim") {
         triggerDownload("astra-bim-package.json", "application/json", JSON.stringify({
