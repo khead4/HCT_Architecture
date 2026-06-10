@@ -599,6 +599,7 @@ function initialSiteSurvey() {
       qgisPackageName: "astra-qgis-site-intelligence.gpkg",
       qgisCoordinateSystem: "WGS 84 / Web Mercator auxiliary sphere",
       qgisWorkflow: "Download the ASTRA QGIS handoff JSON, open QGIS, create or open the .qgz project, add GeoPackage/GeoJSON/CSV layers, then paste source links or exported web map URLs back into ASTRA.",
+      webGisEmbedUrl: "",
       arcgisPortalUrl: "https://www.arcgis.com",
       arcgisProInstallStatus: "not installed",
       arcgisProInstallUrl: "https://doc.esri.com/en/arcgis-pro/latest/get-started/install-and-sign-in-to-arcgis-pro.html",
@@ -5446,6 +5447,10 @@ function arcgisMapViewerUrl(fields) {
     : `${base}/apps/mapviewer/index.html`;
 }
 
+function liveGisEmbedUrl(fields) {
+  return safeExternalMapUrl(fields.webGisEmbedUrl) || arcgisEmbedUrl(fields);
+}
+
 function arcgisProHandoffPackage(project) {
   const survey = state.siteSurvey;
   const fields = survey.fields || {};
@@ -5507,6 +5512,7 @@ function qgisHandoffPackage(project) {
     qgis: {
       installStatus: fields.qgisInstallStatus || "",
       downloadUrl: fields.qgisDownloadUrl || "",
+      webGisEmbedUrl: fields.webGisEmbedUrl || "",
       projectName: fields.qgisProjectName || "",
       projectPath: fields.qgisProjectPath || "",
       packageName: fields.qgisPackageName || "",
@@ -6497,7 +6503,7 @@ function gisSurface(project) {
   const survey = state.siteSurvey;
   const fields = survey.fields;
   const gisFindings = survey.gisFindings?.length ? survey.gisFindings : [];
-  const embedUrl = arcgisEmbedUrl(fields);
+  const embedUrl = liveGisEmbedUrl(fields);
   const mapViewerUrl = arcgisMapViewerUrl(fields);
   const qgisDownloadUrl = safeExternalMapUrl(fields.qgisDownloadUrl) || "https://qgis.org/download/";
   const proInstallUrl = safeExternalMapUrl(fields.arcgisProInstallUrl) || "https://doc.esri.com/en/arcgis-pro/latest/get-started/install-and-sign-in-to-arcgis-pro.html";
@@ -6634,18 +6640,18 @@ function gisSurface(project) {
       <section class="site-survey-section gis-arcgis-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">4. Web map + optional ArcGIS</span>
-            <h3>Embedded Web Map + Licensed Pro Handoff</h3>
-            <p>Use this when an ArcGIS Online, Enterprise, or student-license workflow is available. Otherwise, keep the project in the QGIS handoff path above.</p>
+            <span class="mini-label">4. Live Web GIS + optional ArcGIS</span>
+            <h3>Embed the Actual Web Map</h3>
+            <p>Paste an embeddable ArcGIS Online, ArcGIS Enterprise, QGIS Cloud, qgis2web, or public web-map URL. Desktop ArcGIS Pro and QGIS stay connected through handoff packages because browsers cannot run those native apps inside the page.</p>
           </div>
           <a class="add-row-button arcgis-open-link" href="${escapeHtml(mapViewerUrl)}" target="_blank" rel="noopener noreferrer">Open ArcGIS Map Viewer</a>
         </div>
-        ${siteSubsectionIntro("WEB", "Web GIS source and project metadata", "Paste a Web Map ID or ArcGIS embed URL to load the live ArcGIS map here. If ArcGIS is not licensed, keep this as optional and use the QGIS package fields as the primary source of truth.")}
+        ${siteSubsectionIntro("WEB", "Actual web GIS source and project metadata", "Paste the web GIS embed URL when the map is already published online. Use Web Map ID for ArcGIS, or the live embed URL field for QGIS Cloud, qgis2web, ArcGIS Experience Builder, ArcGIS Instant Apps, or another embeddable map source.")}
         <div class="arcgis-workbench-grid">
           <div class="arcgis-frame-shell">
             ${embedUrl ? `
               <iframe
-                title="ArcGIS embedded web map"
+                title="Embedded live web GIS map"
                 src="${escapeHtml(embedUrl)}"
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
@@ -6653,13 +6659,14 @@ function gisSurface(project) {
               </iframe>
             ` : `
               <div class="arcgis-empty-state">
-                <span class="mini-label">ArcGIS map not connected</span>
-                <strong>Paste an ArcGIS embed URL or Web Map ID</strong>
-                <p>The local parcel diagram remains available below. Once a web map is linked, this frame becomes the live ArcGIS viewer for layers, parcels, overlays, and policy geography.</p>
+                <span class="mini-label">Live web GIS not connected</span>
+                <strong>Paste an embeddable map URL or ArcGIS Web Map ID</strong>
+                <p>This frame loads the actual published web map when the source allows embedding. If the source blocks iframes or requires desktop software, ASTRA keeps the link, source, and QGIS/ArcGIS handoff package instead.</p>
               </div>
             `}
           </div>
           <div class="site-intake-grid arcgis-config-grid">
+            ${siteFieldInput("webGisEmbedUrl", "Live web GIS embed URL")}
             ${siteFieldInput("arcgisPortalUrl", "ArcGIS portal / organization URL")}
             ${siteFieldInput("arcgisWebMapId", "ArcGIS web map ID")}
             ${siteFieldInput("arcgisEmbedUrl", "ArcGIS embed URL")}
@@ -6676,6 +6683,7 @@ function gisSurface(project) {
         <div class="arcgis-handoff-grid">
           ${[
             ["Desktop GIS", fields.desktopGisPrimary || "QGIS"],
+            ["Live web GIS", fields.webGisEmbedUrl || "--"],
             ["QGIS project", fields.qgisProjectName || "--"],
             ["QGIS package", fields.qgisPackageName || "--"],
             ["Portal", fields.arcgisPortalUrl || "--"],

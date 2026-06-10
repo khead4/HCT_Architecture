@@ -4438,12 +4438,29 @@ body:not([data-active-section="dashboard"]) .main {
 body:not([data-active-section="dashboard"]) .topbar {
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 220;
   min-height: 72px;
   padding: 14px clamp(18px, 3vw, 34px);
   border-bottom: 1px solid rgba(255,255,255,.12);
   background: rgba(0,0,0,.58);
   backdrop-filter: blur(16px);
+}
+
+body:not([data-active-section="dashboard"]) .top-actions {
+  position: relative;
+  z-index: 230;
+  max-width: min(680px, 58vw);
+  margin-left: auto;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.36)),
+    rgba(0,0,0,.12);
+  border-radius: 10px;
+}
+
+body:not([data-active-section="dashboard"]) .top-actions .secondary-button,
+body:not([data-active-section="dashboard"]) .top-actions .primary-button {
+  min-height: 52px;
+  box-shadow: 0 16px 42px rgba(0,0,0,.26);
 }
 
 body:not([data-active-section="dashboard"]) .project-name {
@@ -9917,10 +9934,10 @@ body[data-active-section="dashboard"] .dashboard-flow.journey-home {
 
 /* Role-first home */
 .entry-actions {
-  position: absolute;
+  position: fixed;
   top: clamp(16px, 2.6vw, 34px);
   right: clamp(24px, 4.6vw, 86px);
-  z-index: 30;
+  z-index: 240;
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
@@ -9969,7 +9986,7 @@ body[data-active-section="dashboard"] .dashboard-flow.role-home {
   align-items: flex-start;
   min-height: 100vh;
   overflow: visible;
-  padding: clamp(108px, 9vw, 144px) clamp(22px, 4vw, 54px) clamp(22px, 4vw, 54px);
+  padding: clamp(138px, 11vw, 176px) clamp(22px, 4vw, 54px) clamp(22px, 4vw, 54px);
 }
 
 .role-shell {
@@ -10296,7 +10313,7 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
   align-items: center;
   min-height: 100vh;
   overflow: auto;
-  padding: clamp(108px, 9vw, 148px) clamp(22px, 4vw, 58px) clamp(22px, 4vw, 58px);
+  padding: clamp(138px, 11vw, 178px) clamp(22px, 4vw, 58px) clamp(22px, 4vw, 58px);
 }
 
 .auth-shell {
@@ -10834,6 +10851,45 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
 }
 
 @media (max-width: 760px) {
+  body:not([data-active-section="dashboard"]) .topbar {
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  body:not([data-active-section="dashboard"]) .top-actions {
+    width: 100%;
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  body:not([data-active-section="dashboard"]) .top-actions button {
+    min-height: 48px;
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  .entry-actions {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    justify-content: flex-end;
+    max-width: none;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.58)),
+      rgba(0,0,0,.18);
+  }
+
+  .entry-actions button {
+    min-height: 52px;
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  body[data-active-section="dashboard"] .dashboard-flow.role-home,
+  body[data-active-section="dashboard"] .dashboard-flow.auth-home {
+    padding-top: 112px;
+  }
+
   .data-memory-card {
     max-height: 92vh;
     padding: 16px;
