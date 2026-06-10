@@ -5333,6 +5333,150 @@ body:not([data-active-section="dashboard"]) #questionInput {
   text-transform: uppercase;
 }
 
+.design-coordination-grid p {
+  margin: 8px 0 0;
+  color: rgba(222,230,216,.64);
+  font-size: 12px;
+  line-height: 1.42;
+}
+
+.design-file-card {
+  min-height: 100%;
+}
+
+.design-file-card h3,
+.design-coordination-card h3,
+.design-handoff-card h3 {
+  font-size: clamp(25px, 2.2vw, 36px);
+}
+
+.design-file-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.design-workspace .site-intake-grid label {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.design-workspace .site-intake-grid label > span {
+  color: rgba(224,207,139,.84);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.design-workspace .site-intake-grid input,
+.design-workspace .site-intake-grid textarea,
+.design-workspace .site-intake-grid select {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px;
+  background: rgba(0,0,0,.34);
+  color: rgba(255,255,255,.92);
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  outline: none;
+}
+
+.design-workspace .site-intake-grid input:focus,
+.design-workspace .site-intake-grid textarea:focus,
+.design-workspace .site-intake-grid select:focus {
+  border-color: rgba(104,199,189,.72);
+  box-shadow: 0 0 0 3px rgba(104,199,189,.14);
+}
+
+.design-workspace .site-intake-grid .wide-field,
+.design-file-grid .wide-field {
+  grid-column: 1 / -1;
+}
+
+.design-coordination-card,
+.design-handoff-card {
+  grid-column: 1 / -1;
+}
+
+.design-risk-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.design-risk-strip div,
+.design-next-steps span,
+.design-export-note {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+}
+
+.design-risk-strip div {
+  border-left: 4px solid rgba(214,169,94,.72);
+  padding: 14px;
+}
+
+.design-risk-strip span,
+.design-export-note strong {
+  display: block;
+  color: rgba(224,207,139,.86);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.design-risk-strip strong {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255,255,255,.94);
+  font-size: 18px;
+  line-height: 1.18;
+}
+
+.design-risk-strip p {
+  margin: 8px 0 0;
+  color: rgba(222,230,216,.68);
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.design-next-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.design-next-steps span {
+  color: rgba(255,255,255,.84);
+  padding: 13px;
+  font-size: 13px;
+  line-height: 1.42;
+}
+
+.design-handoff-card .download-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.design-export-note {
+  border-left: 4px solid rgba(104,199,189,.74);
+  padding: 14px;
+}
+
+.design-export-note p {
+  margin: 7px 0 0;
+  color: rgba(222,230,216,.72);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 @media (max-width: 1100px) {
   .design-program-split,
   .design-instruction-zone,
@@ -5346,6 +5490,12 @@ body:not([data-active-section="dashboard"]) #questionInput {
 
   .design-program-panel {
     min-height: 540px;
+  }
+
+  .design-risk-strip,
+  .design-next-steps,
+  .design-handoff-card .download-actions {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -5378,6 +5528,7 @@ body:not([data-active-section="dashboard"]) #questionInput {
   }
 
   .design-program-panel dl,
+  .design-file-grid,
   .design-fact-grid {
     grid-template-columns: 1fr;
   }

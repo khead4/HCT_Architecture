@@ -647,7 +647,27 @@ function initialSiteSurvey() {
       lumionShadingEta: "5 weeks after bracket confirmation",
       lumionLandscapeCost: "$9,500",
       lumionLandscapeShipDate: "2026-09-02",
-      lumionLandscapeEta: "2 weeks after grading confirmation"
+      lumionLandscapeEta: "2 weeks after grading confirmation",
+      autocadFileName: "Aalborg_HCT_Plan_Set.dwg",
+      autocadDxfFileName: "Aalborg_HCT_Plan_Set.dxf",
+      autocadVersion: "AutoCAD 2026",
+      autocadUnits: "Architectural feet",
+      autocadDrawingScale: "1/8 in = 1 ft",
+      autocadLayerStandard: "AIA/NCS conceptual layer set",
+      autocadXrefStatus: "Site survey xref pending",
+      autocadTitleblockStatus: "Concept titleblock draft",
+      autocadSheetSetStatus: "Schematic sheet set pending",
+      autocadExportNotes: "Export clean plan geometry, setbacks, grid, dimensions, and consultant reference layers as DXF/DWG before detailed documentation.",
+      rhinoFileName: "Aalborg_HCT_Concept_Model.3dm",
+      rhinoObjFileName: "Aalborg_HCT_Concept_Model.obj",
+      rhinoVersion: "Rhino 8",
+      rhinoUnits: "Feet",
+      rhinoTolerance: "0.01 ft",
+      rhinoLayerStandard: "Massing / envelope / glazing / material zones",
+      rhinoGrasshopperStatus: "Not connected",
+      rhinoExportFormat: "OBJ / DAE",
+      rhinoExportNotes: "Export clean massing, facade rhythm, material zones, and simplified context for Lumion, Sun Studies, ASHRAE, and BIM review.",
+      cadRhinoCoordinationNotes: "Keep AutoCAD as the drawing/documentation source and Rhino as the 3D design/model source. Return decisions, risks, and handoff notes to ASTRA after each export."
     },
     uploads: [],
     environmental: [
@@ -4724,19 +4744,134 @@ function siteSurveySurface(project) {
   `;
 }
 
+function autocadHandoffPackage(project) {
+  const fields = state.siteSurvey.fields || {};
+  const frontRule = (project.verifiedRules || []).find(rule => rule.ruleType === "front_setback");
+  const heightRule = (project.verifiedRules || []).find(rule => rule.ruleType === "height_limit");
+  return {
+    exportedAt: new Date().toISOString(),
+    intent: "AutoCAD drawing coordination handoff from ASTRA",
+    project: project.project,
+    file: {
+      fileName: fields.autocadFileName || "--",
+      dxfFileName: fields.autocadDxfFileName || "--",
+      version: fields.autocadVersion || "--",
+      units: fields.autocadUnits || "--",
+      drawingScale: fields.autocadDrawingScale || "--",
+      layerStandard: fields.autocadLayerStandard || "--"
+    },
+    drawingStatus: {
+      xrefStatus: fields.autocadXrefStatus || "--",
+      titleblockStatus: fields.autocadTitleblockStatus || "--",
+      sheetSetStatus: fields.autocadSheetSetStatus || "--",
+      exportNotes: fields.autocadExportNotes || "--"
+    },
+    modelFacts: project.designModel,
+    constraints: {
+      frontSetback: frontRule || null,
+      heightLimit: heightRule || null
+    },
+    risks: state.siteSurvey.hazards || [],
+    keyTakeaways: [
+      "Use AutoCAD for 2D documentation, dimensions, sheet coordination, DWG/DXF exchange, and consultant backgrounds.",
+      "Keep Rhino as the 3D source for massing and model geometry.",
+      "Return drawing decisions and unresolved issues to ASTRA before the next handoff."
+    ]
+  };
+}
+
+function rhinoHandoffPackage(project) {
+  const fields = state.siteSurvey.fields || {};
+  return {
+    exportedAt: new Date().toISOString(),
+    intent: "Rhino model handoff from ASTRA",
+    project: project.project,
+    file: {
+      fileName: fields.rhinoFileName || "--",
+      objFileName: fields.rhinoObjFileName || "--",
+      version: fields.rhinoVersion || "--",
+      units: fields.rhinoUnits || "--",
+      tolerance: fields.rhinoTolerance || "--",
+      layerStandard: fields.rhinoLayerStandard || "--",
+      grasshopperStatus: fields.rhinoGrasshopperStatus || "--",
+      exportFormat: fields.rhinoExportFormat || "--"
+    },
+    modelFacts: project.designModel,
+    materialIntent: materialIntentItems(project),
+    exportNotes: fields.rhinoExportNotes || "--",
+    downstreamUse: ["Sun Studies", "ASHRAE + EC3", "Lumion", "BIM package", "Engineering review"],
+    keyTakeaways: [
+      "Use Rhino for 3D form, massing, facade rhythm, material zones, and simplified geometry exports.",
+      "Use AutoCAD for drawing documentation and DWG coordination.",
+      "Keep exported model assumptions visible in ASTRA."
+    ]
+  };
+}
+
+function autocadDxf(project) {
+  const model = project.designModel || {};
+  const width = 48;
+  const depth = 32;
+  const front = numericSiteValue(model.frontDistanceFt) || 18;
+  return [
+    "0", "SECTION", "2", "HEADER", "9", "$INSUNITS", "70", "2", "0", "ENDSEC",
+    "0", "SECTION", "2", "ENTITIES",
+    "0", "LWPOLYLINE", "8", "ASTRA_PLAN", "90", "4", "70", "1",
+    "10", "0", "20", "0", "10", String(width), "20", "0", "10", String(width), "20", String(depth), "10", "0", "20", String(depth),
+    "0", "LINE", "8", "ASTRA_SETBACK", "10", "0", "20", String(front), "11", String(width), "21", String(front),
+    "0", "TEXT", "8", "ASTRA_LABELS", "10", "2", "20", String(depth + 4), "40", "2.5", "1", `${project.project?.name || "ASTRA"} AutoCAD plan handoff`,
+    "0", "ENDSEC", "0", "EOF"
+  ].join("\n");
+}
+
+function rhinoObj(project) {
+  const model = project.designModel || {};
+  const width = 48;
+  const depth = 32;
+  const height = numericSiteValue(model.heightFt) || 28;
+  const hw = width / 2;
+  const hd = depth / 2;
+  const name = fieldsSafeName(state.siteSurvey.fields?.rhinoObjFileName || model.name || "astra-rhino-massing");
+  return [
+    `# ASTRA Rhino OBJ handoff: ${name}`,
+    `# Source model: ${model.name || "--"}`,
+    "o ASTRA_Massing",
+    `v -${hw} -${hd} 0`,
+    `v ${hw} -${hd} 0`,
+    `v ${hw} ${hd} 0`,
+    `v -${hw} ${hd} 0`,
+    `v -${hw} -${hd} ${height}`,
+    `v ${hw} -${hd} ${height}`,
+    `v ${hw} ${hd} ${height}`,
+    `v -${hw} ${hd} ${height}`,
+    "f 1 2 3 4",
+    "f 5 8 7 6",
+    "f 1 5 6 2",
+    "f 2 6 7 3",
+    "f 3 7 8 4",
+    "f 4 8 5 1",
+    ""
+  ].join("\n");
+}
+
+function designCoordinationRows(project) {
+  const model = project.designModel || {};
+  const fields = state.siteSurvey.fields || {};
+  return [
+    ["AutoCAD file", fields.autocadFileName, "2D documentation file"],
+    ["Rhino file", fields.rhinoFileName, "3D model source"],
+    ["Shared units", `${fields.autocadUnits || "--"} / ${fields.rhinoUnits || "--"}`, "Prevent scale mismatch"],
+    ["Model height", model.heightFt ? `${model.heightFt} ft` : "--", "Check against zoning height"],
+    ["Front distance", model.frontDistanceFt ? `${model.frontDistanceFt} ft` : "--", "Check against front setback"],
+    ["Material intent", materialIntentItems(project).join(" / "), "Feeds Lumion and EC3 review"]
+  ];
+}
+
 function designSurface(project) {
   const model = project.designModel || {};
   const frontRule = (project.verifiedRules || []).find(rule => rule.ruleType === "front_setback");
-  const heightRule = (project.verifiedRules || []).find(rule => rule.ruleType === "height_limit");
-  const materialIntent = materialIntentItems(project);
-  const designFacts = [
-    ["Current model", model.name || "--"],
-    ["Selected element", model.selectedElement || "--"],
-    ["Height", model.heightFt ? `${model.heightFt} ft` : "--"],
-    ["Front distance", model.frontDistanceFt ? `${model.frontDistanceFt} ft` : "--"],
-    ["South glazing", model.southGlazingPercent ? `${model.southGlazingPercent}%` : "--"],
-    ["Material intent", materialIntent.length ? materialIntent.join(" / ") : "--"]
-  ];
+  const designFacts = designCoordinationRows(project);
+  const designRisks = (state.siteSurvey.hazards || []).slice(0, 3);
   const instructionRows = [
     {
       label: "1. Draft in AutoCAD",
@@ -4830,25 +4965,92 @@ function designSurface(project) {
         <article class="design-instruction-card">
           <span class="mini-label">Current design facts</span>
           <h3>Project Memory Feeding The Model</h3>
-          <div class="design-fact-grid">
+          <div class="design-fact-grid design-coordination-grid">
             ${designFacts.map(row => `
               <div>
                 <span>${escapeHtml(row[0])}</span>
                 <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+                <p>${escapeHtml(row[2])}</p>
               </div>
             `).join("")}
           </div>
         </article>
 
+        <article class="design-instruction-card design-file-card">
+          <span class="mini-label">AutoCAD file setup</span>
+          <h3>Drawing Package Inputs</h3>
+          <p>Use this side for the drawing source of truth: plan geometry, dimensions, titleblocks, sheet sets, standards, and consultant exchange.</p>
+          <div class="site-intake-grid design-file-grid">
+            ${siteFieldInput("autocadFileName", "AutoCAD DWG file")}
+            ${siteFieldInput("autocadDxfFileName", "AutoCAD DXF export")}
+            ${siteFieldInput("autocadVersion", "AutoCAD version")}
+            ${siteFieldInput("autocadUnits", "AutoCAD units")}
+            ${siteFieldInput("autocadDrawingScale", "Drawing scale")}
+            ${siteFieldInput("autocadLayerStandard", "Layer standard")}
+            ${siteFieldInput("autocadXrefStatus", "Xref status")}
+            ${siteFieldInput("autocadTitleblockStatus", "Titleblock status")}
+            ${siteFieldInput("autocadSheetSetStatus", "Sheet set status")}
+            ${siteFieldTextarea("autocadExportNotes", "AutoCAD export notes", 3)}
+          </div>
+        </article>
+
+        <article class="design-instruction-card design-file-card">
+          <span class="mini-label">Rhino model setup</span>
+          <h3>3D Design Package Inputs</h3>
+          <p>Use this side for the model source of truth: form, massing, facade rhythm, material zones, model tolerance, and downstream visualization exports.</p>
+          <div class="site-intake-grid design-file-grid">
+            ${siteFieldInput("rhinoFileName", "Rhino 3DM file")}
+            ${siteFieldInput("rhinoObjFileName", "Rhino OBJ export")}
+            ${siteFieldInput("rhinoVersion", "Rhino version")}
+            ${siteFieldInput("rhinoUnits", "Rhino units")}
+            ${siteFieldInput("rhinoTolerance", "Model tolerance")}
+            ${siteFieldInput("rhinoLayerStandard", "Layer structure")}
+            ${siteFieldInput("rhinoGrasshopperStatus", "Grasshopper status")}
+            ${siteFieldInput("rhinoExportFormat", "Export formats")}
+            ${siteFieldTextarea("rhinoExportNotes", "Rhino export notes", 3)}
+          </div>
+        </article>
+
+        <article class="design-instruction-card design-coordination-card">
+          <span class="mini-label">Coordination</span>
+          <h3>What Should Stay Synchronized</h3>
+          <div class="site-intake-grid">
+            ${siteFieldTextarea("cadRhinoCoordinationNotes", "AutoCAD / Rhino coordination notes", 4)}
+          </div>
+          <div class="design-risk-strip" aria-label="Design risks and checks">
+            ${(designRisks.length ? designRisks : [
+              { name: "Design check", severity: "--", status: "--", mitigation: "Add site, policy, or model data before treating this as verified." }
+            ]).map(item => `
+              <div>
+                <span>${escapeHtml(item.name || "Risk")}</span>
+                <strong>${escapeHtml(siteDisplayValue(item.severity))}</strong>
+                <p>${escapeHtml(item.mitigation || item.status || "--")}</p>
+              </div>
+            `).join("")}
+          </div>
+          <div class="design-next-steps">
+            <span>Check drawing scale before consultant exchange</span>
+            <span>Check Rhino units before OBJ/DAE export</span>
+            <span>Send unresolved issues back to ASTRA advice history</span>
+          </div>
+        </article>
+
         <article class="design-instruction-card design-handoff-card">
           <span class="mini-label">Handoff</span>
-          <h3>Send The Model Forward</h3>
+          <h3>Send The Work Forward</h3>
           <p>Use these exports when the AutoCAD/Rhino work needs to move into Lumion, BIM, project memory, or spreadsheet review. Replace prototype geometry with the real CAD/Rhino file when it is ready.</p>
           <div class="download-actions">
+            <button data-download="autocad-dxf">Download AutoCAD DXF</button>
+            <button data-download="autocad-handoff">Download AutoCAD JSON</button>
+            <button data-download="rhino-obj">Download Rhino OBJ</button>
+            <button data-download="rhino-handoff">Download Rhino JSON</button>
             <button data-download="lumion-cad">Download Lumion .DAE</button>
             <button data-download="bim">Download BIM Package</button>
-            <button data-download="parcel">Download Project JSON</button>
             <button data-download="csv">Download Project CSV</button>
+          </div>
+          <div class="design-export-note">
+            <strong>Takeaway</strong>
+            <p>AutoCAD owns drawing precision, Rhino owns 3D exploration, and ASTRA owns the memory of decisions, evidence, risks, and next actions.</p>
           </div>
         </article>
       </section>
@@ -7788,7 +7990,7 @@ function renderSurface() {
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
-  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae" || state.activeSection === "lumion") bindSiteSurveyPage();
+  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae" || state.activeSection === "lumion" || state.activeSection === "design") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
@@ -8184,6 +8386,20 @@ function downloadByKind(kind) {
   if (kind === "lumion-cad") {
     const fileName = fieldsSafeName(state.siteSurvey.fields?.lumionCadFileName || "astra-lumion-massing.dae");
     triggerDownload(fileName.toLowerCase().endsWith(".dae") ? fileName : `${fileName}.dae`, "model/vnd.collada+xml", lumionCadDae(state.project));
+  }
+  if (kind === "autocad-dxf") {
+    const fileName = fieldsSafeName(state.siteSurvey.fields?.autocadDxfFileName || "astra-autocad-plan.dxf");
+    triggerDownload(fileName.toLowerCase().endsWith(".dxf") ? fileName : `${fileName}.dxf`, "application/dxf", autocadDxf(state.project));
+  }
+  if (kind === "autocad-handoff") {
+    triggerDownload("astra-autocad-handoff.json", "application/json", JSON.stringify(autocadHandoffPackage(state.project), null, 2));
+  }
+  if (kind === "rhino-obj") {
+    const fileName = fieldsSafeName(state.siteSurvey.fields?.rhinoObjFileName || "astra-rhino-massing.obj");
+    triggerDownload(fileName.toLowerCase().endsWith(".obj") ? fileName : `${fileName}.obj`, "model/obj", rhinoObj(state.project));
+  }
+  if (kind === "rhino-handoff") {
+    triggerDownload("astra-rhino-handoff.json", "application/json", JSON.stringify(rhinoHandoffPackage(state.project), null, 2));
   }
   if (kind === "lumion-schedule-xls") {
     triggerDownload("astra-lumion-material-schedule.xls", "application/vnd.ms-excel", lumionScheduleExcel(state.project));
