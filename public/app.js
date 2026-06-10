@@ -6057,7 +6057,7 @@ function caseStudyRecords() {
   return Array.isArray(state.siteSurvey.caseStudies) ? state.siteSurvey.caseStudies : [];
 }
 
-const creativeNoteTypeOptions = ["Writing", "Bulleted list", "Table"];
+const creativeNoteTypeOptions = ["Writing", "Bulleted list", "Table", "Drawing / picture"];
 
 function creativeNoteRecords() {
   if (!Array.isArray(state.siteSurvey.creativeNotes)) state.siteSurvey.creativeNotes = [];
@@ -6086,9 +6086,16 @@ function creativeNoteType(note) {
 function newCreativeNote(type = "Writing") {
   const now = new Date().toISOString();
   const safeType = creativeNoteTypeOptions.includes(type) ? type : "Writing";
+  const starterHeader = safeType === "Table"
+    ? "New idea table"
+    : safeType === "Bulleted list"
+    ? "New idea list"
+    : safeType === "Drawing / picture"
+    ? "New visual idea"
+    : "New design idea";
   return {
     id: `idea-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    header: "New design idea",
+    header: starterHeader,
     type: safeType,
     writing: "",
     bullets: safeType === "Bulleted list" ? [""] : [],
@@ -6124,11 +6131,28 @@ function creativeNotePlainText(note) {
   const type = creativeNoteType(note);
   if (type === "Bulleted list") return listValue(note.bullets, []).join(" | ") || "--";
   if (type === "Table") return creativeNoteTableValue(note).replace(/\n/g, " / ") || "--";
+  if (type === "Drawing / picture") {
+    const visualCount = Array.isArray(note.visuals) ? note.visuals.length : 0;
+    const caption = String(note.writing || "").trim();
+    return [visualCount ? `${visualCount} visual${visualCount === 1 ? "" : "s"}` : "", caption].filter(Boolean).join(" | ") || "--";
+  }
   return String(note.writing || "").trim() || "--";
 }
 
 function creativeNotePreviewMarkup(note) {
   const type = creativeNoteType(note);
+  if (type === "Drawing / picture") {
+    const visuals = Array.isArray(note.visuals) ? note.visuals : [];
+    const firstVisual = visuals[0];
+    return `
+      <div class="idea-picture-preview">
+        ${firstVisual
+          ? `<img src="${escapeHtml(firstVisual.dataUrl || "")}" alt="${escapeHtml(firstVisual.name || "Idea visual")}">`
+          : `<div class="idea-picture-placeholder">Add a drawing, image, screenshot, precedent, or material reference.</div>`}
+      </div>
+      <p>${escapeHtml(note.writing || "Describe what the visual shows and how it should guide the design.")}</p>
+    `;
+  }
   if (type === "Bulleted list") {
     const bullets = listValue(note.bullets, []).filter(item => String(item || "").trim());
     return bullets.length
@@ -6165,6 +6189,33 @@ function creativeNoteVisualMarkup(note) {
   `).join("");
 }
 
+function noteAddMenuMarkup(variant = "") {
+  const className = `notes-add-menu ${variant}`.trim();
+  const options = [
+    ["Writing", "Text", "Block of text", "Use for rationale, meeting notes, questions, or design direction."],
+    ["Bulleted list", "List", "Bulleted list", "Use when an idea needs quick criteria, tasks, or takeaways."],
+    ["Table", "Table", "Table", "Use when comparing options, materials, risks, costs, or responsibilities."],
+    ["Drawing / picture", "Visual", "Drawing / picture", "Use for sketches, screenshots, precedents, diagrams, or material images."]
+  ];
+  return `
+    <details class="${escapeHtml(className)}">
+      <summary aria-label="Add an ideation block">
+        <span>+</span>
+        <em>Add idea</em>
+      </summary>
+      <div class="notes-add-options" role="group" aria-label="Choose ideation structure">
+        ${options.map(option => `
+          <button type="button" data-note-add-type="${escapeHtml(option[0])}">
+            <span>${escapeHtml(option[1])}</span>
+            <strong>${escapeHtml(option[2])}</strong>
+            <em>${escapeHtml(option[3])}</em>
+          </button>
+        `).join("")}
+      </div>
+    </details>
+  `;
+}
+
 function creativeNoteEditorMarkup(note, index) {
   const type = creativeNoteType(note);
   const typeClass = type.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -6172,6 +6223,8 @@ function creativeNoteEditorMarkup(note, index) {
     ? `<label class="idea-content-editor"><span>Bullets</span><textarea data-note-id="${escapeHtml(note.id)}" data-note-field="bullets" rows="6" placeholder="One bullet per line">${escapeHtml(listValue(note.bullets, []).join("\n"))}</textarea></label>`
     : type === "Table"
     ? `<label class="idea-content-editor"><span>Table</span><textarea data-note-id="${escapeHtml(note.id)}" data-note-field="table" rows="7" placeholder="Header | Header&#10;Value | Value">${escapeHtml(creativeNoteTableValue(note))}</textarea><em>Use one row per line and separate columns with |</em></label>`
+    : type === "Drawing / picture"
+    ? `<label class="idea-content-editor visual-first"><span>Visual caption / design meaning</span><textarea data-note-id="${escapeHtml(note.id)}" data-note-field="writing" rows="5" placeholder="Describe the drawing, picture, precedent, diagram, or material reference and what decision it supports.">${escapeHtml(note.writing || "")}</textarea></label>`
     : `<label class="idea-content-editor"><span>Writing</span><textarea data-note-id="${escapeHtml(note.id)}" data-note-field="writing" rows="7" placeholder="Write the design thought, rationale, question, or meeting note.">${escapeHtml(note.writing || "")}</textarea></label>`;
 
   return `
@@ -8390,6 +8443,36 @@ function engineeringSurface(project) {
     ["Material / EC3", "Embodied carbon, procurement, material substitutions", project.analysisResults.carbon?.embodiedCarbonChange || "--", "needs review"],
     ["Coordination", "Consultant comments, unresolved conflicts, issue closure", issues.length ? `${issues.length} active issues` : "No active issues", issues.length ? "active" : "ready"]
   ];
+  const moveForwardActions = [
+    {
+      number: "01",
+      title: "Send current CAD/Rhino + BIM package",
+      detail: "Download the coordinated model package for technical review.",
+      cta: "Download package",
+      download: "bim"
+    },
+    {
+      number: "02",
+      title: "Confirm site/civil assumptions",
+      detail: "Return to Site Intelligence to verify slope, utilities, drainage, and civil basis.",
+      cta: "Open survey",
+      section: "survey"
+    },
+    {
+      number: "03",
+      title: "Record consultant comments",
+      detail: "Capture consultant questions as project memory, not scattered notes.",
+      cta: "Open notes",
+      section: "notes"
+    },
+    {
+      number: "04",
+      title: "Revise model and update ASTRA memory",
+      detail: "Return to the CAD/Rhino workspace, revise the model, then resend updated data.",
+      cta: "Open design",
+      section: "design"
+    }
+  ];
   return `
     <div class="surface-pad completion-workspace engineering-workspace">
       <header class="completion-hero">
@@ -8437,10 +8520,19 @@ function engineeringSurface(project) {
           <span class="mini-label">Review loop</span>
           <h3>How To Move Forward</h3>
           <div class="completion-step-list">
-            <span>1. Send current CAD/Rhino + BIM package</span>
-            <span>2. Confirm site/civil assumptions</span>
-            <span>3. Record consultant comments</span>
-            <span>4. Revise model and update ASTRA memory</span>
+            ${moveForwardActions.map(action => `
+              <button
+                class="completion-forward-action"
+                type="button"
+                ${action.download ? `data-download="${escapeHtml(action.download)}"` : ""}
+                ${action.section ? `data-section="${escapeHtml(action.section)}"` : ""}
+              >
+                <span>${escapeHtml(action.number)}</span>
+                <strong>${escapeHtml(action.title)}</strong>
+                <p>${escapeHtml(action.detail)}</p>
+                <em>${escapeHtml(action.cta)}</em>
+              </button>
+            `).join("")}
           </div>
         </article>
       </section>
@@ -8578,7 +8670,7 @@ function notesSurface(project) {
           <span>Saved ideas</span>
           <strong>${escapeHtml(String(notes.length))}</strong>
           <em>writing, bullets, tables, visuals</em>
-          <button class="notes-add-button" type="button" data-note-add>+ Add idea</button>
+          ${noteAddMenuMarkup("compact")}
         </div>
       </header>
       <section class="notes-grid notes-context-grid">
@@ -8594,9 +8686,9 @@ function notesSurface(project) {
         <div>
           <span class="mini-label">Create structure</span>
           <h3>Add Ideas, Notes, Tables, Lists, And Visual References</h3>
-          <p>Use the plus button to create a new thinking block, then decide whether it should read like writing, a bullet list, or a table. Visuals stay with the idea so ASTRA can connect the note to design intent.</p>
+          <p>Use the plus button to create a new thinking block, then choose whether it should become a block of text, a bulleted list, a table, or a drawing/picture. Visuals stay with the idea so ASTRA can connect the note to design intent.</p>
         </div>
-        <button class="notes-add-button large" type="button" data-note-add aria-label="Add a new note or idea">+</button>
+        ${noteAddMenuMarkup("large")}
       </section>
       <section class="notes-builder-grid" aria-label="Editable notes and ideation blocks">
         ${notes.length ? notes.map((note, index) => creativeNoteEditorMarkup(note, index)).join("") : `
@@ -8604,7 +8696,7 @@ function notesSurface(project) {
             <span class="mini-label">No notes yet</span>
             <h3>Start with one design thought.</h3>
             <p>Add a header, choose a structure, and attach visuals when a sketch, precedent, diagram, material board, or screenshot helps explain the idea.</p>
-            <button class="notes-add-button" type="button" data-note-add>+ Add idea</button>
+            ${noteAddMenuMarkup("empty")}
           </article>
         `}
       </section>
@@ -9239,12 +9331,29 @@ function downloadByKind(kind) {
     triggerDownload("astra-arcgis-pro-handoff.json", "application/json", JSON.stringify(arcgisProHandoffPackage(state.project), null, 2));
   }
   if (kind === "bim") {
-    triggerDownload("astra-bim-package.json", "application/json", JSON.stringify({
+    triggerDownload("astra-cad-rhino-bim-package.json", "application/json", JSON.stringify({
       project: state.project.project,
       designModel: state.project.designModel,
+      cadRhino: {
+        autocad: autocadHandoffPackage(state.project),
+        rhino: rhinoHandoffPackage(state.project)
+      },
       constraints: state.siteSurvey.constraints,
       risks: state.siteSurvey.hazards,
-      opportunities: state.siteSurvey.opportunities
+      opportunities: state.siteSurvey.opportunities,
+      siteAssumptions: {
+        slope: state.siteSurvey.fields?.averageSlope || state.project.site.averageSlopePercent,
+        slopeDirection: state.siteSurvey.fields?.slopeDirection || state.project.site.slopeDirection,
+        utilities: state.siteSurvey.fields?.utilitySummary || state.project.site.utilities,
+        drainage: state.siteSurvey.fields?.drainageNotes || "--",
+        civilReviewStatus: state.siteSurvey.fields?.civilReviewStatus || "needs review"
+      },
+      notes: creativeNoteRecords().map(note => ({
+        header: note.header || "Untitled idea",
+        type: creativeNoteType(note),
+        text: creativeNotePlainText(note),
+        visuals: Array.isArray(note.visuals) ? note.visuals.map(visual => ({ name: visual.name || "visual" })) : []
+      }))
     }, null, 2));
   }
   if (kind === "astra") {
@@ -9648,11 +9757,21 @@ function readCreativeNoteImage(file) {
 }
 
 function bindNotesPage() {
+  const addCreativeNote = type => {
+    creativeNoteRecords().unshift(newCreativeNote(type));
+    persistSiteSurvey();
+    render();
+  };
+
   document.querySelectorAll("[data-note-add]").forEach(button => {
     button.addEventListener("click", () => {
-      creativeNoteRecords().unshift(newCreativeNote());
-      persistSiteSurvey();
-      render();
+      addCreativeNote("Writing");
+    });
+  });
+
+  document.querySelectorAll("[data-note-add-type]").forEach(button => {
+    button.addEventListener("click", () => {
+      addCreativeNote(button.dataset.noteAddType || "Writing");
     });
   });
 
