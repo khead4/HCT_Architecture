@@ -4869,9 +4869,16 @@ function designCoordinationRows(project) {
 
 function designSurface(project) {
   const model = project.designModel || {};
+  const fields = state.siteSurvey.fields || {};
   const frontRule = (project.verifiedRules || []).find(rule => rule.ruleType === "front_setback");
   const designFacts = designCoordinationRows(project);
   const designRisks = (state.siteSurvey.hazards || []).slice(0, 3);
+  const lumionFacts = [
+    ["Lumion scene", fields.lumionProjectName || "--"],
+    ["Import file", fields.lumionCadFileName || "--"],
+    ["Import format", fields.lumionCadFormat || "--"],
+    ["Material library", fields.lumionMaterialLibrary || "--"]
+  ];
   const instructionRows = [
     {
       label: "1. Draft in AutoCAD",
@@ -5032,6 +5039,43 @@ function designSurface(project) {
             <span>Check drawing scale before consultant exchange</span>
             <span>Check Rhino units before OBJ/DAE export</span>
             <span>Send unresolved issues back to ASTRA advice history</span>
+          </div>
+        </article>
+
+        <article class="design-instruction-card design-lumion-card">
+          <div class="design-lumion-copy">
+            <span class="mini-label">Visualization destination</span>
+            <h3>Where Lumion Enters The Flow</h3>
+            <p>Lumion sits after CAD/Rhino model setup and before final client-facing review. Use it for atmosphere, material appearance, daylight feeling, landscape context, and render critique while ASTRA keeps the evidence, risks, costs, and decisions attached.</p>
+            <div class="design-lumion-route" aria-label="CAD Rhino Lumion ASTRA route">
+              <span>AutoCAD / Rhino model</span>
+              <i aria-hidden="true"></i>
+              <strong>Lumion scene</strong>
+              <i aria-hidden="true"></i>
+              <span>ASTRA memory</span>
+            </div>
+          </div>
+          <div class="design-lumion-box" aria-label="Lumion destination box">
+            <div class="lumion-screen-frame">
+              <div class="lumion-sky"></div>
+              <div class="lumion-model-preview">
+                <span>${escapeHtml(model.name || "Concept massing")}</span>
+              </div>
+              <div class="lumion-ground"></div>
+            </div>
+            <div class="design-lumion-facts">
+              ${lumionFacts.map(row => `
+                <div>
+                  <span>${escapeHtml(row[0])}</span>
+                  <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+                </div>
+              `).join("")}
+            </div>
+            <div class="design-lumion-actions">
+              <button data-section="lumion">Open Lumion Workspace</button>
+              <button data-download="lumion-cad">Download Lumion .DAE</button>
+              <button data-download="lumion">Download Lumion Brief</button>
+            </div>
           </div>
         </article>
 
