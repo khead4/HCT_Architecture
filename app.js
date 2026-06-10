@@ -8043,47 +8043,447 @@ function checklistSurface(title, items) {
   `;
 }
 
-function notesSurface() {
+function completionMetricRows(project) {
+  const issues = projectFlowIssues(project);
+  const caseCount = caseStudyRecords().length;
+  return [
+    ["Open issues", issues.length ? String(issues.length) : "--", issues.length ? "needs action" : "clear"],
+    ["Evidence records", String((state.siteSurvey.evidence || []).length + (state.siteSurvey.uploads || []).length), "saved"],
+    ["Policy records", String((project.verifiedRules || []).length + (state.siteSurvey.policyLookups || []).length), "source linked"],
+    ["Case studies", caseCount ? String(caseCount) : "--", caseCount ? "ready" : "generate"]
+  ];
+}
+
+function finalizationSurface(project) {
+  const issues = projectFlowIssues(project);
+  const packageItems = state.siteSurvey.packageItems || [];
+  const decisionRows = finalizationDecisionRows(project);
   return `
-    <div class="surface-pad note-board">
-      <div class="sticky-note">Preserve west view corridor.</div>
-      <div class="sticky-note green">Client values natural materials.</div>
-      <div class="sticky-note blue">Check excavation depth against slope.</div>
-      <div class="sticky-note red">Height conflict before permit package.</div>
+    <div class="surface-pad completion-workspace finalization-workspace">
+      <header class="completion-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Finalization workspace</span>
+          <h3>Pre-Engineering Decision Package</h3>
+          <p>Bring the brief, site facts, policy evidence, CAD/Rhino model, sun-study findings, ASHRAE/material checks, Lumion review, risks, and exports into one approval-ready package.</p>
+        </div>
+        <div class="completion-score-card">
+          <span>Package state</span>
+          <strong>${issues.length ? "Review" : "Ready"}</strong>
+          <em>${issues.length ? `${issues.length} issue${issues.length === 1 ? "" : "s"} open` : "No blocking issue detected"}</em>
+        </div>
+      </header>
+
+      <section class="completion-metric-grid">
+        ${completionMetricRows(project).map(row => `
+          <article class="${escapeHtml(siteStatusClass(row[2]))}">
+            <span>${escapeHtml(row[0])}</span>
+            <strong>${escapeHtml(row[1])}</strong>
+            <p>${escapeHtml(row[2])}</p>
+          </article>
+        `).join("")}
+      </section>
+
+      <section class="completion-main-grid">
+        <article class="completion-panel wide">
+          <span class="mini-label">Decision register</span>
+          <h3>What Engineering Receives</h3>
+          <div class="completion-table">
+            ${decisionRows.map(row => `
+              <div>
+                <strong>${escapeHtml(row[0])}</strong>
+                <span>${escapeHtml(row[1])}</span>
+                <em>${escapeHtml(row[2])}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+
+        <article class="completion-panel">
+          <span class="mini-label">Open before handoff</span>
+          <h3>Risks + Conflicts</h3>
+          <div class="completion-list">
+            ${issues.length ? issues.map(issue => `
+              <div class="${escapeHtml(siteStatusClass(issue.priority || "needs review"))}">
+                <strong>${escapeHtml(issue.label)}</strong>
+                <p>${escapeHtml(issue.text)}</p>
+                <em>${escapeHtml(issue.section || "review")}</em>
+              </div>
+            `).join("") : `<div><strong>No open conflicts</strong><p>The package can move to technical coordination.</p><em>ready</em></div>`}
+          </div>
+        </article>
+
+        <article class="completion-panel">
+          <span class="mini-label">Included package items</span>
+          <h3>Export Scope</h3>
+          <div class="completion-list compact">
+            ${packageItems.map(item => `
+              <div class="${item.included ? "verified" : "missing"}">
+                <strong>${escapeHtml(item.name)}</strong>
+                <p>${item.included ? "Included in package" : "Not included yet"}</p>
+                <em>${item.included ? "included" : "excluded"}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      </section>
+
+      <section class="completion-export-band">
+        <div>
+          <span class="mini-label">Deliverables</span>
+          <h3>Download The Final Handoff</h3>
+          <p>Use the same source-linked package for engineering review, permit prep, client explanation, and archive history.</p>
+        </div>
+        <div class="download-actions">
+          <button data-download="astra">ASTRA Project Package</button>
+          <button data-download="bim">BIM Package</button>
+          <button data-download="csv">Project CSV</button>
+          <button data-download="case-json">Case Study JSON</button>
+        </div>
+      </section>
+      <div id="annotationLayer" class="annotation-layer"></div>
+    </div>
+  `;
+}
+
+function engineeringSurface(project) {
+  const model = project.designModel || {};
+  const issues = projectFlowIssues(project);
+  const disciplines = [
+    ["Structural", "Height, spans, foundation, lateral assumptions", model.heightFt ? `${model.heightFt} ft model height` : "--", "needs review"],
+    ["Civil", "Slope, drainage, utilities, stormwater low points", `${project.site.averageSlopePercent}% slope toward ${project.site.slopeDirection}`, "active"],
+    ["MEP", "Electrical, water, sewer, ventilation, envelope coordination", project.site.utilities.join(", "), "needs review"],
+    ["Envelope", "ASHRAE assumptions, glazing, shading, thermal risk", project.analysisResults.ashrae?.summary || "--", "needs review"],
+    ["Material / EC3", "Embodied carbon, procurement, material substitutions", project.analysisResults.carbon?.embodiedCarbonChange || "--", "needs review"],
+    ["Coordination", "Consultant comments, unresolved conflicts, issue closure", issues.length ? `${issues.length} active issues` : "No active issues", issues.length ? "active" : "ready"]
+  ];
+  return `
+    <div class="surface-pad completion-workspace engineering-workspace">
+      <header class="completion-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Engineering workspace</span>
+          <h3>Consultant Coordination Board</h3>
+          <p>Track structural, civil, MEP, envelope, material, and coordination issues while keeping each comment tied to the current model, site facts, policy rules, and ASTRA memory.</p>
+        </div>
+        <div class="completion-score-card">
+          <span>Technical state</span>
+          <strong>${issues.length ? "Coordinate" : "Ready"}</strong>
+          <em>${issues.length ? "Resolve before closeout" : "No major block detected"}</em>
+        </div>
+      </header>
+
+      <section class="completion-main-grid engineering-grid">
+        ${disciplines.map(row => `
+          <article class="completion-panel ${escapeHtml(siteStatusClass(row[3]))}">
+            <span class="mini-label">${escapeHtml(row[0])}</span>
+            <h3>${escapeHtml(row[1])}</h3>
+            <p>${escapeHtml(siteDisplayValue(row[2]))}</p>
+            <em>${escapeHtml(row[3])}</em>
+          </article>
+        `).join("")}
+      </section>
+
+      <section class="completion-main-grid">
+        <article class="completion-panel wide">
+          <span class="mini-label">Issue tracker</span>
+          <h3>Engineering Questions To Resolve</h3>
+          <div class="completion-table issue-table">
+            ${(issues.length ? issues : [
+              { label: "No active conflict", text: "Continue consultant review and record comments here as they arrive.", severity: "ready", section: "engineering" }
+            ]).map(issue => `
+              <div class="${escapeHtml(siteStatusClass(issue.priority || issue.section))}">
+                <strong>${escapeHtml(issue.label)}</strong>
+                <span>${escapeHtml(issue.text)}</span>
+                <em>${escapeHtml(issue.section || issue.priority || "review")}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+        <article class="completion-panel">
+          <span class="mini-label">Review loop</span>
+          <h3>How To Move Forward</h3>
+          <div class="completion-step-list">
+            <span>1. Send current CAD/Rhino + BIM package</span>
+            <span>2. Confirm site/civil assumptions</span>
+            <span>3. Record consultant comments</span>
+            <span>4. Revise model and update ASTRA memory</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="completion-export-band">
+        <div>
+          <span class="mini-label">Engineering exports</span>
+          <h3>Send The Technical Package</h3>
+          <p>BIM, GIS, policy, ASHRAE, and CSV exports keep the consultant review from splitting into disconnected files.</p>
+        </div>
+        <div class="download-actions">
+          <button data-download="bim">BIM Package</button>
+          <button data-download="gis">GIS Package</button>
+          <button data-download="sustainability">ASHRAE + EC3 JSON</button>
+          <button data-download="csv">Issue CSV Basis</button>
+        </div>
+      </section>
+      <div id="annotationLayer" class="annotation-layer"></div>
+    </div>
+  `;
+}
+
+function permitSurface(project) {
+  const fields = state.siteSurvey.fields || {};
+  const rules = project.verifiedRules || [];
+  const issues = projectFlowIssues(project);
+  const checklist = [
+    ["Parcel/address verified", project.site.verificationStatus],
+    ["Zoning district confirmed", fields.zoningDistrict || fields.detectedZoneArea ? "saved" : "missing"],
+    ["Setbacks checked", rules.some(rule => rule.ruleType === "front_setback") ? "source linked" : "missing"],
+    ["Height checked", rules.some(rule => rule.ruleType === "height_limit") ? "source linked" : "missing"],
+    ["Building-code basis entered", fields.buildingCodeSummary ? "saved" : "missing"],
+    ["Environmental hazards reviewed", fields.environmentalHazards ? "saved" : "missing"],
+    ["Engineering comments coordinated", issues.length ? "needs review" : "ready"],
+    ["Exports ready", "ready"]
+  ];
+  return `
+    <div class="surface-pad completion-workspace permit-workspace">
+      <header class="completion-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Permit workspace</span>
+          <h3>Code Review + Submission Readiness</h3>
+          <p>Keep zoning, code basis, corrections, missing documents, environmental hazards, engineering comments, and export readiness in one permit-facing workflow.</p>
+        </div>
+        <div class="completion-score-card">
+          <span>Permit state</span>
+          <strong>${issues.length ? "Corrections" : "Assemble"}</strong>
+          <em>${fields.permittingSpeed || "Review speed pending"}</em>
+        </div>
+      </header>
+
+      <section class="completion-main-grid">
+        <article class="completion-panel">
+          <span class="mini-label">Readiness checklist</span>
+          <h3>Submission Gate</h3>
+          <div class="completion-checklist">
+            ${checklist.map(item => `
+              <div class="${escapeHtml(siteStatusClass(item[1]))}">
+                <strong>${escapeHtml(item[0])}</strong>
+                <em>${escapeHtml(siteDisplayValue(item[1]))}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+
+        <article class="completion-panel wide">
+          <span class="mini-label">Rule matrix</span>
+          <h3>Code + Policy Records</h3>
+          <div class="completion-table">
+            ${rules.map(rule => `
+              <div class="${escapeHtml(siteStatusClass(rule.verificationStatus))}">
+                <strong>${escapeHtml(rule.section)}</strong>
+                <span>${escapeHtml(rule.exactText || `${rule.value || "--"} ${rule.unit || ""}`)}</span>
+                <em>${escapeHtml(rule.verificationStatus || "needs review")}</em>
+              </div>
+            `).join("") || `<div><strong>--</strong><span>No verified rule records saved.</span><em>missing</em></div>`}
+          </div>
+        </article>
+
+        <article class="completion-panel wide">
+          <span class="mini-label">Correction response</span>
+          <h3>What Could Block Approval</h3>
+          <div class="completion-list">
+            ${(issues.length ? issues : [
+              { label: "No active correction", text: "Use this area to record reviewer comments when a submission returns.", severity: "ready", section: "permit" }
+            ]).map(issue => `
+              <div class="${escapeHtml(siteStatusClass(issue.priority || issue.section))}">
+                <strong>${escapeHtml(issue.label)}</strong>
+                <p>${escapeHtml(issue.text)}</p>
+                <em>${escapeHtml(issue.section || "permit")}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      </section>
+
+      <section class="completion-export-band">
+        <div>
+          <span class="mini-label">Permit exports</span>
+          <h3>Submission Data Package</h3>
+          <p>Export source-backed code, policy, survey, GIS, case-study, and correction data for review workflows.</p>
+        </div>
+        <div class="download-actions">
+          <button data-download="policy-lookup-csv">Policy Lookup CSV</button>
+          <button data-download="parcel">Project JSON</button>
+          <button data-download="csv">Project CSV</button>
+          <button data-download="case-csv">Case Study CSV</button>
+        </div>
+      </section>
+      <div id="annotationLayer" class="annotation-layer"></div>
+    </div>
+  `;
+}
+
+function notesSurface(project) {
+  const discovery = state.projectDiscovery || {};
+  const notes = [
+    ["Design rationale", discovery.outcomes || project.clientIntent.summary, "brief"],
+    ["Material feeling", listValue(discovery.atmosphere, []).join(", ") || "--", "style"],
+    ["Risk thought", projectFlowIssues(project)[0]?.text || "Keep front setback, height, stormwater, slope, and geotechnical assumptions visible.", "risk"],
+    ["Next creative move", "Compare massing options against daylight, views, stormwater, carbon, and client values.", "direction"]
+  ];
+  return `
+    <div class="surface-pad completion-workspace notes-workspace">
+      <header class="completion-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Notes + ideation</span>
+          <h3>Connected Design Thinking</h3>
+          <p>Capture design rationale, open ideas, meeting notes, and creative prompts without separating them from site, policy, sun, sustainability, or client evidence.</p>
+        </div>
+      </header>
+      <section class="notes-grid">
+        ${notes.map(note => `
+          <article class="sticky-note ${escapeHtml(note[2])}">
+            <span>${escapeHtml(note[2])}</span>
+            <strong>${escapeHtml(note[0])}</strong>
+            <p>${escapeHtml(note[1])}</p>
+          </article>
+        `).join("")}
+      </section>
+      <section class="completion-main-grid">
+        <article class="completion-panel wide">
+          <span class="mini-label">Idea clusters</span>
+          <h3>Reusable Creative Threads</h3>
+          <div class="completion-table">
+            ${[
+              ["Client values", listValue(discovery.architecturalStyle, []).join(" / ") || "--", "design filter"],
+              ["Site opportunity", siteTopOpportunity(state.siteSurvey)?.name || "Opportunity pending", "site memory"],
+              ["Sun-study thought", sunStudyMetricSummary(project, state.siteSurvey) || "--", "solar cue"],
+              ["Sustainability thought", sustainabilityMetricSummary(project, state.siteSurvey) || "--", "performance cue"]
+            ].map(row => `
+              <div>
+                <strong>${escapeHtml(row[0])}</strong>
+                <span>${escapeHtml(row[1])}</span>
+                <em>${escapeHtml(row[2])}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      </section>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
 }
 
 function archiveSurface(project) {
+  const transcript = project.aiTranscript || [];
+  const sources = [
+    ...surveyEvidenceRegister(project).slice(0, 5).map(item => ({ title: item[0], detail: item[3], status: item[2] })),
+    ...caseStudyRecords().slice(0, 4).map(item => ({ title: item.title, detail: item.evidenceBasis || item.focus, status: item.status || "saved" }))
+  ];
   return `
-    <div class="surface-pad timeline-surface">
-      ${(project.aiTranscript || []).slice(0, 6).map(item => `
-        <div class="timeline-item">
-          <strong>${escapeHtml(item.section || "Decision")}</strong>
-          <p>${escapeHtml(item.question || item.decision || "Recorded item")}</p>
-          <span>${escapeHtml(item.timestamp || "")}</span>
+    <div class="surface-pad completion-workspace archive-workspace">
+      <header class="completion-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Reasoning archive</span>
+          <h3>AI Transcript + Evidence Trail</h3>
+          <p>Trace questions, answers, source records, decisions, case studies, and exports so the team can understand why a design direction changed.</p>
         </div>
-      `).join("") || `<div class="empty-state">No archive records yet. Ask the assistor to create one.</div>`}
+        <div class="completion-score-card">
+          <span>Archive records</span>
+          <strong>${escapeHtml(String(transcript.length + sources.length))}</strong>
+          <em>questions, sources, cases</em>
+        </div>
+      </header>
+      <section class="completion-main-grid">
+        <article class="completion-panel wide">
+          <span class="mini-label">Timeline</span>
+          <h3>Recent Reasoning</h3>
+          <div class="archive-timeline">
+            ${transcript.length ? transcript.slice(0, 8).map(item => `
+              <div class="timeline-item">
+                <strong>${escapeHtml(item.section || "Decision")}</strong>
+                <p>${escapeHtml(item.question || item.decision || "Recorded item")}</p>
+                <span>${escapeHtml(item.timestamp || "")}</span>
+              </div>
+            `).join("") : `<div class="empty-state">No AI transcript records yet. Ask ASTRA a question and save the response to start the archive.</div>`}
+          </div>
+        </article>
+        <article class="completion-panel">
+          <span class="mini-label">Source trail</span>
+          <h3>Reusable Evidence</h3>
+          <div class="completion-list compact">
+            ${sources.map(item => `
+              <div class="${escapeHtml(siteStatusClass(item.status))}">
+                <strong>${escapeHtml(item.title)}</strong>
+                <p>${escapeHtml(item.detail || "--")}</p>
+                <em>${escapeHtml(item.status || "saved")}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      </section>
+      <section class="completion-export-band">
+        <div>
+          <span class="mini-label">Archive exports</span>
+          <h3>Export The Record</h3>
+          <p>Use project JSON, CSV, and case-study exports to preserve the reasoning chain outside the browser.</p>
+        </div>
+        <div class="download-actions">
+          <button data-download="astra">ASTRA Project Package</button>
+          <button data-download="csv">Project CSV</button>
+          <button data-download="case-json">Case Study JSON</button>
+        </div>
+      </section>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
 }
 
-function caseSurface() {
+function caseSurface(project) {
+  const cases = caseStudyRecords();
+  const primaryCase = cases[0] || buildGeneratedCaseStudies(project)[0];
   return `
-    <div class="surface-pad case-surface">
-      <div class="case-page">
-        <h3>Design Rationale Draft</h3>
-        <p><strong>Project goal:</strong> warm, daylight-rich, low-energy residence.</p>
-        <p><strong>Site response:</strong> balance west view corridor with stormwater and slope constraints.</p>
-        <p><strong>Current issue:</strong> zoning setback and height need revision before permit readiness.</p>
-      </div>
-      <div class="case-sidebar">
-        <span class="status-token verified">source linked</span>
-        <span class="status-token medium">client version</span>
-        <span class="status-token">firm version</span>
-      </div>
+    <div class="surface-pad completion-workspace case-study-workspace">
+      <header class="completion-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Case study generator</span>
+          <h3>Source-Linked Project Narrative</h3>
+          <p>Generate client, firm, planning, sustainability, resilience, and design-review narratives from the same project memory used by the rest of ASTRA.</p>
+        </div>
+        <div class="completion-score-card">
+          <span>Saved cases</span>
+          <strong>${escapeHtml(String(cases.length))}</strong>
+          <em>${cases.length ? "ready to export" : "generate from data"}</em>
+        </div>
+      </header>
+      <section class="case-study-layout">
+        <article class="case-page">
+          <span class="mini-label">${escapeHtml(primaryCase?.audience || "Narrative")}</span>
+          <h3>${escapeHtml(primaryCase?.title || "Design Rationale Draft")}</h3>
+          <p><strong>Desired outcome:</strong> ${escapeHtml(primaryCase?.desiredOutcome || state.projectDiscovery.outcomes || project.clientIntent.summary)}</p>
+          <p><strong>Design response:</strong> ${escapeHtml(primaryCase?.designResponse || "Use the verified project memory to explain the design response.")}</p>
+          <p><strong>Evidence basis:</strong> ${escapeHtml(primaryCase?.evidenceBasis || "Evidence basis pending.")}</p>
+          <p><strong>Recommended actions:</strong> ${escapeHtml(primaryCase?.recommendedActions || "Generate case studies from current data, then choose the audience-specific version.")}</p>
+        </article>
+        <aside class="case-sidebar">
+          <button class="add-row-button" type="button" data-case-study-generate>Generate From Current Data</button>
+          <button data-download="case-json">Download Case JSON</button>
+          <button data-download="case-csv">Download Case CSV</button>
+          <button data-download="csv">Download Project CSV</button>
+          <div class="completion-list compact">
+            ${(cases.length ? cases : buildGeneratedCaseStudies(project)).slice(0, 6).map(item => `
+              <div class="${escapeHtml(siteStatusClass(item.status))}">
+                <strong>${escapeHtml(item.title)}</strong>
+                <p>${escapeHtml(item.focus || item.audience || "--")}</p>
+                <em>${escapeHtml(item.status || "draft")}</em>
+              </div>
+            `).join("")}
+          </div>
+        </aside>
+      </section>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
@@ -8115,12 +8515,24 @@ function renderSurface() {
     ? ashraeSurface(project)
     : state.activeSection === "lumion"
     ? lumionSurface(project)
+    : state.activeSection === "finalization"
+    ? finalizationSurface(project)
+    : state.activeSection === "engineering"
+    ? engineeringSurface(project)
+    : state.activeSection === "permit"
+    ? permitSurface(project)
+    : state.activeSection === "notes"
+    ? notesSurface(project)
+    : state.activeSection === "archive"
+    ? archiveSurface(project)
+    : state.activeSection === "case-study"
+    ? caseSurface(project)
     : projectPageSurface(project, section);
   document.getElementById("visualWorkspace").innerHTML = html;
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
-  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae" || state.activeSection === "lumion" || state.activeSection === "design") bindSiteSurveyPage();
+  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae" || state.activeSection === "lumion" || state.activeSection === "design" || state.activeSection === "case-study") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
