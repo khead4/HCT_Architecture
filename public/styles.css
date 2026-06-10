@@ -4974,6 +4974,420 @@ body:not([data-active-section="dashboard"]) #questionInput {
   }
 }
 
+.design-workspace {
+  display: grid;
+  gap: clamp(24px, 3vw, 42px);
+  width: min(1960px, 100%);
+  max-width: none;
+  margin: 0 auto;
+  min-height: 100%;
+  padding: clamp(24px, 3.6vw, 56px);
+  background:
+    radial-gradient(900px 540px at 12% 0%, rgba(91,167,146,.13), transparent 70%),
+    radial-gradient(760px 460px at 92% 14%, rgba(214,169,94,.11), transparent 72%),
+    linear-gradient(145deg, #07100e 0%, #101914 56%, #15130f 100%);
+  color: rgba(245,242,228,.94);
+}
+
+.design-hero,
+.design-program-panel,
+.design-instruction-card {
+  border: 1px solid rgba(117,184,170,.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.068), rgba(255,255,255,.02)),
+    rgba(8,18,16,.72);
+  box-shadow: 0 26px 76px rgba(0,0,0,.32);
+}
+
+.design-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(18px, 2.4vw, 36px);
+  align-items: center;
+  padding: clamp(24px, 3vw, 42px);
+}
+
+.design-hero h3,
+.design-program-panel h3,
+.design-instruction-card h3 {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.96);
+  font-size: clamp(30px, 3.6vw, 58px);
+  font-weight: 560;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.design-hero p,
+.design-program-panel p,
+.design-instruction-card p,
+.design-program-panel dd {
+  color: rgba(222,230,216,.72);
+  font-size: 15px;
+  line-height: 1.58;
+}
+
+.design-program-split {
+  min-height: min(58vh, 720px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(18px, 2vw, 28px);
+  align-items: stretch;
+}
+
+.design-program-panel {
+  display: grid;
+  grid-template-rows: auto minmax(260px, 1fr) auto;
+  gap: clamp(18px, 2vw, 28px);
+  padding: clamp(22px, 2.6vw, 38px);
+  overflow: hidden;
+}
+
+.autocad-panel {
+  border-color: rgba(91,167,146,.28);
+}
+
+.rhino-panel {
+  border-color: rgba(214,169,94,.28);
+}
+
+.autocad-panel h3 {
+  color: rgba(152,231,218,.96);
+}
+
+.rhino-panel h3 {
+  color: rgba(246,214,151,.96);
+}
+
+.program-panel-copy {
+  max-width: 760px;
+}
+
+.autocad-viewport,
+.rhino-viewport {
+  position: relative;
+  min-height: 310px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(0deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 28px 28px,
+    rgba(0,0,0,.36);
+}
+
+.cad-plan-outline {
+  position: absolute;
+  inset: 17% 15% 19% 13%;
+  border: 2px solid rgba(152,231,218,.82);
+  background:
+    linear-gradient(90deg, transparent 49%, rgba(152,231,218,.34) 50%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, rgba(152,231,218,.34) 50%, transparent 51%),
+    rgba(152,231,218,.035);
+}
+
+.cad-plan-outline span {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  color: rgba(152,231,218,.9);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 820;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.cad-plan-outline .room {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(255,255,255,.26);
+  background: rgba(255,255,255,.045);
+}
+
+.cad-plan-outline .room-a {
+  left: 8%;
+  bottom: 12%;
+  width: 34%;
+  height: 36%;
+}
+
+.cad-plan-outline .room-b {
+  right: 10%;
+  bottom: 12%;
+  width: 35%;
+  height: 36%;
+}
+
+.cad-plan-outline .room-c {
+  left: 8%;
+  top: 16%;
+  width: 74%;
+  height: 28%;
+}
+
+.cad-dimension {
+  position: absolute;
+  border: 1px solid rgba(152,231,218,.44);
+  border-radius: 999px;
+  color: rgba(152,231,218,.92);
+  background: rgba(0,0,0,.44);
+  padding: 7px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 780;
+  letter-spacing: .08em;
+}
+
+.cad-dimension.dim-x {
+  left: 15%;
+  bottom: 8%;
+}
+
+.cad-dimension.dim-y {
+  right: 12%;
+  top: 10%;
+}
+
+.rhino-viewport {
+  background:
+    radial-gradient(420px 260px at 60% 25%, rgba(214,169,94,.12), transparent 72%),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 30px 30px,
+    linear-gradient(0deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 30px 30px,
+    rgba(0,0,0,.36);
+}
+
+.rhino-grid {
+  position: absolute;
+  left: 10%;
+  right: 8%;
+  bottom: 18%;
+  height: 42%;
+  border-bottom: 2px solid rgba(214,169,94,.42);
+  transform: skewX(-18deg);
+  background:
+    repeating-linear-gradient(90deg, rgba(214,169,94,.13) 0 1px, transparent 1px 42px),
+    repeating-linear-gradient(0deg, rgba(214,169,94,.11) 0 1px, transparent 1px 34px);
+}
+
+.rhino-mass {
+  position: absolute;
+  left: 33%;
+  top: 26%;
+  width: 34%;
+  height: 40%;
+  display: grid;
+  align-content: end;
+  gap: 6px;
+  border: 1px solid rgba(246,214,151,.66);
+  background:
+    linear-gradient(145deg, rgba(214,169,94,.28), rgba(104,199,189,.09)),
+    rgba(255,255,255,.04);
+  box-shadow: 22px 20px 0 rgba(214,169,94,.12), 0 28px 62px rgba(0,0,0,.36);
+  padding: 12px;
+  transform: skewY(-4deg);
+}
+
+.rhino-mass strong,
+.rhino-mass span {
+  position: relative;
+  z-index: 1;
+  color: rgba(255,255,255,.94);
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.rhino-mass span {
+  color: rgba(246,214,151,.84);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.rhino-axis {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(214,169,94,.4);
+  border-radius: 999px;
+  color: rgba(246,214,151,.92);
+  background: rgba(0,0,0,.44);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 820;
+}
+
+.rhino-axis.x { left: 14%; bottom: 16%; }
+.rhino-axis.y { left: 23%; bottom: 31%; }
+.rhino-axis.z { left: 14%; top: 18%; }
+
+.design-program-panel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.design-program-panel dl div {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 12px;
+}
+
+.design-program-panel dt {
+  color: rgba(224,207,139,.88);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.design-program-panel dd {
+  margin: 7px 0 0;
+  font-size: 13px;
+}
+
+.design-horizontal-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: rgba(224,207,139,.84);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.design-horizontal-divider::before,
+.design-horizontal-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, transparent, rgba(214,169,94,.48), rgba(104,199,189,.34), transparent);
+}
+
+.design-instruction-zone {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1fr);
+  gap: clamp(18px, 2.2vw, 30px);
+}
+
+.design-instruction-card {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  padding: clamp(22px, 2.6vw, 36px);
+}
+
+.design-handoff-card {
+  grid-column: 1 / -1;
+}
+
+.design-instruction-list {
+  display: grid;
+  gap: 12px;
+}
+
+.design-instruction-list div,
+.design-fact-grid div {
+  border: 1px solid rgba(255,255,255,.1);
+  border-left: 4px solid rgba(104,199,189,.74);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 13px;
+}
+
+.design-instruction-list strong,
+.design-fact-grid strong {
+  display: block;
+  color: rgba(255,255,255,.92);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.design-instruction-list p {
+  margin: 7px 0 0;
+  color: rgba(222,230,216,.68);
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.design-fact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.design-fact-grid span {
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(224,207,139,.86);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1100px) {
+  .design-program-split,
+  .design-instruction-zone,
+  .design-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .design-program-split {
+    min-height: auto;
+  }
+
+  .design-program-panel {
+    min-height: 540px;
+  }
+}
+
+@media (max-width: 760px) {
+  .design-workspace {
+    gap: 28px;
+    padding: 16px;
+  }
+
+  .design-hero,
+  .design-program-panel,
+  .design-instruction-card {
+    padding: 20px;
+  }
+
+  .design-hero h3,
+  .design-program-panel h3,
+  .design-instruction-card h3 {
+    font-size: clamp(28px, 10vw, 42px);
+  }
+
+  .design-program-panel {
+    min-height: auto;
+    grid-template-rows: auto auto auto;
+  }
+
+  .autocad-viewport,
+  .rhino-viewport {
+    min-height: 280px;
+  }
+
+  .design-program-panel dl,
+  .design-fact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .design-horizontal-divider {
+    align-items: stretch;
+    text-align: center;
+  }
+}
+
 .simple-project-page {
   display: grid;
   grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);

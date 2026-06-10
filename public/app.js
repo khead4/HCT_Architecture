@@ -3516,7 +3516,7 @@ function renderIntegrations() {
   `;
 }
 
-function designSurface() {
+function designParcelSurface() {
   return `
     <div class="parcel">
       <div class="gis-layer flood-layer">Stormwater path</div>
@@ -4718,6 +4718,140 @@ function siteSurveySurface(project) {
       </section>
         </main>
       </div>
+
+      <div id="annotationLayer" class="annotation-layer"></div>
+    </div>
+  `;
+}
+
+function designSurface(project) {
+  const model = project.designModel || {};
+  const frontRule = (project.verifiedRules || []).find(rule => rule.ruleType === "front_setback");
+  const heightRule = (project.verifiedRules || []).find(rule => rule.ruleType === "height_limit");
+  const materialIntent = materialIntentItems(project);
+  const designFacts = [
+    ["Current model", model.name || "--"],
+    ["Selected element", model.selectedElement || "--"],
+    ["Height", model.heightFt ? `${model.heightFt} ft` : "--"],
+    ["Front distance", model.frontDistanceFt ? `${model.frontDistanceFt} ft` : "--"],
+    ["South glazing", model.southGlazingPercent ? `${model.southGlazingPercent}%` : "--"],
+    ["Material intent", materialIntent.length ? materialIntent.join(" / ") : "--"]
+  ];
+  const instructionRows = [
+    {
+      label: "1. Draft in AutoCAD",
+      text: "Use AutoCAD for plans, dimensions, titleblock logic, DWG cleanup, consultant backgrounds, and drawing coordination."
+    },
+    {
+      label: "2. Model in Rhino",
+      text: "Use Rhino for massing, form exploration, facade rhythm, 3D geometry, material zones, and model exports to Sun Studies, ASHRAE, and Lumion."
+    },
+    {
+      label: "3. Return decisions to ASTRA",
+      text: "Keep constraints, risks, selected elements, material intent, and next actions in ASTRA so design work does not fragment across files."
+    }
+  ];
+
+  return `
+    <div class="surface-pad design-workspace">
+      <header class="design-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">CAD / Rhino design workspace</span>
+          <h3>AutoCAD And Rhino Stay Side By Side</h3>
+          <p>Use the top split for the correct production environment: AutoCAD for precise 2D drawing coordination, Rhino for 3D design exploration and model handoff. Instructions and supporting data stay below the horizontal divider.</p>
+        </div>
+      </header>
+
+      <section class="design-program-split" aria-label="AutoCAD and Rhino program split">
+        <article class="design-program-panel autocad-panel">
+          <div class="program-panel-copy">
+            <span class="mini-label">Left side / AutoCAD</span>
+            <h3>AutoCAD</h3>
+            <p>2D drafting, DWG coordination, dimensions, sheet logic, plan/elevation/detail cleanup, and consultant exchange.</p>
+          </div>
+          <div class="autocad-viewport" aria-label="AutoCAD plan workspace mock">
+            <div class="cad-plan-outline">
+              <span>Plan</span>
+              <i class="room room-a"></i>
+              <i class="room room-b"></i>
+              <i class="room room-c"></i>
+            </div>
+            <div class="cad-dimension dim-x">${escapeHtml(frontRule ? `${frontRule.value} ${frontRule.unit}` : "--")}</div>
+            <div class="cad-dimension dim-y">DWG</div>
+          </div>
+          <dl>
+            <div><dt>Best for</dt><dd>Permit drawings, construction sheets, dimensions, CAD standards</dd></div>
+            <div><dt>Output</dt><dd>DWG / DXF / PDF sheet sets</dd></div>
+          </dl>
+        </article>
+
+        <article class="design-program-panel rhino-panel">
+          <div class="program-panel-copy">
+            <span class="mini-label">Right side / Rhino</span>
+            <h3>Rhino</h3>
+            <p>3D massing, NURBS modeling, facade studies, material zones, Grasshopper-ready logic, and handoff geometry.</p>
+          </div>
+          <div class="rhino-viewport" aria-label="Rhino model workspace mock">
+            <div class="rhino-grid"></div>
+            <div class="rhino-mass">
+              <strong>${escapeHtml(model.name || "Model")}</strong>
+              <span>${escapeHtml(model.orientation || "--")}</span>
+            </div>
+            <div class="rhino-axis x">X</div>
+            <div class="rhino-axis y">Y</div>
+            <div class="rhino-axis z">Z</div>
+          </div>
+          <dl>
+            <div><dt>Best for</dt><dd>Concept massing, form studies, facade rhythm, model exports</dd></div>
+            <div><dt>Output</dt><dd>3DM / OBJ / DAE / FBX handoff geometry</dd></div>
+          </dl>
+        </article>
+      </section>
+
+      <div class="design-horizontal-divider" aria-hidden="true">
+        <span>Additional information and instructions</span>
+      </div>
+
+      <section class="design-instruction-zone">
+        <article class="design-instruction-card">
+          <span class="mini-label">Process</span>
+          <h3>How To Use This Page</h3>
+          <div class="design-instruction-list">
+            ${instructionRows.map(row => `
+              <div>
+                <strong>${escapeHtml(row.label)}</strong>
+                <p>${escapeHtml(row.text)}</p>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+
+        <article class="design-instruction-card">
+          <span class="mini-label">Current design facts</span>
+          <h3>Project Memory Feeding The Model</h3>
+          <div class="design-fact-grid">
+            ${designFacts.map(row => `
+              <div>
+                <span>${escapeHtml(row[0])}</span>
+                <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+
+        <article class="design-instruction-card design-handoff-card">
+          <span class="mini-label">Handoff</span>
+          <h3>Send The Model Forward</h3>
+          <p>Use these exports when the AutoCAD/Rhino work needs to move into Lumion, BIM, project memory, or spreadsheet review. Replace prototype geometry with the real CAD/Rhino file when it is ready.</p>
+          <div class="download-actions">
+            <button data-download="lumion-cad">Download Lumion .DAE</button>
+            <button data-download="bim">Download BIM Package</button>
+            <button data-download="parcel">Download Project JSON</button>
+            <button data-download="csv">Download Project CSV</button>
+          </div>
+        </article>
+      </section>
 
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
@@ -7641,6 +7775,8 @@ function renderSurface() {
     ? gisSurface(project)
     : state.activeSection === "policy"
     ? policySurface(project)
+    : state.activeSection === "design"
+    ? designSurface(project)
     : state.activeSection === "sun"
     ? sunSurface(project)
     : state.activeSection === "ashrae"
