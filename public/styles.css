@@ -5641,7 +5641,7 @@ body:not([data-active-section="dashboard"]) #questionInput {
 }
 
 .arcgis-install-config-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .arcgis-workbench-grid {
@@ -5703,7 +5703,7 @@ body:not([data-active-section="dashboard"]) #questionInput {
 
 .arcgis-handoff-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: clamp(12px, 1.4vw, 18px);
 }
 

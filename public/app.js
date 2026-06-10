@@ -46,12 +46,12 @@ const sections = [
   },
   {
     id: "gis",
-    title: "ArcGIS Pro / Spatial Mapping",
+    title: "QGIS + ArcGIS / Spatial Mapping",
     stage: "Spatial intelligence",
-    desc: "ArcGIS web maps, ArcGIS Pro project handoff, GIS layers, site context, risks, and opportunities.",
-    goal: "Understand the site as a layered spatial system connected to ArcGIS Pro and web map evidence.",
-    actions: ["Embed ArcGIS map", "Track Pro package", "Compare overlays", "Publish map findings"],
-    ai: ["Interprets overlaps", "Links ArcGIS layers", "Suggests placement reviews"]
+    desc: "QGIS-first project handoff, optional ArcGIS Pro licensing, web maps, GIS layers, site context, risks, and opportunities.",
+    goal: "Understand the site as a layered spatial system while ASTRA stays the command center for GIS evidence.",
+    actions: ["Use QGIS handoff", "Track Pro option", "Compare overlays", "Publish map findings"],
+    ai: ["Interprets overlaps", "Links GIS layers", "Suggests placement reviews"]
   },
   {
     id: "design",
@@ -591,6 +591,14 @@ function initialSiteSurvey() {
       lookupMethod: "Manual entry",
       gisSourceUrl: "Demo GIS layer stack: parcel, stormwater, viewshed, vegetation",
       gisLookupStatus: "active",
+      desktopGisPrimary: "QGIS",
+      qgisInstallStatus: "not installed",
+      qgisDownloadUrl: "https://qgis.org/download/",
+      qgisProjectName: "astra-site-intelligence.qgz",
+      qgisProjectPath: "",
+      qgisPackageName: "astra-qgis-site-intelligence.gpkg",
+      qgisCoordinateSystem: "WGS 84 / Web Mercator auxiliary sphere",
+      qgisWorkflow: "Download the ASTRA QGIS handoff JSON, open QGIS, create or open the .qgz project, add GeoPackage/GeoJSON/CSV layers, then paste source links or exported web map URLs back into ASTRA.",
       arcgisPortalUrl: "https://www.arcgis.com",
       arcgisProInstallStatus: "not installed",
       arcgisProInstallUrl: "https://doc.esri.com/en/arcgis-pro/latest/get-started/install-and-sign-in-to-arcgis-pro.html",
@@ -5192,6 +5200,43 @@ function arcgisProHandoffPackage(project) {
   };
 }
 
+function qgisHandoffPackage(project) {
+  const survey = state.siteSurvey;
+  const fields = survey.fields || {};
+  return {
+    exportedAt: new Date().toISOString(),
+    type: "qgis-handoff",
+    note: "QGIS is a desktop GIS application, so this package stores the QGIS project metadata, source layers, GeoPackage/GeoJSON/CSV handoff targets, and web references used by the browser workspace.",
+    project: project.project,
+    qgis: {
+      installStatus: fields.qgisInstallStatus || "",
+      downloadUrl: fields.qgisDownloadUrl || "",
+      projectName: fields.qgisProjectName || "",
+      projectPath: fields.qgisProjectPath || "",
+      packageName: fields.qgisPackageName || "",
+      coordinateSystem: fields.qgisCoordinateSystem || "",
+      primaryDesktopGis: fields.desktopGisPrimary || "QGIS",
+      workflow: fields.qgisWorkflow || ""
+    },
+    parcel: {
+      address: fields.addressLookup || fields.parcelAddress || "",
+      apn: fields.parcelApn || "",
+      cityCounty: fields.cityCounty || "",
+      stateRegion: fields.stateRegion || "",
+      country: fields.country || "",
+      latitude: fields.latitude || "",
+      longitude: fields.longitude || "",
+      jurisdiction: fields.jurisdiction || "",
+      zone: fields.detectedZoneArea || fields.zoningDistrict || ""
+    },
+    gisLayers: project.gisLayers || [],
+    gisFindings: survey.gisFindings || [],
+    policyLookups: survey.policyLookups || [],
+    hazards: survey.hazards || [],
+    opportunities: survey.opportunities || []
+  };
+}
+
 function caseStudyRecords() {
   return Array.isArray(state.siteSurvey.caseStudies) ? state.siteSurvey.caseStudies : [];
 }
@@ -5418,12 +5463,12 @@ function dataStorageMemoryRows(project) {
     },
     {
       symbol: "GIS",
-      title: "GIS + ArcGIS layers",
+      title: "GIS + QGIS/ArcGIS layers",
       count: dataCount((survey.gisFindings || []).length + (project.gisLayers || []).length, "layers"),
-      stored: fields.arcgisWebMapId || fields.gisSourceUrl || "--",
+      stored: fields.qgisPackageName || fields.arcgisWebMapId || fields.gisSourceUrl || "--",
       csv: "site_gis_finding / gis_layer",
-      use: "Carries mapped constraints, ArcGIS references, layer findings, and spatial design implications.",
-      status: fields.gisLookupStatus || policyFieldStatus(fields.arcgisWebMapId || fields.gisSourceUrl)
+      use: "Carries mapped constraints, QGIS/ArcGIS references, layer findings, and spatial design implications.",
+      status: fields.gisLookupStatus || policyFieldStatus(fields.qgisPackageName || fields.arcgisWebMapId || fields.gisSourceUrl)
     },
     {
       symbol: "LAW",
@@ -5900,6 +5945,7 @@ function gisSurface(project) {
   const gisFindings = survey.gisFindings?.length ? survey.gisFindings : [];
   const embedUrl = arcgisEmbedUrl(fields);
   const mapViewerUrl = arcgisMapViewerUrl(fields);
+  const qgisDownloadUrl = safeExternalMapUrl(fields.qgisDownloadUrl) || "https://qgis.org/download/";
   const proInstallUrl = safeExternalMapUrl(fields.arcgisProInstallUrl) || "https://doc.esri.com/en/arcgis-pro/latest/get-started/install-and-sign-in-to-arcgis-pro.html";
   const proProductUrl = safeExternalMapUrl(fields.arcgisProProductUrl) || "https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview";
 
@@ -5909,13 +5955,13 @@ function gisSurface(project) {
         <button class="journey-link" data-section="dashboard">Back to flow</button>
         <div>
           <span class="mini-label">GIS analyst workspace</span>
-          <h3>ArcGIS Pro / Spatial Mapping</h3>
-          <p>Embed an ArcGIS web map, track ArcGIS Pro project/package metadata, identify the correct zone or policy area, and pass source-linked spatial findings into site survey and policy review.</p>
+          <h3>QGIS + ArcGIS / Spatial Mapping</h3>
+          <p>Use QGIS as the free default GIS engine, keep ArcGIS Pro as an optional licensed pathway, and pass source-linked spatial findings into site survey and policy review.</p>
         </div>
         <div class="site-output-card">
           <span>Output</span>
-          <strong>ArcGIS Pro Handoff</strong>
-          <p>Portal, web map, feature service, Pro project/package, GIS layer findings, source URLs, and design implications.</p>
+          <strong>GIS Handoff Package</strong>
+          <p>QGIS project/package metadata, optional ArcGIS Pro links, GIS layer findings, source URLs, and design implications.</p>
         </div>
       </header>
 
@@ -5952,34 +5998,42 @@ function gisSurface(project) {
       <section class="site-survey-section gis-arcgis-install-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">2. ArcGIS Pro install</span>
-            <h3>Install ArcGIS Pro, Then Connect It</h3>
-            <p>ArcGIS Pro is a Windows desktop GIS application. The web app cannot install or run it inside the browser, so this step stores install, license, and version status before the web map handoff begins.</p>
+            <span class="mini-label">2. Desktop GIS engine</span>
+            <h3>Use QGIS Now, Keep ArcGIS Optional</h3>
+            <p>QGIS keeps the GIS workflow free and closer to an all-in-one platform. ArcGIS Pro can still be tracked when a student or professional license is available.</p>
           </div>
-          <a class="add-row-button arcgis-open-link" href="${escapeHtml(proInstallUrl)}" target="_blank" rel="noopener noreferrer">Open Install Guide</a>
+          <a class="add-row-button arcgis-open-link" href="${escapeHtml(qgisDownloadUrl)}" target="_blank" rel="noopener noreferrer">Open QGIS Download</a>
         </div>
-        ${siteSubsectionIntro("APP", "Desktop setup", "Use the official Esri install guide or ArcGIS Pro product page, then record install status here so ASTRA knows whether GIS work can move into Pro or should stay as web-map review.")}
+        ${siteSubsectionIntro("GIS", "All-in-one workflow", "ASTRA remains the decision layer: it stores sources, explains what the data means, and exports QGIS or ArcGIS handoffs without making the user scatter project memory across disconnected tools.")}
         <div class="arcgis-install-grid">
           <article>
             <span>1</span>
-            <strong>Get ArcGIS Pro</strong>
-            <p>Use an Esri account, organization license, or trial path before assuming Pro is available.</p>
-            <a href="${escapeHtml(proProductUrl)}" target="_blank" rel="noopener noreferrer">ArcGIS Pro product page</a>
+            <strong>Download QGIS</strong>
+            <p>Free and open-source GIS for Windows, macOS, and Linux. Use it as the default desktop GIS path for now.</p>
+            <a href="${escapeHtml(qgisDownloadUrl)}" target="_blank" rel="noopener noreferrer">QGIS download page</a>
           </article>
           <article>
             <span>2</span>
-            <strong>Install on Windows</strong>
-            <p>Install ArcGIS Pro locally, then confirm version, install context, and optional components.</p>
-            <a href="${escapeHtml(proInstallUrl)}" target="_blank" rel="noopener noreferrer">Install documentation</a>
+            <strong>Export QGIS handoff</strong>
+            <p>Download ASTRA's QGIS handoff JSON and use GeoPackage, GeoJSON, CSV, or web services as source layers.</p>
+            <button type="button" data-download="qgis">Download QGIS Handoff</button>
           </article>
           <article>
             <span>3</span>
-            <strong>Connect ASTRA data</strong>
-            <p>Use the ArcGIS Pro handoff JSON, feature service, web map, or GIS package to move saved site data into Pro.</p>
-            <button type="button" data-download="arcgis-pro">Download Pro Handoff</button>
+            <strong>Optional ArcGIS Pro</strong>
+            <p>Use this path only when a student, school, or professional ArcGIS license is available.</p>
+            <a href="${escapeHtml(proProductUrl)}" target="_blank" rel="noopener noreferrer">ArcGIS Student / Pro info</a>
           </article>
         </div>
         <div class="site-intake-grid arcgis-install-config-grid">
+          ${siteFieldSelect("desktopGisPrimary", "Primary desktop GIS", ["QGIS", "ArcGIS Pro", "Web GIS only", "Undecided"])}
+          ${siteFieldSelect("qgisInstallStatus", "QGIS install status", ["not installed", "downloaded", "installed", "needs update", "blocked", "unknown"])}
+          ${siteFieldInput("qgisDownloadUrl", "QGIS download URL")}
+          ${siteFieldInput("qgisProjectName", "QGIS project name")}
+          ${siteFieldInput("qgisProjectPath", "QGIS .qgz path / reference")}
+          ${siteFieldInput("qgisPackageName", "QGIS GeoPackage / package name")}
+          ${siteFieldInput("qgisCoordinateSystem", "QGIS coordinate system")}
+          ${siteFieldTextarea("qgisWorkflow", "QGIS workflow / handoff notes", 4)}
           ${siteFieldSelect("arcgisProInstallStatus", "ArcGIS Pro install status", ["not installed", "downloaded", "installed", "needs update", "blocked", "unknown"])}
           ${siteFieldSelect("arcgisProLicenseStatus", "ArcGIS Pro license status", ["unknown", "trial", "named user", "single use", "concurrent use", "not licensed", "blocked"])}
           ${siteFieldInput("arcgisProVersion", "ArcGIS Pro version")}
@@ -5991,13 +6045,13 @@ function gisSurface(project) {
       <section class="site-survey-section gis-arcgis-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">3. ArcGIS Pro connection</span>
-            <h3>Embedded ArcGIS Web Map + Pro Handoff</h3>
-            <p>After Pro is installed, the browser can embed an ArcGIS web map or Enterprise portal view while storing the ArcGIS Pro project and package metadata needed for handoff.</p>
+            <span class="mini-label">3. Web map + optional ArcGIS</span>
+            <h3>Embedded Web Map + Licensed Pro Handoff</h3>
+            <p>Use this when an ArcGIS Online, Enterprise, or student-license workflow is available. Otherwise, keep the project in the QGIS handoff path above.</p>
           </div>
           <a class="add-row-button arcgis-open-link" href="${escapeHtml(mapViewerUrl)}" target="_blank" rel="noopener noreferrer">Open ArcGIS Map Viewer</a>
         </div>
-        ${siteSubsectionIntro("PRO", "ArcGIS source and project metadata", "Paste a Web Map ID or ArcGIS embed URL to load the live ArcGIS map here. Use the Pro fields to keep the .aprx, .ppkx, feature service, and coordinate system tied to ASTRA project memory.")}
+        ${siteSubsectionIntro("WEB", "Web GIS source and project metadata", "Paste a Web Map ID or ArcGIS embed URL to load the live ArcGIS map here. If ArcGIS is not licensed, keep this as optional and use the QGIS package fields as the primary source of truth.")}
         <div class="arcgis-workbench-grid">
           <div class="arcgis-frame-shell">
             ${embedUrl ? `
@@ -6032,11 +6086,14 @@ function gisSurface(project) {
         </div>
         <div class="arcgis-handoff-grid">
           ${[
+            ["Desktop GIS", fields.desktopGisPrimary || "QGIS"],
+            ["QGIS project", fields.qgisProjectName || "--"],
+            ["QGIS package", fields.qgisPackageName || "--"],
             ["Portal", fields.arcgisPortalUrl || "--"],
             ["Web map", fields.arcgisWebMapId || "--"],
             ["Feature service", fields.arcgisFeatureServiceUrl || "--"],
-            ["Pro package", fields.arcgisProPackageName || "--"],
-            ["Coordinate system", fields.arcgisCoordinateSystem || "--"],
+            ["ArcGIS package", fields.arcgisProPackageName || "--"],
+            ["Coordinate system", fields.qgisCoordinateSystem || fields.arcgisCoordinateSystem || "--"],
             ["Sync status", fields.arcgisLayerSyncStatus || "--"]
           ].map(item => `
             <article>
@@ -6046,6 +6103,7 @@ function gisSurface(project) {
           `).join("")}
         </div>
         <div class="download-actions">
+          <button data-download="qgis">Download QGIS Handoff JSON</button>
           <button data-download="arcgis-pro">Download ArcGIS Pro Handoff JSON</button>
           <button data-download="gis">Download GIS Package JSON</button>
         </div>
@@ -6106,6 +6164,7 @@ function gisSurface(project) {
           <p>ArcGIS, GIS findings, and Pro handoff data are saved into the same project memory used by Site + Survey Intelligence, Zoning + Policy Intelligence, CAD/Rhino review, and export downloads.</p>
         </div>
         <div class="download-actions">
+          <button data-download="qgis">Download QGIS Handoff</button>
           <button data-download="arcgis-pro">Download ArcGIS Pro Handoff</button>
           <button data-download="gis">Download GIS Package</button>
           <button data-download="parcel">Download Site JSON</button>
@@ -6451,8 +6510,12 @@ function downloadByKind(kind) {
       gisLayers: state.project.gisLayers,
       gisFindings: state.siteSurvey.gisFindings,
       layerStatus: siteLayerRows(state.siteSurvey),
+      qgis: qgisHandoffPackage(state.project).qgis,
       arcgis: arcgisProHandoffPackage(state.project).arcgis
     }, null, 2));
+  }
+  if (kind === "qgis") {
+    triggerDownload("astra-qgis-handoff.json", "application/json", JSON.stringify(qgisHandoffPackage(state.project), null, 2));
   }
   if (kind === "arcgis-pro") {
     triggerDownload("astra-arcgis-pro-handoff.json", "application/json", JSON.stringify(arcgisProHandoffPackage(state.project), null, 2));
