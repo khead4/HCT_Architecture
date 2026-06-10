@@ -3069,22 +3069,55 @@ th {
 
 @media (max-width: 760px) {
   .lumion-workspace {
-    gap: 28px;
-    padding: 16px;
+    gap: 22px;
+    padding: 14px;
   }
 
   .lumion-hero,
   .lumion-cad-bridge,
   .lumion-tool-panel,
+  .lumion-app-residence,
   .lumion-schedule-panel {
-    padding: 20px;
+    padding: 18px;
   }
 
   .lumion-hero h3,
   .lumion-cad-bridge h3,
   .lumion-tool-panel h3,
+  .lumion-app-copy h3,
   .lumion-schedule-head h3 {
-    font-size: clamp(26px, 9vw, 38px);
+    font-size: clamp(25px, 8.4vw, 36px);
+    line-height: 1.06;
+  }
+
+  .lumion-hero p,
+  .lumion-cad-bridge p,
+  .lumion-tool-panel p,
+  .lumion-app-copy p,
+  .lumion-schedule-head p {
+    font-size: 14px;
+    line-height: 1.58;
+  }
+
+  .lumion-score {
+    min-height: 108px;
+  }
+
+  .lumion-score strong {
+    font-size: clamp(42px, 14vw, 58px);
+  }
+
+  .lumion-cad-bridge .download-actions,
+  .lumion-schedule-head .download-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .lumion-cad-bridge .download-actions button,
+  .lumion-schedule-head .download-actions button {
+    width: 100%;
+    min-height: 48px;
   }
 
   .lumion-render-wall .render-frame {
@@ -3093,23 +3126,165 @@ th {
 
   .lumion-app-residence {
     min-height: auto;
-    padding: 20px;
+    gap: 18px;
+  }
+
+  .lumion-app-window {
+    min-height: auto;
+  }
+
+  .lumion-app-toolbar {
+    gap: 6px;
+    padding: 11px 12px;
+  }
+
+  .lumion-app-toolbar span {
+    width: 8px;
+    height: 8px;
+  }
+
+  .lumion-app-toolbar strong {
+    margin-left: 4px;
+    font-size: 11px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
   }
 
   .lumion-scene-preview {
-    min-height: 360px;
+    min-height: 310px;
   }
 
-  .lumion-preview-materials,
+  .lumion-preview-sun {
+    right: 11%;
+    top: 14%;
+    width: 48px;
+    height: 48px;
+  }
+
+  .lumion-preview-building {
+    left: 10%;
+    bottom: 29%;
+    width: 58%;
+    height: 36%;
+    transform: perspective(520px) rotateY(-10deg) rotateX(2deg);
+  }
+
+  .lumion-preview-building::before {
+    inset: -15px 9% auto;
+    height: 28px;
+  }
+
   .lumion-app-facts {
     grid-template-columns: 1fr;
   }
 
   .lumion-preview-materials {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
     width: auto;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .lumion-preview-materials span {
+    flex: 0 0 150px;
+    min-height: 40px;
+    font-size: 11px;
+  }
+
+  .lumion-app-copy {
+    align-content: start;
+    gap: 14px;
+  }
+
+  .lumion-app-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .lumion-app-actions button {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .lumion-schedule-table {
+    overflow: visible;
+  }
+
+  .lumion-schedule-row.head {
+    display: none;
+  }
+
+  .lumion-schedule-row {
+    min-width: 0;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .lumion-schedule-row strong {
+    font-size: 16px;
+  }
+
+  .lumion-schedule-row:not(.head) span {
+    display: grid;
+    grid-template-columns: minmax(82px, .42fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+  }
+
+  .lumion-schedule-row:not(.head) span::before {
+    color: rgba(224,207,139,.86);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 820;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .lumion-schedule-row:not(.head) span:nth-of-type(1)::before { content: "Material"; }
+  .lumion-schedule-row:not(.head) span:nth-of-type(2)::before { content: "Score"; }
+  .lumion-schedule-row:not(.head) span:nth-of-type(3)::before { content: "Style"; }
+  .lumion-schedule-row:not(.head) span:nth-of-type(4)::before { content: "Details"; }
+  .lumion-schedule-row:not(.head) span:nth-of-type(5)::before { content: "Cost"; }
+  .lumion-schedule-row:not(.head) span:nth-of-type(6)::before { content: "Ship"; }
+  .lumion-schedule-row:not(.head) span:nth-of-type(7)::before { content: "ETA"; }
+}
+
+@media (max-width: 520px) {
+  .lumion-workspace {
+    padding: 12px;
+  }
+
+  .lumion-hero,
+  .lumion-cad-bridge,
+  .lumion-tool-panel,
+  .lumion-app-residence,
+  .lumion-schedule-panel {
+    padding: 16px;
+  }
+
+  .lumion-scene-preview {
+    min-height: 260px;
+  }
+
+  .lumion-preview-building {
+    left: 8%;
+    bottom: 32%;
+    width: 64%;
+    height: 34%;
+  }
+
+  .lumion-preview-materials span {
+    flex-basis: 132px;
+  }
+
+  .lumion-app-facts div,
+  .lumion-schedule-row {
+    padding: 13px;
   }
 }
 
