@@ -10510,6 +10510,263 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
   background: rgba(214,169,94,.12);
 }
 
+/* Synchronized Sun Study + ASHRAE workspaces */
+.sun-study-workspace,
+.sustainability-workspace {
+  gap: clamp(20px, 2vw, 30px);
+  background:
+    radial-gradient(860px 460px at 12% 0%, rgba(104,199,189,.16), transparent 68%),
+    radial-gradient(780px 420px at 88% 4%, rgba(216,178,99,.12), transparent 66%),
+    linear-gradient(145deg, #07100e 0%, #101914 54%, #17231d 100%);
+  color: rgba(245,242,228,.94);
+}
+
+.sun-study-hero,
+.cad-sun-readout,
+.sun-diagram-card,
+.sun-method-card,
+.sun-action-panel,
+.sustainability-hero,
+.sustainability-metric-grid article,
+.sustainability-method-grid article,
+.ashrae-assumption-panel,
+.ec3-board,
+.sustainability-action-panel,
+.material-intent-strip {
+  border: 1px solid rgba(117,184,170,.18);
+  border-radius: 8px;
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.065), rgba(255,255,255,.022)),
+    rgba(8,18,16,.72);
+  box-shadow: 0 24px 70px rgba(0,0,0,.28);
+}
+
+.sun-study-hero,
+.sustainability-hero {
+  background:
+    radial-gradient(620px 320px at 82% 16%, rgba(104,199,189,.14), transparent 72%),
+    linear-gradient(150deg, rgba(255,255,255,.075), rgba(255,255,255,.024)),
+    rgba(8,18,16,.78);
+}
+
+.sun-study-hero h3,
+.sustainability-hero h3,
+.sun-diagram-notes h3,
+.sustainability-method-head h3,
+.ec3-board-head h3,
+.sustainability-action-panel h3,
+.material-intent-strip h3 {
+  color: rgba(255,255,255,.96);
+  letter-spacing: 0;
+}
+
+.sun-study-hero p,
+.sun-diagram-notes p,
+.sun-action-panel p,
+.sustainability-hero p,
+.ec3-board-head p,
+.sustainability-action-panel p,
+.material-intent-strip p,
+.sustainability-method-grid p,
+.ec3-material-grid p {
+  color: rgba(222,230,216,.72);
+}
+
+.sun-study-score,
+.sustainability-score-card {
+  background:
+    linear-gradient(145deg, rgba(104,199,189,.22), rgba(216,178,99,.16)),
+    rgba(255,255,255,.06);
+  border: 1px solid rgba(216,178,99,.2);
+  color: rgba(245,242,228,.94);
+}
+
+.sun-study-score span,
+.sun-study-score em,
+.sustainability-score-card span,
+.sustainability-score-card em {
+  color: rgba(224,207,139,.88);
+}
+
+.sun-study-score strong,
+.sustainability-score-card strong,
+.sustainability-metric-grid strong,
+.sustainability-method-head strong,
+.ec3-material-grid strong {
+  color: rgba(255,255,255,.96);
+}
+
+.sustainability-metric-grid article:nth-child(n),
+.sustainability-method-grid article,
+.ec3-material-grid article {
+  background:
+    linear-gradient(145deg, rgba(104,199,189,.07), rgba(255,255,255,.018)),
+    rgba(8,18,16,.62);
+}
+
+.sustainability-metric-grid article:nth-child(2),
+.sustainability-method-grid article:nth-child(2) {
+  background:
+    linear-gradient(145deg, rgba(103,161,200,.08), rgba(255,255,255,.018)),
+    rgba(8,18,16,.62);
+}
+
+.sustainability-metric-grid article:nth-child(3),
+.sustainability-method-grid article:nth-child(3) {
+  background:
+    linear-gradient(145deg, rgba(216,178,99,.09), rgba(255,255,255,.018)),
+    rgba(8,18,16,.62);
+}
+
+.sustainability-metric-grid article:nth-child(4) {
+  background:
+    linear-gradient(145deg, rgba(114,180,120,.09), rgba(255,255,255,.018)),
+    rgba(8,18,16,.62);
+}
+
+.sustainability-metric-grid span,
+.ec3-material-grid span,
+.sun-method-card .mini-label,
+.ashrae-assumption-panel .mini-label,
+.material-intent-strip .mini-label {
+  color: rgba(104,199,189,.86);
+}
+
+.sustainability-metric-grid strong {
+  font-size: clamp(23px, 2vw, 32px);
+  overflow-wrap: anywhere;
+}
+
+.sustainability-metric-grid p {
+  color: rgba(222,230,216,.66);
+}
+
+.sustainability-method-head strong,
+.ec3-material-grid em,
+.sustainability-method-grid em {
+  background: rgba(104,199,189,.12);
+  border: 1px solid rgba(104,199,189,.2);
+  color: rgba(224,207,139,.94);
+}
+
+.ashrae-assumption-panel {
+  gap: clamp(22px, 2.2vw, 34px);
+  padding: clamp(26px, 3vw, 44px);
+}
+
+.ashrae-assumption-panel .ec3-board-head {
+  gap: clamp(18px, 2.4vw, 34px);
+  align-items: center;
+}
+
+.ashrae-assumption-panel .mini-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 12px;
+  letter-spacing: .2em;
+}
+
+.ashrae-assumption-panel .ec3-board-head h3 {
+  max-width: 760px;
+  font-size: clamp(30px, 3vw, 48px);
+  line-height: 1.02;
+}
+
+.ashrae-assumption-panel .ec3-board-head p {
+  max-width: 780px;
+  margin-top: 12px;
+  font-size: clamp(15px, 1.1vw, 17px);
+  line-height: 1.62;
+}
+
+.sun-study-input-panel .ec3-board-head h3 {
+  font-size: clamp(28px, 2.6vw, 44px);
+}
+
+.sun-study-input-panel .ec3-board-head p {
+  font-size: clamp(14px, 1vw, 16px);
+}
+
+.material-intent-strip {
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(320px, 1fr);
+  gap: clamp(18px, 2.4vw, 34px);
+  align-items: center;
+  padding: clamp(22px, 2.6vw, 36px);
+}
+
+.material-intent-strip h3 {
+  margin: 8px 0 0;
+  font-size: clamp(26px, 2.4vw, 40px);
+  line-height: 1.05;
+}
+
+.material-intent-strip p {
+  max-width: 640px;
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.material-intent-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.material-intent-chips span {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(216,178,99,.32);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(216,178,99,.14), rgba(104,199,189,.08)),
+    rgba(255,255,255,.045);
+  color: rgba(255,255,255,.9);
+  padding: 10px 14px;
+  font-size: clamp(14px, 1vw, 16px);
+  font-weight: 760;
+  text-transform: capitalize;
+}
+
+.sun-study-workspace .site-intake-grid input,
+.sun-study-workspace .site-intake-grid textarea,
+.sun-study-workspace .site-intake-grid select,
+.sustainability-workspace .site-intake-grid input,
+.sustainability-workspace .site-intake-grid textarea,
+.sustainability-workspace .site-intake-grid select {
+  border-color: rgba(117,184,170,.2);
+  background: rgba(255,255,255,.055);
+  color: rgba(255,255,255,.92);
+}
+
+.sun-study-workspace .site-intake-grid input:focus,
+.sun-study-workspace .site-intake-grid textarea:focus,
+.sun-study-workspace .site-intake-grid select:focus,
+.sustainability-workspace .site-intake-grid input:focus,
+.sustainability-workspace .site-intake-grid textarea:focus,
+.sustainability-workspace .site-intake-grid select:focus {
+  border-color: rgba(104,199,189,.76);
+  box-shadow: 0 0 0 4px rgba(104,199,189,.1);
+}
+
+.sun-study-workspace .field-label,
+.sustainability-workspace .field-label {
+  color: rgba(224,207,139,.82);
+}
+
+@media (max-width: 980px) {
+  .material-intent-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .ashrae-assumption-panel .ec3-board-head {
+    align-items: flex-start;
+  }
+}
+
 @media (max-width: 1320px) {
   .site-survey-hero {
     grid-template-columns: minmax(0, 1fr);

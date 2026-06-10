@@ -3324,6 +3324,10 @@ function applicationIntegrationRecords(project) {
   const ashrae = project?.analysisResults?.ashrae || {};
   const carbon = project?.analysisResults?.carbon || {};
   const sun = project?.analysisResults?.sunStudy || {};
+  const materialIntent = materialIntentItems(project);
+  const materialSummary = materialIntent.length
+    ? `${materialIntent.length} material intents tracked: ${materialIntent.join(" / ")}`
+    : "Material intent pending";
   return [
     {
       step: "01",
@@ -3403,7 +3407,7 @@ function applicationIntegrationRecords(project) {
       status: appIntegrationStatus(project, ["lumion", "visual"], "brief ready"),
       section: "lumion",
       purpose: "Tests atmosphere, material appearance, views, daylight experience, and client-facing visual clarity.",
-      handoff: `${project?.designModel?.materialIntent || "Material intent pending"} / ${listValue(state.projectDiscovery?.atmosphere, []).join(", ") || "atmosphere pending"}`,
+      handoff: `${materialSummary} / ${listValue(state.projectDiscovery?.atmosphere, []).join(", ") || "atmosphere pending"}`,
       takeaway: "Lumion communicates the experience, but it should stay linked to the design evidence instead of becoming a separate aesthetic thread.",
       actions: [
         { label: "Open Lumion", type: "section", value: "lumion" },
@@ -6999,6 +7003,13 @@ function ec3MaterialRows(project) {
   ];
 }
 
+function materialIntentItems(project) {
+  return String(project.designModel?.materialIntent || "")
+    .split(",")
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
 function ashraeSurface(project) {
   const fields = state.siteSurvey.fields || {};
   const analysis = project.analysisResults || {};
@@ -7008,6 +7019,7 @@ function ashraeSurface(project) {
   const coolingImpact = siteDisplayValue(ashrae.coolingImpactPercent);
   const coolingLabel = coolingImpact === "--" ? "--" : `+${coolingImpact}%`;
   const materialRows = ec3MaterialRows(project);
+  const materialIntent = materialIntentItems(project);
   const methodRows = [
     {
       label: "ASHRAE",
@@ -7064,6 +7076,17 @@ function ashraeSurface(project) {
             <p>${escapeHtml(item[2])}</p>
           </article>
         `).join("")}
+      </section>
+
+      <section class="material-intent-strip" aria-label="Material intent summary">
+        <div>
+          <span class="mini-label">Material intent</span>
+          <h3>Current Material Direction</h3>
+          <p>Use these as design intent until quantities, product selections, EPDs, and EC3 factors are saved.</p>
+        </div>
+        <div class="material-intent-chips">
+          ${materialIntent.length ? materialIntent.map(item => `<span>${escapeHtml(item)}</span>`).join("") : `<span>--</span>`}
+        </div>
       </section>
 
       <section class="ashrae-assumption-panel">
