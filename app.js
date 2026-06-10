@@ -3308,16 +3308,184 @@ function renderSection() {
   `).join("");
 }
 
+function appIntegrationStatus(project, keywords, fallback = "connected through ASTRA handoff") {
+  const integrations = project?.integrations || [];
+  const match = integrations.find(item => {
+    const haystack = `${item.id || ""} ${item.name || ""} ${item.purpose || ""}`.toLowerCase();
+    return keywords.some(keyword => haystack.includes(keyword));
+  });
+  return match?.status || fallback;
+}
+
+function applicationIntegrationRecords(project) {
+  const fields = state.siteSurvey?.fields || {};
+  const qgisDownloadUrl = fields.qgisDownloadUrl || "https://qgis.org/download/";
+  const arcgisUrl = fields.arcgisEmbedUrl || fields.arcgisPortalUrl || "https://www.arcgis.com";
+  const ashrae = project?.analysisResults?.ashrae || {};
+  const carbon = project?.analysisResults?.carbon || {};
+  const sun = project?.analysisResults?.sunStudy || {};
+  return [
+    {
+      step: "01",
+      lane: "Memory",
+      app: "ASTRA Data Memory",
+      status: "active",
+      section: "data",
+      purpose: "Collects verified and missing project facts before they spread across outside tools.",
+      handoff: "Stores client brief, survey, GIS, policy, sun-study, sustainability, case-study, and selected-memory rows.",
+      takeaway: "ASTRA is the command center. External apps support decisions, but ASTRA keeps the source of truth.",
+      actions: [
+        { label: "Open Data Hub", type: "section", value: "data" },
+        { label: "Download CSV", type: "download", value: "csv" }
+      ]
+    },
+    {
+      step: "02",
+      lane: "Spatial",
+      app: "QGIS + ArcGIS Web Map",
+      status: appIntegrationStatus(project, ["qgis", "arcgis", "spatial"], fields.desktopGisPrimary || "QGIS primary"),
+      section: "gis",
+      purpose: "Verifies where the parcel, overlays, hazards, utilities, views, and policy geography are located.",
+      handoff: `${fields.qgisPackageName || "QGIS package pending"} / ${fields.arcgisWebMapId || fields.arcgisEmbedUrl || "ArcGIS web map optional"}`,
+      takeaway: "Use QGIS as the free GIS path, then add ArcGIS only when a web map, student license, or Pro workflow is available.",
+      actions: [
+        { label: "Open GIS", type: "section", value: "gis" },
+        { label: "QGIS Handoff", type: "download", value: "qgis" },
+        { label: "QGIS", type: "link", value: qgisDownloadUrl }
+      ]
+    },
+    {
+      step: "03",
+      lane: "Geometry",
+      app: "CAD / Rhino",
+      status: appIntegrationStatus(project, ["rhino", "cad", "grasshopper"], "model observed"),
+      section: "design",
+      purpose: "Carries the current massing, selected design element, height, setbacks, glazing, and material intent.",
+      handoff: `${project?.designModel?.name || "Current model"} / ${project?.designModel?.selectedElement || "selection pending"}`,
+      takeaway: "Geometry is reviewed against site, policy, sun, and sustainability evidence before the design is treated as ready.",
+      actions: [
+        { label: "Open Design", type: "section", value: "design" },
+        { label: "BIM Package", type: "download", value: "bim" }
+      ]
+    },
+    {
+      step: "04",
+      lane: "Solar",
+      app: "SunCalc + Sun Diagram",
+      status: sun.daylightScore ? "study recorded" : "needs coordinates",
+      section: "sun",
+      purpose: "Explains solar path, daylight, glare, shadow, heat-gain cues, and orientation consequences.",
+      handoff: sunStudyMetricSummary(project, state.siteSurvey) || "Sun-study evidence pending",
+      takeaway: "Sun Studies answer placement and comfort questions. They are related to sustainability, but they are not the sustainability model.",
+      actions: [
+        { label: "Open Sun Study", type: "section", value: "sun" },
+        { label: "Sun JSON", type: "download", value: "sun-study" }
+      ]
+    },
+    {
+      step: "05",
+      lane: "Performance",
+      app: "ASHRAE / EnergyPlus + EC3",
+      status: appIntegrationStatus(project, ["ashrae", "energy", "ec3", "carbon"], ashrae.envelopeRisk || "needs review"),
+      section: "ashrae",
+      purpose: "Checks operational energy assumptions, envelope risk, embodied carbon, material impact, and water/stormwater strategy.",
+      handoff: `${ashrae.coolingImpactPercent ? `ASHRAE +${ashrae.coolingImpactPercent}% cooling` : "ASHRAE pending"} / ${carbon.embodiedCarbonChange || "EC3 pending"}`,
+      takeaway: "Sustainability claims should come from energy, carbon, water, material quantities, and source status, not from visual solar observations alone.",
+      actions: [
+        { label: "Open ASHRAE + EC3", type: "section", value: "ashrae" },
+        { label: "Sustainability JSON", type: "download", value: "sustainability" }
+      ]
+    },
+    {
+      step: "06",
+      lane: "Experience",
+      app: "Lumion Visualization",
+      status: appIntegrationStatus(project, ["lumion", "visual"], "brief ready"),
+      section: "lumion",
+      purpose: "Tests atmosphere, material appearance, views, daylight experience, and client-facing visual clarity.",
+      handoff: `${project?.designModel?.materialIntent || "Material intent pending"} / ${listValue(state.projectDiscovery?.atmosphere, []).join(", ") || "atmosphere pending"}`,
+      takeaway: "Lumion communicates the experience, but it should stay linked to the design evidence instead of becoming a separate aesthetic thread.",
+      actions: [
+        { label: "Open Lumion", type: "section", value: "lumion" },
+        { label: "Lumion Brief", type: "download", value: "lumion" }
+      ]
+    },
+    {
+      step: "07",
+      lane: "Package",
+      app: "Permit + Final Handoff",
+      status: "export-ready when sources are reviewed",
+      section: "finalization",
+      purpose: "Packages verified facts, unresolved risks, app outputs, design implications, and next actions for review.",
+      handoff: "ASTRA project package / case-study table / selected memory",
+      takeaway: "The final handoff should show what is verified, what is missing, which app produced the insight, and what decision it supports.",
+      actions: [
+        { label: "Open Handoff", type: "section", value: "finalization" },
+        { label: "ASTRA Package", type: "download", value: "astra" },
+        { label: "Integration Map", type: "download", value: "integration-map" }
+      ]
+    }
+  ];
+}
+
+function integrationActionMarkup(action) {
+  if (action.type === "section") {
+    return `<button type="button" data-section="${escapeHtml(action.value)}">${escapeHtml(action.label)}</button>`;
+  }
+  if (action.type === "download") {
+    return `<button type="button" data-download="${escapeHtml(action.value)}">${escapeHtml(action.label)}</button>`;
+  }
+  return `<a href="${escapeHtml(action.value)}" target="_blank" rel="noopener noreferrer">${escapeHtml(action.label)}</a>`;
+}
+
 function renderIntegrations() {
   const project = state.project;
   if (!project) return;
-  el.integrations.innerHTML = project.integrations.map(item => `
-    <div class="integration-card">
-      <strong><span class="status-dot"></span>${escapeHtml(item.name)}</strong>
-      <p>${escapeHtml(item.purpose)}</p>
-      <p class="mini-label">${escapeHtml(item.status)}</p>
-    </div>
-  `).join("");
+  const records = applicationIntegrationRecords(project);
+  el.integrations.innerHTML = `
+    <section class="integration-sequence" aria-label="Ordered application integration sequence">
+      <header class="integration-sequence-head">
+        <div>
+          <span class="mini-label">Ordered application layer</span>
+          <h3>One Process, Connected Tools</h3>
+          <p>Each app has a job, a location in the workflow, and a handoff back to project memory.</p>
+        </div>
+        <button type="button" data-download="integration-map">Download Map</button>
+      </header>
+      <div class="integration-flow">
+        ${records.map(item => `
+          <article class="integration-card" data-integration-lane="${escapeHtml(item.lane.toLowerCase())}">
+            <div class="integration-step">
+              <span>${escapeHtml(item.step)}</span>
+              <em>${escapeHtml(item.lane)}</em>
+            </div>
+            <div class="integration-copy">
+              <strong><span class="status-dot"></span>${escapeHtml(item.app)}</strong>
+              <p>${escapeHtml(item.purpose)}</p>
+              <dl>
+                <dt>Placement</dt>
+                <dd>${escapeHtml(sectionById(item.section)?.title || item.section)}</dd>
+                <dt>Handoff</dt>
+                <dd>${escapeHtml(item.handoff)}</dd>
+                <dt>Key takeaway</dt>
+                <dd>${escapeHtml(item.takeaway)}</dd>
+              </dl>
+              <div class="integration-actions">
+                ${(item.actions || []).map(integrationActionMarkup).join("")}
+              </div>
+            </div>
+            <span class="integration-status">${escapeHtml(item.status)}</span>
+          </article>
+        `).join("")}
+      </div>
+      <footer class="integration-takeaways">
+        <span>ASTRA stays the source of truth.</span>
+        <span>Desktop apps use handoff packages.</span>
+        <span>Web apps use links, embeds, or source URLs.</span>
+        <span>Every output returns as evidence.</span>
+      </footer>
+    </section>
+  `;
 }
 
 function designSurface() {
@@ -7142,6 +7310,7 @@ function projectCsv(project) {
     ["success_metric", "water_reduction", discovery.waterReductionTarget, "saved"],
     ["success_metric", "user_satisfaction", discovery.userSatisfactionTarget, "saved"],
     ...project.clientIntent.priorities.map(item => ["client_priority", item.label, item.weight, item.source]),
+    ...applicationIntegrationRecords(project).map(item => ["application_integration", `${item.step} ${item.app}`, `${item.lane} | ${item.purpose} | handoff: ${item.handoff} | takeaway: ${item.takeaway}`, item.status]),
     ["site", "parcel_area_sq_ft", project.site.parcelAreaSqFt, project.site.verificationStatus],
     ["site", "average_slope_percent", project.site.averageSlopePercent, project.site.verificationStatus],
     ["site", "slope_direction", project.site.slopeDirection, project.site.verificationStatus],
@@ -7343,6 +7512,110 @@ const exportInfoRecords = {
   }
 };
 
+function sunStudyHandoffPackage(project) {
+  const fields = state.siteSurvey.fields || {};
+  const solarReadout = solarPositionReadout(fields.latitude, fields.longitude);
+  return {
+    exportedAt: new Date().toISOString(),
+    intent: "Sun Study handoff from ASTRA",
+    project: project.project,
+    coordinates: {
+      latitude: fields.latitude || "--",
+      longitude: fields.longitude || "--",
+      basis: solarReadout.basis
+    },
+    designModel: {
+      name: project.designModel?.name,
+      orientation: project.designModel?.orientation,
+      selectedElement: project.designModel?.selectedElement,
+      southGlazingPercent: project.designModel?.southGlazingPercent
+    },
+    sunStudy: project.analysisResults?.sunStudy || {},
+    sunCalc: solarReadout,
+    savedEvidence: dataMemoryDomainRecords(project, "SUN"),
+    keyTakeaways: [
+      "Use this package for solar placement, path, daylight, shadow, glare, heat-gain cues, and shading decisions.",
+      "Do not treat sun-study results as sustainability metrics by themselves.",
+      "If a solar decision changes envelope performance, pass that separate question to ASHRAE + EC3."
+    ]
+  };
+}
+
+function sustainabilityHandoffPackage(project) {
+  const fields = state.siteSurvey.fields || {};
+  return {
+    exportedAt: new Date().toISOString(),
+    intent: "ASHRAE + EC3 sustainability handoff from ASTRA",
+    project: project.project,
+    designModel: project.designModel,
+    sustainabilityBasis: {
+      annualEnergyUse: fields.annualEnergyUse || "--",
+      embodiedCarbon: fields.embodiedCarbon || "--",
+      stormwaterRetention: fields.stormwaterRetention || "--",
+      sustainabilityPriority: fields.sustainabilityPriority || "--",
+      codeBasis: fields.buildingCodeSummary || "--"
+    },
+    ashrae: project.analysisResults?.ashrae || {},
+    carbon: project.analysisResults?.carbon || {},
+    ec3MaterialRows: ec3MaterialRows(project),
+    savedEvidence: dataMemoryDomainRecords(project, "SUS"),
+    keyTakeaways: [
+      "Use this package for operational energy, envelope assumptions, embodied carbon, material impact, and water/stormwater strategy.",
+      "Keep EC3/EPD claims under review until product quantities and source links are entered.",
+      "Reference Sun Studies only when solar placement changes the envelope question."
+    ]
+  };
+}
+
+function lumionHandoffPackage(project) {
+  const viewRecord = siteFactRecord(state.siteSurvey.gisFindings || [], ["view", "viewshed", "corridor"]);
+  const vegetationRecord = siteFactRecord(state.siteSurvey.gisFindings || [], ["vegetation", "tree"]);
+  return {
+    exportedAt: new Date().toISOString(),
+    intent: "Lumion visualization brief from ASTRA",
+    project: project.project,
+    designModel: project.designModel,
+    clientAtmosphere: state.projectDiscovery?.atmosphere || [],
+    styleDirection: state.projectDiscovery?.architecturalStyle || [],
+    materialIntent: project.designModel?.materialIntent || "--",
+    siteContext: {
+      views: siteRecordText(viewRecord || {}) || "--",
+      vegetation: siteRecordText(vegetationRecord || {}) || "--",
+      sunStudyEvidence: sunStudyMetricSummary(project, state.siteSurvey) || "--"
+    },
+    keyTakeaways: [
+      "Use Lumion to communicate atmosphere, material appearance, view quality, daylight experience, and client review intent.",
+      "Do not let render mood replace source-backed design decisions.",
+      "Bring important comments back into ASTRA as advice, evidence, or case-study notes."
+    ]
+  };
+}
+
+function applicationIntegrationPackage(project) {
+  return {
+    exportedAt: new Date().toISOString(),
+    intent: "ASTRA ordered application integration map",
+    project: project.project,
+    workflow: applicationIntegrationRecords(project).map(item => ({
+      step: item.step,
+      lane: item.lane,
+      app: item.app,
+      status: item.status,
+      placement: sectionById(item.section)?.title || item.section,
+      purpose: item.purpose,
+      handoff: item.handoff,
+      keyTakeaway: item.takeaway
+    })),
+    keyTakeaways: [
+      "ASTRA is the central project memory and decision layer.",
+      "QGIS/ArcGIS ground the project spatially before design decisions harden.",
+      "CAD/Rhino carries geometry into solar, sustainability, visualization, and handoff checks.",
+      "Sun Studies and Sustainability are adjacent but separate workflows.",
+      "Every external output returns to ASTRA as evidence, selected memory, a handoff package, or an export row."
+    ]
+  };
+}
+
 function downloadByKind(kind) {
   if (!state.project) return;
   if (kind === "parcel") {
@@ -7362,6 +7635,18 @@ function downloadByKind(kind) {
   }
   if (kind === "selected-memory-csv") {
     triggerDownload("astra-selected-memory.csv", "text/csv", selectedDataMemoryCsv());
+  }
+  if (kind === "integration-map") {
+    triggerDownload("astra-application-integration-map.json", "application/json", JSON.stringify(applicationIntegrationPackage(state.project), null, 2));
+  }
+  if (kind === "sun-study") {
+    triggerDownload("astra-sun-study-handoff.json", "application/json", JSON.stringify(sunStudyHandoffPackage(state.project), null, 2));
+  }
+  if (kind === "sustainability") {
+    triggerDownload("astra-ashrae-ec3-sustainability-handoff.json", "application/json", JSON.stringify(sustainabilityHandoffPackage(state.project), null, 2));
+  }
+  if (kind === "lumion") {
+    triggerDownload("astra-lumion-visualization-brief.json", "application/json", JSON.stringify(lumionHandoffPackage(state.project), null, 2));
   }
   if (kind === "gis") {
     triggerDownload("astra-gis-package.json", "application/json", JSON.stringify({
