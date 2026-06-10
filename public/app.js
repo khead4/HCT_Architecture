@@ -30,7 +30,7 @@ const sections = [
     id: "data",
     title: "Database / Data Storage + CSV",
     stage: "Structured project memory",
-    desc: "Store project facts, sustainability metrics, flood strategy, initiative data, custom case studies, and JSON/CSV exports.",
+    desc: "Store project facts, sun-study evidence, sustainability metrics, flood strategy, initiative data, custom case studies, and JSON/CSV exports.",
     goal: "Keep project information reusable across GIS, AI, design, reports, case studies, and external tools.",
     actions: ["Review saved data", "Generate case studies", "Download JSON", "Download CSV"],
     ai: ["Detects missing data", "Builds case records", "Explains export-ready evidence"]
@@ -74,9 +74,9 @@ const sections = [
   {
     id: "ashrae",
     title: "ASHRAE + EC3 Sustainability",
-    stage: "Material sustainability",
-    desc: "ASHRAE-style energy assumptions, EC3-ready embodied-carbon review, material sustainability, and climate performance.",
-    goal: "Evaluate whether material and envelope choices support sustainable performance.",
+    stage: "Energy, carbon + materials",
+    desc: "ASHRAE-style energy assumptions, EC3-ready embodied-carbon review, material sustainability, water strategy, and performance evidence.",
+    goal: "Evaluate whether energy, envelope, material, carbon, and water choices support sustainable performance.",
     actions: ["Load assumptions", "Review energy metrics", "Compare EC3 material impacts", "Revise strategy"],
     ai: ["Explains green metrics", "Marks weak points", "Separates computed facts from advice"]
   },
@@ -714,12 +714,13 @@ function initialSiteSurvey() {
         title: "Outcome-Led Low-Energy Residence",
         audience: "Client / design review",
         desiredOutcome: "Warm, daylight-rich, low-energy residence with natural materials and a clear landscape relationship.",
-        focus: "Desired outcome + sustainability metrics",
-        sustainabilityMetrics: "Target pending ASHRAE model, low-carbon timber strategy, daylight score 82, embodied carbon comparison -14%.",
+        focus: "Desired outcome + performance basis",
+        sustainabilityMetrics: "Target pending ASHRAE model, low-carbon timber strategy, embodied carbon comparison -14%.",
+        sunStudyEvidence: "Sun study V4: daylight score 82, medium glare risk, west/southwest view orientation, and shading review needed before more glazing is added.",
         floodStrategy: "Keep the primary massing out of the western low point and pair landscape preservation with rainwater-supported planting.",
         initiativeDevelopment: "Use solar-ready roof area, passive design evidence, and rainwater retention as initiative-based development supports.",
         designResponse: "Orient primary living spaces toward west/southwest views while balancing glare, shading, and envelope performance.",
-        evidenceBasis: "Client brief, sun study V4, ASHRAE/sustainability result V4, material carbon comparison V2, stormwater GIS overlay.",
+        evidenceBasis: "Client brief, separate sun study V4, ASHRAE/sustainability result V4, material carbon comparison V2, stormwater GIS overlay.",
         recommendedActions: "Resolve height/front setback conflicts, confirm ASHRAE target, document shading, and verify eligibility for expedited sustainability review.",
         status: "source linked",
         documentType: "Case Study",
@@ -735,6 +736,7 @@ function initialSiteSurvey() {
         desiredOutcome: "Limit flood exposure while preserving design quality and landscape value.",
         focus: "Limited flooding + risk prevention",
         sustainabilityMetrics: "Stormwater retention priority, rainwater-supported planting, western low-point mitigation, and open space preservation.",
+        sunStudyEvidence: "Solar exposure remains a separate placement check; flood strategy is based on stormwater, topography, and civil coordination.",
         floodStrategy: "Maintain a no-build/low-impact landscape zone at the western low point, route runoff through retention planting, and verify grading before foundation lock.",
         initiativeDevelopment: "Frame stormwater management as a low-impact development initiative tied to landscape preservation and permitting readiness.",
         designResponse: "Shift massing eastward/north-east, protect view corridors, and coordinate service entries away from mapped stormwater conflict areas.",
@@ -753,7 +755,8 @@ function initialSiteSurvey() {
         audience: "Permit / sustainability review",
         desiredOutcome: "Use policy initiatives to improve permitting readiness and design quality without fragmenting the workflow.",
         focus: "Initiative based development",
-        sustainabilityMetrics: "Solar-ready envelope, passive design measures, low embodied carbon material strategy, and rainwater retention package.",
+        sustainabilityMetrics: "ASHRAE energy target, passive envelope strategy, low embodied carbon material strategy, and rainwater retention package.",
+        sunStudyEvidence: "Solar-ready roof area is tracked as policy/site opportunity; daylight, path, glare, and shadow remain in the Sun Studies workspace.",
         floodStrategy: "Tie stormwater retention to landscape and flood-risk mitigation rather than treating it as a late civil correction.",
         initiativeDevelopment: "Package solar-ready roof area, passive design, low-carbon timber, and rainwater retention as a coordinated initiative path.",
         designResponse: "Create a policy-ready design narrative that explains why orientation, materials, envelope, and landscape are connected decisions.",
@@ -1571,7 +1574,7 @@ function siteAgentStackRows(stats) {
   const settings = stats.settings;
   return [
     ["Main agent", settings.assistantMode.includes("Qwen") ? "Qwen via Ollama when configured" : settings.assistantMode, "Answers from the saved project, site survey, and evidence records first."],
-    ["Deep reasoning", settings.reasoningSpecialist, "Reserved for compliance conflicts, ASHRAE tradeoffs, material placement, sun study, and sustainability decisions."],
+    ["Deep reasoning", settings.reasoningSpecialist, "Reserved for compliance conflicts, ASHRAE/material sustainability tradeoffs, and separate sun-study placement decisions."],
     ["RAG memory", settings.ragDepth, `${stats.evidenceTotal} records available; citations stay attached to source names and verification status.`],
     ["Fallback", "Deterministic evidence engine", "No API key is required. If Ollama is not connected, ASTRA still gives bounded guidance from entered data."]
   ];
@@ -2420,11 +2423,11 @@ const roleJourneys = {
       {
         number: "03",
         label: "Performance",
-        title: "Energy + Envelope",
+        title: "Energy + Solar Checks",
         section: "ashrae",
         sections: ["ashrae", "sun"],
-        detail: "Review daylight, cooling impact, envelope risk, carbon, and performance assumptions.",
-        hover: "Use this when technical advice depends on physics, energy, comfort, or material performance.",
+        detail: "Review ASHRAE/EC3 sustainability evidence separately from Sun Studies daylight, glare, shadow, and orientation evidence.",
+        hover: "Use this when technical advice depends on energy, comfort, material performance, or solar placement, while keeping each source distinct.",
         pages: ["ASHRAE", "Sun"]
       },
       {
@@ -3040,7 +3043,7 @@ function renumberJourney(stages) {
 roleJourneys.architect.stages = renumberJourney([
   makeJourneyStage("clientele", "Brief", "Capture the client brief, priorities, budget, and design values.", "Start here when the architect needs to understand what the project should become.", ["Customer info", "Priorities"]),
   makeJourneyStage("survey", "Survey", "Review parcel facts, utilities, slope, soil, and boundary conditions.", "Use this before design moves depend on site facts.", ["Parcel", "Survey"]),
-  makeJourneyStage("data", "Database + CSV", "Store project facts, sustainability metrics, flood strategy, initiatives, custom case studies, and JSON/CSV exports.", "Use this when information needs to move cleanly between tools or become downloadable project and case-study data.", ["Database", "Cases", "JSON", "CSV"]),
+  makeJourneyStage("data", "Database + CSV", "Store project facts, sun-study evidence, sustainability metrics, flood strategy, initiatives, custom case studies, and JSON/CSV exports.", "Use this when information needs to move cleanly between tools or become downloadable project and case-study data.", ["Database", "Cases", "JSON", "CSV"]),
   makeJourneyStage("policy", "Policy", "Check zoning, setbacks, height, incentives, and cited policy rules.", "Use this before committing to a massing move that may conflict with code.", ["Rules", "Sources"]),
   makeJourneyStage("gis", "GIS", "Compare mapped layers, overlays, risks, views, and spatial opportunities.", "Use this when design direction depends on where something happens on the parcel.", ["GIS", "Parcel map"]),
   makeJourneyStage("design", "Design", "Develop massing, placement, openings, and the core concept model.", "Use this for the main architectural design workspace.", ["Model", "Map"]),
@@ -3705,7 +3708,8 @@ function finalizationDecisionRows(project) {
     ["Site basis", `${project.site.parcelAreaSqFt.toLocaleString()} sq ft parcel, ${project.site.averageSlopePercent}% slope toward ${project.site.slopeDirection}`, project.site.verificationStatus],
     ["Design model", `${project.designModel.name}: ${project.designModel.heightFt} ft high, ${project.designModel.frontDistanceFt} ft from front line`, "current"],
     ["Policy basis", `${front ? `${front.value} ft front setback` : "Front setback pending"}; ${height ? `${height.value} ft height limit` : "Height limit pending"}`, "source linked"],
-    ["Performance basis", `${project.analysisResults.sunStudy.daylightScore} daylight, +${project.analysisResults.ashrae.coolingImpactPercent}% cooling impact`, "needs review"],
+    ["Sun study basis", `${project.analysisResults.sunStudy.daylightScore} daylight score; glare and orientation remain in Sun Studies`, "needs review"],
+    ["Sustainability basis", `+${project.analysisResults.ashrae.coolingImpactPercent}% ASHRAE cooling impact; carbon and material impact remain in ASHRAE + EC3`, "needs review"],
     ["Handoff package", "Client brief, survey facts, GIS layers, policy citations, design model, Lumion views, parcel JSON, and project CSV", "ready"]
   ];
 }
@@ -5361,17 +5365,31 @@ function caseStudyRecords() {
   return Array.isArray(state.siteSurvey.caseStudies) ? state.siteSurvey.caseStudies : [];
 }
 
-function caseStudyMetricSummary(project, survey) {
+function sustainabilityMetricSummary(project, survey) {
   const fields = survey.fields || {};
   const analysis = project?.analysisResults || {};
   return [
     fields.annualEnergyUse ? `Energy: ${fields.annualEnergyUse}` : "",
     fields.embodiedCarbon ? `Carbon: ${fields.embodiedCarbon}` : "",
-    fields.daylightFactor ? `Daylight: ${fields.daylightFactor}` : "",
     fields.stormwaterRetention ? `Stormwater: ${fields.stormwaterRetention}` : "",
-    analysis.sunStudy?.daylightScore ? `Sun study daylight score ${analysis.sunStudy.daylightScore}` : "",
     analysis.ashrae?.coolingImpactPercent ? `ASHRAE cooling impact +${analysis.ashrae.coolingImpactPercent}%` : "",
     analysis.carbon?.embodiedCarbonChange ? `Embodied carbon ${analysis.carbon.embodiedCarbonChange}` : ""
+  ].filter(Boolean).join(" / ");
+}
+
+function sunStudyMetricSummary(project, survey) {
+  const fields = survey.fields || {};
+  const analysis = project?.analysisResults || {};
+  const sunStudy = analysis.sunStudy || {};
+  const model = project?.designModel || {};
+  const solarReadout = solarPositionReadout(fields.latitude, fields.longitude);
+  return [
+    fields.daylightFactor ? `Daylight target: ${fields.daylightFactor}` : "",
+    sunStudy.daylightScore ? `Sun study daylight score ${sunStudy.daylightScore}` : "",
+    sunStudy.glareRisk ? `Glare risk: ${sunStudy.glareRisk}` : "",
+    model.orientation ? `Orientation: ${model.orientation}` : "",
+    model.southGlazingPercent ? `South glazing: ${model.southGlazingPercent}%` : "",
+    solarReadout.basis !== "--" ? `SunCalc basis: ${solarReadout.basis}` : ""
   ].filter(Boolean).join(" / ");
 }
 
@@ -5382,7 +5400,8 @@ function buildGeneratedCaseStudies(project) {
   const analysis = project.analysisResults || {};
   const topOpportunity = siteTopOpportunity(survey);
   const dominantRisk = siteDominantRisk(survey);
-  const metrics = caseStudyMetricSummary(project, survey);
+  const metrics = sustainabilityMetricSummary(project, survey);
+  const sunMetrics = sunStudyMetricSummary(project, survey);
   const floodFact = fields.environmentalHazards || fields.drainageNotes || siteRecordText((survey.hazards || []).find(item => String(item.name || "").toLowerCase().includes("flood"))) || "--";
   const initiative = fields.zoneInitiatives || "Initiative path pending";
   const desiredOutcome = fields.desiredFutureUse || discovery.outcomes || project.clientIntent.summary;
@@ -5396,6 +5415,7 @@ function buildGeneratedCaseStudies(project) {
       desiredOutcome,
       focus: "Desired outcome, client intent, and design quality",
       sustainabilityMetrics: metrics || "--",
+      sunStudyEvidence: sunMetrics || "--",
       floodStrategy: floodFact,
       initiativeDevelopment: initiative,
       designResponse: fields.policyDesignImplications || `Use ${topOpportunity?.name || "the strongest saved opportunity"} as the design driver while keeping ${dominantRisk?.name || "known risks"} visible.`,
@@ -5421,6 +5441,7 @@ function buildGeneratedCaseStudies(project) {
       desiredOutcome: "Limit flooding and stormwater exposure without reducing the creative quality of the design.",
       focus: "Limited flooding, elevation, stormwater, and recovery procedure",
       sustainabilityMetrics: fields.stormwaterRetention || metrics || "--",
+      sunStudyEvidence: "Separate solar-placement review; this resilience case is driven by stormwater, elevation, slope, and recovery data.",
       floodStrategy: `${floodFact}. ${fields.riskPrevention || ""}`.trim(),
       initiativeDevelopment: "Use stormwater retention and landscape preservation as a low-impact development strategy.",
       designResponse: "Keep the primary mass out of the western low point, preserve the view corridor, and coordinate grading before foundation assumptions are locked.",
@@ -5440,6 +5461,7 @@ function buildGeneratedCaseStudies(project) {
       desiredOutcome: "Use incentives and policy initiatives to make the design more sustainable and easier to explain.",
       focus: "Initiative based development",
       sustainabilityMetrics: metrics || fields.zoneInitiatives || "--",
+      sunStudyEvidence: sunMetrics || "--",
       floodStrategy: fields.stormwaterRetention || "Stormwater retention strategy pending",
       initiativeDevelopment: initiative,
       designResponse: "Package solar-ready roof area, passive design, low-carbon material intent, and rainwater retention as one coordinated development path.",
@@ -5456,14 +5478,35 @@ function buildGeneratedCaseStudies(project) {
     {
       title: "Sustainability Metrics Case Study",
       audience: "ASHRAE / material review",
-      desiredOutcome: "Translate energy, daylight, carbon, and material goals into design decisions that can be checked.",
+      desiredOutcome: "Translate energy, carbon, material, and water goals into design decisions that can be checked.",
       focus: "Sustainability metrics and material performance",
       sustainabilityMetrics: metrics || "--",
+      sunStudyEvidence: "Sun-study facts are intentionally excluded from this sustainability metric summary; use the Sun Study Placement case for path, daylight, shadow, glare, and orientation evidence.",
       floodStrategy: fields.environmentalHazards || "--",
       initiativeDevelopment: fields.zoneInitiatives || "--",
       designResponse: `${analysis.ashrae?.summary || "ASHRAE result pending"} ${analysis.carbon?.summary || "Carbon comparison pending"}`.trim(),
-      evidenceBasis: "ASHRAE / Sustainability Result V4 / Material Carbon Comparison V2 / Sun Study Result V4",
-      recommendedActions: "Pair daylight expansion with shading, verify envelope assumptions, and keep embodied-carbon claims tied to the material comparison.",
+      evidenceBasis: "ASHRAE / Sustainability Result V4 / Material Carbon Comparison V2 / stormwater or water-performance record",
+      recommendedActions: "Verify envelope assumptions, add material quantities, attach EPD/EC3 source links, and keep embodied-carbon claims tied to the material comparison.",
+      status: "needs review",
+      documentType: "Case Study",
+      sourceName,
+      sourceUrl: "",
+      verifiedBy: "ASTRA deterministic generator",
+      lastChecked: today,
+      generated: true
+    },
+    {
+      title: "Sun Study Placement Case Study",
+      audience: "Design review / solar placement",
+      desiredOutcome: "Use sun path, daylight, shadow, glare, and orientation evidence to improve placement without treating it as a sustainability calculation.",
+      focus: "Sun study, orientation, glare, daylight, and shading",
+      sustainabilityMetrics: metrics || "--",
+      sunStudyEvidence: sunMetrics || "--",
+      floodStrategy: fields.environmentalHazards || fields.drainageNotes || "--",
+      initiativeDevelopment: "Solar-ready or passive-design initiatives should reference the policy source separately from the sun-study observation.",
+      designResponse: "Use SunCalc, sun diagram, and CAD orientation evidence to tune openings, shading, roof exposure, and massing placement before sending the envelope question to ASHRAE.",
+      evidenceBasis: "Sun Study Result V4 / SunCalc coordinate basis / CAD orientation / separate ASHRAE cross-check when cooling impact is being reviewed",
+      recommendedActions: "Set coordinates, confirm study date/time, compare morning/noon/afternoon exposure, test glare, then pass only envelope-impact questions to ASHRAE.",
       status: "needs review",
       documentType: "Case Study",
       sourceName,
@@ -5477,7 +5520,7 @@ function buildGeneratedCaseStudies(project) {
 
 function caseStudyCsv(project) {
   const rows = [
-    ["title", "audience", "desired_outcome", "focus", "sustainability_metrics", "flood_strategy", "initiative_development", "design_response", "evidence_basis", "recommended_actions", "status", "source"]
+    ["title", "audience", "desired_outcome", "focus", "sustainability_metrics", "sun_study_evidence", "flood_strategy", "initiative_development", "design_response", "evidence_basis", "recommended_actions", "status", "source"]
   ];
   caseStudyRecords().forEach(item => {
     rows.push([
@@ -5486,6 +5529,7 @@ function caseStudyCsv(project) {
       item.desiredOutcome,
       item.focus,
       item.sustainabilityMetrics,
+      item.sunStudyEvidence,
       item.floodStrategy,
       item.initiativeDevelopment,
       item.designResponse,
@@ -5503,7 +5547,8 @@ function caseStudyJson(project) {
     exportedAt: new Date().toISOString(),
     project: project.project,
     desiredOutcome: state.siteSurvey.fields.desiredFutureUse,
-    sustainabilityMetrics: caseStudyMetricSummary(project, state.siteSurvey),
+    sustainabilityMetrics: sustainabilityMetricSummary(project, state.siteSurvey),
+    sunStudyEvidence: sunStudyMetricSummary(project, state.siteSurvey),
     caseStudies: caseStudyRecords()
   }, null, 2);
 }
@@ -5545,7 +5590,8 @@ function dataStorageFactRows(project) {
   const fields = state.siteSurvey.fields || {};
   return [
     { label: "Desired outcome", value: fields.desiredFutureUse || state.projectDiscovery.outcomes, detail: "Primary narrative basis for generated case studies", status: policyFieldStatus(fields.desiredFutureUse || state.projectDiscovery.outcomes) },
-    { label: "Sustainability metrics", value: caseStudyMetricSummary(project, state.siteSurvey), detail: "Energy, carbon, daylight, stormwater, ASHRAE, and material facts", status: "saved" },
+    { label: "Sun study evidence", value: sunStudyMetricSummary(project, state.siteSurvey), detail: "Sun path, daylight, shadow, glare, orientation, and shading facts", status: sunStudyMetricSummary(project, state.siteSurvey) ? "saved" : "missing" },
+    { label: "Sustainability metrics", value: sustainabilityMetricSummary(project, state.siteSurvey), detail: "Energy, carbon, stormwater/water, ASHRAE, EC3, and material facts", status: sustainabilityMetricSummary(project, state.siteSurvey) ? "saved" : "missing" },
     { label: "Limited flooding", value: fields.environmentalHazards || fields.drainageNotes, detail: "Flood, slope, stormwater, and recovery data for resilience case studies", status: policyFieldStatus(fields.environmentalHazards || fields.drainageNotes) },
     { label: "Initiatives", value: fields.zoneInitiatives, detail: "Initiative-based development and expedited review notes", status: fields.policyLookupStatus || policyFieldStatus(fields.zoneInitiatives) },
     { label: "Policy zone", value: fields.detectedZoneArea || fields.zoningDistrict, detail: fields.policySourceUrl || "Policy source pending", status: fields.policyLookupStatus || "needs review" },
@@ -5690,13 +5736,24 @@ function dataMemoryDomainRecords(project, domainKey) {
     });
   }
 
+  if (domainKey === "SUN") {
+    const solarReadout = solarPositionReadout(fields.latitude, fields.longitude);
+    [
+      ["Daylight / glare target", fields.daylightFactor, "User-entered daylight, glare, or solar-study target.", policyFieldStatus(fields.daylightFactor), "sun_study"],
+      ["Sun study daylight score", analysis.sunStudy?.daylightScore, analysis.sunStudy?.summary, analysis.sunStudy?.verificationStatus || "saved", "sun_study"],
+      ["Glare risk", analysis.sunStudy?.glareRisk, "Glare and visual-comfort finding from the sun-study workflow.", analysis.sunStudy?.glareRisk ? "needs review" : "missing", "sun_study"],
+      ["SunCalc coordinate basis", solarReadout.basis, "Latitude/longitude-derived solar-position basis for altitude, azimuth, daylight, and shadow cues.", solarReadout.basis === "--" ? "missing" : "saved", "sun_calc"],
+      ["SunCalc noon altitude", solarReadout.altitude, solarReadout.takeaway, solarReadout.altitude === "--" ? "missing" : "saved", "sun_calc"],
+      ["Solar orientation", project.designModel?.orientation, "Current CAD/model orientation used by the Sun Studies page.", policyFieldStatus(project.designModel?.orientation), "solar_orientation"],
+      ["South glazing percent", project.designModel?.southGlazingPercent ? `${project.designModel.southGlazingPercent}%` : "", "Opening ratio used for glare/shadow/orientation review before ASHRAE envelope review.", policyFieldStatus(project.designModel?.southGlazingPercent), "solar_orientation"]
+    ].forEach(row => add(...row, "Sun Studies workspace", "sun study evidence"));
+  }
+
   if (domainKey === "SUS") {
     [
       ["Annual energy use", fields.annualEnergyUse, "Energy target or ASHRAE model status.", policyFieldStatus(fields.annualEnergyUse), "success_metric"],
       ["Embodied carbon target", fields.embodiedCarbon, "Material carbon target used by EC3-ready review.", policyFieldStatus(fields.embodiedCarbon), "success_metric"],
-      ["Daylight factor", fields.daylightFactor, "Daylight goal tied to SunCalc and design review.", policyFieldStatus(fields.daylightFactor), "success_metric"],
       ["Stormwater retention", fields.stormwaterRetention, "Water/landscape metric used by resilience case studies.", policyFieldStatus(fields.stormwaterRetention), "success_metric"],
-      ["Sun study daylight score", analysis.sunStudy?.daylightScore, analysis.sunStudy?.summary, "saved", "sun_study"],
       ["ASHRAE cooling impact", analysis.ashrae?.coolingImpactPercent ? `+${analysis.ashrae.coolingImpactPercent}%` : "", analysis.ashrae?.summary, analysis.ashrae?.envelopeRisk || "needs review", "ashrae_result"],
       ["Embodied carbon comparison", analysis.carbon?.embodiedCarbonChange, analysis.carbon?.summary, "under review", "ec3_carbon_result"]
     ].forEach(row => add(...row, "ASHRAE + EC3 workspace", "sustainability metric"));
@@ -5773,14 +5830,24 @@ function dataStorageMemoryRows(project) {
       status: fields.policyLookupStatus || policyFieldStatus(fields.detectedZoneArea || fields.zoningDistrict)
     },
     {
+      key: "SUN",
+      symbol: "SUN",
+      title: "Sun study evidence",
+      count: sunStudyMetricSummary(project, survey) ? "saved" : "--",
+      stored: sunStudyMetricSummary(project, survey) || "--",
+      csv: "sun_study / sun_calc / solar_orientation",
+      use: "Stores sun path, daylight, shadow, glare, orientation, and shading evidence separately from sustainability metrics.",
+      status: sunStudyMetricSummary(project, survey) ? "saved" : "missing"
+    },
+    {
       key: "SUS",
       symbol: "SUS",
       title: "Sustainability metrics",
-      count: caseStudyMetricSummary(project, survey) ? "saved" : "--",
-      stored: caseStudyMetricSummary(project, survey) || "--",
+      count: sustainabilityMetricSummary(project, survey) ? "saved" : "--",
+      stored: sustainabilityMetricSummary(project, survey) || "--",
       csv: "success_metric / site_case_study",
-      use: "Feeds ASHRAE, daylight, embodied carbon, stormwater, and low-carbon case-study exports.",
-      status: caseStudyMetricSummary(project, survey) ? "saved" : "missing"
+      use: "Feeds ASHRAE, EC3, embodied carbon, stormwater/water, material, and low-carbon case-study exports.",
+      status: sustainabilityMetricSummary(project, survey) ? "saved" : "missing"
     },
     {
       key: "CASE",
@@ -5823,11 +5890,18 @@ function dataCaseStudyOutcomeRows(project) {
       check: "Packages incentive, policy, sustainability, and procedure notes for planning or permit review."
     },
     {
-      symbol: "MET",
+      symbol: "SUN",
+      title: "Sun study evidence",
+      fact: sunStudyMetricSummary(project, survey) || topOpportunity?.value || "--",
+      output: "Sun Study Placement Case Study",
+      check: "Uses sun path, daylight, shadow, glare, orientation, and shading evidence without mixing it into sustainability metrics."
+    },
+    {
+      symbol: "SUS",
       title: "Sustainability metrics",
-      fact: caseStudyMetricSummary(project, survey) || topOpportunity?.value || "--",
+      fact: sustainabilityMetricSummary(project, survey) || "--",
       output: "Sustainability Metrics Case Study",
-      check: "Uses energy, carbon, daylight, stormwater, ASHRAE, and material facts without inventing missing values."
+      check: "Uses energy, carbon, water/stormwater, ASHRAE, EC3, and material facts without inventing missing values."
     }
   ];
 }
@@ -5845,7 +5919,7 @@ function dataStorageSurface(project) {
         <div>
           <span class="mini-label">Database / data storage + CSV</span>
           <h3>Project Memory, CSV + Case Study Data Hub</h3>
-          <p>Store actual project facts, sustainability metrics, flood-limitation strategies, policy initiatives, ArcGIS data, and generated case studies in one exportable system.</p>
+          <p>Store actual project facts, sun-study evidence, sustainability metrics, flood-limitation strategies, policy initiatives, ArcGIS data, and generated case studies in one exportable system.</p>
         </div>
         <div class="site-output-card">
           <span>Output</span>
@@ -5914,7 +5988,7 @@ function dataStorageSurface(project) {
               ${siteFieldTextarea("clientGoals", "Client goals", 3)}
               ${siteFieldInput("annualEnergyUse", "Annual energy use target")}
               ${siteFieldInput("embodiedCarbon", "Embodied carbon target")}
-              ${siteFieldInput("daylightFactor", "Daylight / sun metric")}
+              ${siteFieldInput("daylightFactor", "Sun study daylight / glare target")}
               ${siteFieldInput("stormwaterRetention", "Stormwater retention metric")}
               ${siteFieldTextarea("environmentalHazards", "Flooding / environmental hazards", 3)}
               ${siteFieldTextarea("zoneInitiatives", "Initiative-based development", 3)}
@@ -5961,6 +6035,7 @@ function dataStorageSurface(project) {
                   ${siteRowInput("caseStudies", index, "focus", item.focus || "", "Focus")}
                   ${siteRowTextarea("caseStudies", index, "desiredOutcome", item.desiredOutcome || "", "Desired outcome", 3)}
                   ${siteRowTextarea("caseStudies", index, "sustainabilityMetrics", item.sustainabilityMetrics || "", "Sustainability metrics", 3)}
+                  ${siteRowTextarea("caseStudies", index, "sunStudyEvidence", item.sunStudyEvidence || "", "Sun study evidence", 3)}
                   ${siteRowTextarea("caseStudies", index, "floodStrategy", item.floodStrategy || "", "Limited flooding / resilience strategy", 3)}
                   ${siteRowTextarea("caseStudies", index, "initiativeDevelopment", item.initiativeDevelopment || "", "Initiative-based development", 3)}
                   ${siteRowTextarea("caseStudies", index, "designResponse", item.designResponse || "", "Design response", 3)}
@@ -5980,10 +6055,11 @@ function dataStorageSurface(project) {
             </div>
             <div class="database-list data-schema-list">
               ${[
-                ["site_survey_form", "All intake, policy, sustainability, elevation, and case-study input fields", "saved"],
+                ["site_survey_form", "All intake, policy, sustainability, sun study, elevation, and case-study input fields", "saved"],
+                ["sun_study", "Sun path, daylight, shadow, glare, orientation, and shading evidence", "separate"],
                 ["site_policy_lookup", "Address, zone, source, status, policy result, and reviewer metadata", "source linked"],
                 ["site_hazard", "Flooding, slope, soil, utility, severity, source, and mitigation data", "risk"],
-                ["site_case_study", "Desired outcome, sustainability metrics, flood strategy, initiatives, evidence, actions", "exportable"],
+                ["site_case_study", "Desired outcome, sun study evidence, sustainability metrics, flood strategy, initiatives, evidence, actions", "exportable"],
                 ["policy_rule", "Verified rules, values, units, sections, and source titles", "verified"],
                 ["gis_layer", "GIS overlay name, status, finding, source, and downstream use", "active"]
               ].map(row => `
@@ -6009,7 +6085,7 @@ function dataStorageSurface(project) {
               <button type="button" data-export-info="parcel"><span>JSON</span><strong>Full ASTRA Project</strong><em>Project, site survey, rules, GIS, model, and cases</em></button>
               <button type="button" data-export-info="csv"><span>CSV</span><strong>Project Data Table</strong><em>All saved records in a spreadsheet-ready table</em></button>
               <button type="button" data-export-info="case-json"><span>JSON</span><strong>Case Studies</strong><em>Custom generated narratives with source fields</em></button>
-              <button type="button" data-export-info="case-csv"><span>CSV</span><strong>Case Study Table</strong><em>Desired outcome, metrics, flood, initiatives, actions</em></button>
+              <button type="button" data-export-info="case-csv"><span>CSV</span><strong>Case Study Table</strong><em>Outcome, sun evidence, sustainability, flood, initiatives</em></button>
             </div>
           </section>
         </main>
@@ -6641,6 +6717,23 @@ function sunSurface(project) {
         </aside>
       </section>
 
+      <section class="sun-study-input-panel ashrae-assumption-panel">
+        <div class="ec3-board-head">
+          <div>
+            <span class="mini-label">Sun study inputs</span>
+            <h3>Editable Solar Placement Basis</h3>
+            <p>These fields belong to the Sun Studies workflow: coordinates, daylight/glare goals, orientation, and solar observations. They can inform ASHRAE later, but they are not sustainability metrics by themselves.</p>
+          </div>
+          <button class="add-row-button" type="button" data-section="data">Open Data Memory</button>
+        </div>
+        <div class="site-intake-grid ashrae-input-grid">
+          ${siteFieldInput("latitude", "Latitude")}
+          ${siteFieldInput("longitude", "Longitude")}
+          ${siteFieldInput("daylightFactor", "Daylight / glare target")}
+          ${siteFieldTextarea("policyDesignImplications", "Solar design implication", 3)}
+        </div>
+      </section>
+
       <section class="sun-diagram-card">
         <div class="sun-diagram">
           <div class="sun-orbit" aria-hidden="true">
@@ -6685,13 +6778,13 @@ function sunSurface(project) {
         <div>
           <span class="mini-label">ASTRA interpretation</span>
           <h3>Design Direction</h3>
-          <p>Keep the west/southwest daylight and view benefit, but avoid treating more glazing as the only solution. Pair orientation with exterior shading, high-performance glass, roof solar readiness, landscape shade, and ASHRAE cooling review.</p>
+          <p>Use this page for placement, path, daylight, shadow, glare, and orientation. Do not treat it as a sustainability score: if the solar choice changes energy, carbon, or material impact, pass that separate question to ASHRAE + EC3.</p>
         </div>
         <div class="sun-action-list">
           <span>Set coordinates before final solar angles</span>
           <span>Compare morning, noon, and afternoon study dates</span>
           <span>Check glare before approving facade changes</span>
-          <span>Link orientation to material and envelope choices</span>
+          <span>Send envelope-impact questions to ASHRAE + EC3</span>
         </div>
       </section>
       <div id="annotationLayer" class="annotation-layer"></div>
@@ -6743,7 +6836,6 @@ function ashraeSurface(project) {
   const analysis = project.analysisResults || {};
   const ashrae = analysis.ashrae || {};
   const carbon = analysis.carbon || {};
-  const sunStudy = analysis.sunStudy || {};
   const model = project.designModel || {};
   const coolingImpact = siteDisplayValue(ashrae.coolingImpactPercent);
   const coolingLabel = coolingImpact === "--" ? "--" : `+${coolingImpact}%`;
@@ -6769,8 +6861,8 @@ function ashraeSurface(project) {
       label: "Guide",
       title: "Sustainability Decision Guide",
       value: fields.sustainabilityPriority || "Balanced performance",
-      path: "Client goals -> policy initiatives -> SunCalc/ASHRAE/EC3 metrics -> design recommendation.",
-      takeaway: fields.zoneInitiatives || "Sustainability initiative notes are not saved yet.",
+      path: "Client goals -> policy initiatives -> ASHRAE energy evidence -> EC3 material evidence -> design recommendation.",
+      takeaway: fields.zoneInitiatives || "Sustainability initiative notes are not saved yet. Sun-study evidence can be referenced separately when orientation affects envelope choices.",
       status: fields.policyLookupStatus || "needs review"
     }
   ];
@@ -6782,7 +6874,7 @@ function ashraeSurface(project) {
         <div>
           <span class="mini-label">Sustainability workspace</span>
           <h3>ASHRAE + EC3 Material Sustainability</h3>
-          <p>Review operational energy, envelope assumptions, embodied carbon, material choices, and sustainability initiatives in one place so design quality does not split across separate tools.</p>
+          <p>Review operational energy, envelope assumptions, embodied carbon, material choices, water/stormwater strategy, and sustainability initiatives. Sun Studies remains the separate workspace for daylight, shadow, glare, path, and orientation.</p>
         </div>
         <div class="sustainability-score-card">
           <span>Envelope risk</span>
@@ -6793,10 +6885,10 @@ function ashraeSurface(project) {
 
       <section class="sustainability-metric-grid">
         ${[
+          ["Energy target", fields.annualEnergyUse || "--", "Saved operational energy or model status"],
           ["ASHRAE cooling", coolingLabel, "Current glazing and envelope assumption"],
-          ["Daylight score", siteDisplayValue(sunStudy.daylightScore), "From saved Sun Study result"],
           ["Embodied carbon", carbon.embodiedCarbonChange || "--", carbon.sourceTitle || "Material carbon source pending"],
-          ["Material intent", model.materialIntent || "--", "Current CAD/model material direction"]
+          ["Stormwater / water", fields.stormwaterRetention || "--", "Saved water or landscape performance metric"]
         ].map(item => `
           <article>
             <span>${escapeHtml(item[0])}</span>
@@ -6818,7 +6910,6 @@ function ashraeSurface(project) {
         <div class="site-intake-grid ashrae-input-grid">
           ${siteFieldInput("annualEnergyUse", "Annual energy use / model status")}
           ${siteFieldInput("embodiedCarbon", "Embodied carbon target")}
-          ${siteFieldInput("daylightFactor", "Daylight / glare target")}
           ${siteFieldInput("stormwaterRetention", "Stormwater retention metric")}
           ${siteFieldSelect("sustainabilityPriority", "Sustainability priority", sustainabilityPriorityOptions)}
           ${siteFieldInput("policyLookupStatus", "Source / verification status")}
@@ -6868,12 +6959,12 @@ function ashraeSurface(project) {
         <div>
           <span class="mini-label">ASTRA direction</span>
           <h3>What To Do Next</h3>
-          <p>Keep timber-first material strategy, SunCalc glare review, ASHRAE envelope testing, and EC3/EPD product data tied to the same CAD model. Do not finalize a sustainability claim until the metric source and quantity basis are visible.</p>
+          <p>Keep timber-first material strategy, ASHRAE envelope testing, EC3/EPD product data, and water/stormwater performance tied to the CAD model. Use Sun Studies as a separate companion check when solar placement changes the envelope question.</p>
         </div>
         <div class="sun-action-list">
           <span>Enter material quantities from CAD</span>
           <span>Add EC3/EPD source links</span>
-          <span>Compare glazing benefit against carbon and cooling impact</span>
+          <span>Compare envelope changes against carbon and cooling impact</span>
           <span>Attach ASHRAE assumptions to the final package</span>
         </div>
       </section>
@@ -7007,7 +7098,7 @@ function renderSurface() {
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
-  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "ashrae") bindSiteSurveyPage();
+  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
@@ -7046,7 +7137,8 @@ function projectCsv(project) {
     ["success_metric", "energy_use_intensity", discovery.energyUseIntensity, "saved"],
     ["success_metric", "construction_budget", discovery.constructionBudgetTarget, "saved"],
     ["success_metric", "carbon_target", discovery.carbonTarget, "saved"],
-    ["success_metric", "natural_daylight", discovery.naturalDaylightTarget, "saved"],
+    ["sun_study", "natural_daylight_target", discovery.naturalDaylightTarget, "saved"],
+    ["sun_study", "current_sun_study_evidence", sunStudyMetricSummary(project, state.siteSurvey), sunStudyMetricSummary(project, state.siteSurvey) ? "saved" : "missing"],
     ["success_metric", "water_reduction", discovery.waterReductionTarget, "saved"],
     ["success_metric", "user_satisfaction", discovery.userSatisfactionTarget, "saved"],
     ...project.clientIntent.priorities.map(item => ["client_priority", item.label, item.weight, item.source]),
@@ -7067,7 +7159,7 @@ function projectCsv(project) {
     ...state.siteSurvey.policyLookups.map(item => ["site_policy_lookup", item.name, `${item.address || ""} | ${item.jurisdiction || ""} | ${item.result || ""} | ${item.sourceUrl || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.evidence.map(item => ["site_evidence", item.name, `${item.owner || ""}: ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.aiInterpretation.map(item => ["site_ai_interpretation", item.question, item.answer, "saved"]),
-    ...caseStudyRecords().map(item => ["site_case_study", item.title, `${item.audience || ""} | ${item.focus || ""} | desired: ${item.desiredOutcome || ""} | metrics: ${item.sustainabilityMetrics || ""} | flood: ${item.floodStrategy || ""} | initiative: ${item.initiativeDevelopment || ""} | actions: ${item.recommendedActions || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
+    ...caseStudyRecords().map(item => ["site_case_study", item.title, `${item.audience || ""} | ${item.focus || ""} | desired: ${item.desiredOutcome || ""} | sustainability: ${item.sustainabilityMetrics || ""} | sun: ${item.sunStudyEvidence || ""} | flood: ${item.floodStrategy || ""} | initiative: ${item.initiativeDevelopment || ""} | actions: ${item.recommendedActions || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.packageItems.map(item => ["site_package_item", item.name, item.included ? "included" : "excluded", "saved"]),
     ...state.programSpaces.flatMap(space => [
       ["program_space", space.name, `${space.area} sq ft`, "saved"],
@@ -7229,7 +7321,7 @@ const exportInfoRecords = {
     eyebrow: "Section 6 / CSV",
     title: "Project Data Table",
     body: "This is the spreadsheet-ready project table. Use it when project information needs to move cleanly into CSV workflows, QA logs, databases, or external reporting tools.",
-    includes: ["Category, name, value, and status columns", "Client, discovery, site, GIS, policy, sustainability, and program rows", "Saved records only; missing facts remain visible as blank or -- values"],
+    includes: ["Category, name, value, and status columns", "Client, discovery, site, GIS, policy, sun study, sustainability, and program rows", "Saved records only; missing facts remain visible as blank or -- values"],
     download: "csv",
     downloadLabel: "Download Project CSV"
   },
@@ -7237,7 +7329,7 @@ const exportInfoRecords = {
     eyebrow: "Section 6 / JSON",
     title: "Case Studies",
     body: "This package stores the generated and manually edited case-study records as reusable project memory.",
-    includes: ["Desired outcome and audience", "Sustainability metrics, flood strategy, initiative development, and design response", "Evidence basis, source status, reviewer, and recommended actions"],
+    includes: ["Desired outcome and audience", "Separate sun-study evidence and sustainability metrics", "Flood strategy, initiative development, design response, evidence basis, reviewer, and recommended actions"],
     download: "case-json",
     downloadLabel: "Download Case JSON"
   },
@@ -7245,7 +7337,7 @@ const exportInfoRecords = {
     eyebrow: "Section 6 / CSV",
     title: "Case Study Table",
     body: "This is the focused case-study spreadsheet for review meetings, grant or initiative tracking, planning narratives, and sustainability reporting.",
-    includes: ["Desired outcome, metrics, flooding, initiatives, and actions", "Audience, focus, design response, evidence basis, and status", "One row per saved case study"],
+    includes: ["Desired outcome, sun-study evidence, sustainability metrics, flooding, initiatives, and actions", "Audience, focus, design response, evidence basis, and status", "One row per saved case study"],
     download: "case-csv",
     downloadLabel: "Download Case CSV"
   }
@@ -7458,7 +7550,8 @@ function newSiteSurveyRow(group) {
       audience: "Client / review team",
       desiredOutcome: state.siteSurvey.fields.desiredFutureUse || "",
       focus: "Desired outcome",
-      sustainabilityMetrics: caseStudyMetricSummary(state.project, state.siteSurvey),
+      sustainabilityMetrics: sustainabilityMetricSummary(state.project, state.siteSurvey),
+      sunStudyEvidence: sunStudyMetricSummary(state.project, state.siteSurvey),
       floodStrategy: state.siteSurvey.fields.environmentalHazards || state.siteSurvey.fields.drainageNotes || "",
       initiativeDevelopment: state.siteSurvey.fields.zoneInitiatives || "",
       designResponse: "",

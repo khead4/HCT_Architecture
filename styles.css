@@ -6594,6 +6594,13 @@ body:not([data-active-section="dashboard"]) #questionInput {
     rgba(0,0,0,.32);
 }
 
+.data-memory-grid button:nth-child(7) {
+  border-top-color: rgba(158,124,213,.86);
+  background:
+    linear-gradient(135deg, rgba(158,124,213,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.32);
+}
+
 .data-memory-grid button:hover,
 .data-memory-grid button:focus-visible {
   transform: translateY(-2px);
