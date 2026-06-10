@@ -3746,7 +3746,8 @@ body:not([data-active-section="dashboard"]) #questionInput {
   gap: clamp(24px, 3vw, 42px);
   padding: clamp(26px, 3.2vw, 48px);
   border-left: 6px solid var(--section-accent, rgba(62,182,194,.72));
-  overflow: hidden;
+  overflow: visible;
+  scroll-margin-top: 96px;
 }
 
 .site-survey-section::after {
