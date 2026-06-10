@@ -213,6 +213,14 @@ const policySourceOptions = ["Manual entry", "Manual reviewer entry", "Municipal
 const siteAspectCategoryOptions = ["Survey", "GIS", "Environmental", "Utilities", "Zoning / Policy", "Hazard", "Sensor", "Access", "Easement", "Other"];
 const gisLayerTypeOptions = ["Parcel boundary", "Zoning district", "Overlay district", "Flood / hydrology", "Topography / contours", "Soils", "Utilities", "Vegetation", "Viewshed", "Transportation", "Environmental constraint", "Custom research"];
 const lookupMethodOptions = ["Manual entry", "Municipal GIS", "County parcel viewer", "ArcGIS REST service", "Uploaded GIS layer", "Policy PDF", "Surveyor entry", "Other"];
+const evidenceStrictnessOptions = ["Balanced", "Flexible concept", "Permit-ready"];
+const riskToleranceOptions = ["Conservative", "Exploratory", "Permit cautious"];
+const policyConfidenceOptions = ["Entered", "Reviewed", "Source linked", "Verified only"];
+const sustainabilityPriorityOptions = ["Balanced performance", "Operational energy first", "Low carbon first", "Water + landscape first", "Accessibility + wellness first"];
+const assistantModeOptions = ["Qwen local + deterministic fallback", "Qwen + DeepSeek review", "Deterministic only", "Gemini if configured"];
+const ragDepthOptions = ["Evidence pack", "Strict citations", "Broad project memory"];
+const reasoningSpecialistOptions = ["DeepSeek R1 on complex checks", "Qwen only", "Manual consultant review"];
+const wcagPriorityOptions = ["WCAG AA", "High contrast / large target", "Keyboard-first"];
 
 function initialProjectDiscovery() {
   return {
@@ -545,34 +553,53 @@ function initialSiteSurvey() {
       uploadSourceUrl: "",
       uploadUploadedBy: "",
       uploadVerificationStatus: "unverified",
-      benchmarkDatum: "Pending surveyor confirmation",
-      minElevation: "",
-      maxElevation: "",
-      contourInterval: "",
+      benchmarkDatum: "Demo survey benchmark D-01 / surveyor datum",
+      minElevation: "102.4 ft",
+      maxElevation: "114.8 ft",
+      contourInterval: "2 ft",
       averageSlope: "8%",
       slopeDirection: "north-east",
-      spotElevations: "",
+      spotElevations: "West low point: 102.4 ft; central buildable bench: 109.6 ft; south frontage: 112.1 ft.",
       existingStructures: "None confirmed",
       accessNotes: "Southern frontage",
       easementNotes: "Easements pending confirmation",
       drainageNotes: "Western low point should be reviewed before placement.",
       addressLookup: "Demo Parcel, Cold Climate Zone",
-      parcelApn: "",
-      cityCounty: "",
-      stateRegion: "",
-      country: "",
-      latitude: "",
-      longitude: "",
+      parcelApn: "DEMO-R1-014520",
+      cityCounty: "Aalborg / Demo County",
+      stateRegion: "North Jutland Region",
+      country: "Denmark",
+      latitude: "57.0488",
+      longitude: "9.9217",
       jurisdiction: "Aalborg Municipality",
       zoningDistrict: "Residential",
       detectedZoneArea: "R-1 Demo Residential",
       overlays: "Stormwater flow path, view corridor",
-      policySourceUrl: "",
-      policyLookupStatus: "pending lookup",
-      lastPolicyCheck: "",
+      policySourceUrl: "Demo City Zoning Ordinance pp. 42-45; Demo Sustainable Building Incentive Guide p. 12",
+      policyLookupStatus: "source linked",
+      lastPolicyCheck: "2026-06-09",
+      zoneInitiatives: "Solar-ready roof area, passive design documentation, rainwater retention landscape strategy, and expedited sustainability review are available as demo initiative paths once source eligibility is confirmed.",
+      policySummary: "R-1 Demo Residential basis: 20 ft front setback, 10 ft side setback, 35 ft height limit, stormwater/view corridor overlays, and residential low-impact development review.",
+      buildingCodeSummary: "Confirm adopted local residential code, fire access, egress, envelope performance, structural loads, stormwater coordination, and ASHRAE-informed energy assumptions before permit-ready claims.",
+      elevationPolicy: "Use the demo survey datum, 102.4-114.8 ft elevation range, 2 ft contour interval, and 8% north-east slope to keep primary structure out of the western stormwater low point.",
+      riskPrevention: "Shift primary massing away from the western low point, keep setbacks visible during layout, document solar-ready/passive measures, and reserve consultant review for geotechnical, drainage, and fire access items.",
+      permittingProcedures: "1. Confirm parcel and zoning source. 2. Verify overlays and flood/stormwater requirements. 3. Resolve setback/height conflicts. 4. Attach sustainability initiative evidence. 5. Package drawings, calculations, and consultant notes for review.",
+      permittingSpeed: "Standard review assumption: 6-10 weeks. Expedited sustainability review may be possible if the solar-ready envelope, passive design, and stormwater retention initiative evidence is complete.",
+      issueRecoveryProcedures: "If a rule conflict appears, freeze the affected design decision, identify the source record, compare the current model value, propose a massing/material/site adjustment, and route unresolved items to planner or consultant review.",
+      environmentalHazards: "Medium stormwater flow at the western low point, 8% slope/foundation coordination, unknown geotechnical confirmation, and late-day solar heat gain from southwest orientation.",
+      policyDesignImplications: "Keep the buildable envelope east/north-east of the stormwater low point, lower or step the 39 ft massing toward the 35 ft height rule, preserve the west/southwest view corridor, and pair daylight goals with shading and high-performance glazing.",
       lookupMethod: "Manual entry",
-      gisSourceUrl: "",
-      gisLookupStatus: "needs review"
+      gisSourceUrl: "Demo GIS layer stack: parcel, stormwater, viewshed, vegetation",
+      gisLookupStatus: "active",
+      evidenceStrictness: "Balanced",
+      riskTolerance: "Conservative",
+      opportunityThreshold: "75",
+      policyConfidenceRequired: "Source linked",
+      sustainabilityPriority: "Balanced performance",
+      assistantMode: "Qwen local + deterministic fallback",
+      ragDepth: "Evidence pack",
+      reasoningSpecialist: "DeepSeek R1 on complex checks",
+      wcagPriority: "WCAG AA"
     },
     uploads: [],
     environmental: [
@@ -638,8 +665,10 @@ function initialSiteSurvey() {
       { name: "Traffic observation", sensorType: "Other", location: "Southern frontage", latestReading: "Manual count pending", unit: "vehicles/hr", timestamp: "", status: "missing", sourceName: "Traffic feed" }
     ],
     policyLookups: [
-      { name: "Zoning district lookup", address: "Demo Parcel, Cold Climate Zone", jurisdiction: "Aalborg Municipality", result: "Residential district assumed until official source is uploaded or linked.", documentType: "Zoning Policy", sourceName: "Manual reviewer entry", sourceUrl: "", status: "pending lookup", lastChecked: "" },
-      { name: "Overlay check", address: "Demo Parcel, Cold Climate Zone", jurisdiction: "Aalborg Municipality", result: "Stormwater and view corridor overlays should be confirmed from GIS/policy source.", documentType: "GIS Layer", sourceName: "GIS overlay", sourceUrl: "", status: "needs review", lastChecked: "" }
+      { name: "Zoning district lookup", address: "Demo Parcel, Cold Climate Zone", parcelApn: "DEMO-R1-014520", jurisdiction: "Aalborg Municipality", result: "R-1 Demo Residential district with 20 ft front setback, 10 ft side setback, and 35 ft height limit.", documentType: "Zoning Policy", sourceName: "Demo City Zoning Ordinance", sourceUrl: "Demo City Zoning Ordinance pp. 42-45", status: "source linked", verifiedBy: "Planner / Policy Reviewer", lastChecked: "2026-06-09" },
+      { name: "Overlay check", address: "Demo Parcel, Cold Climate Zone", parcelApn: "DEMO-R1-014520", jurisdiction: "Aalborg Municipality", result: "Stormwater flow path and west/southwest view corridor overlays affect placement, grading, and landscape preservation decisions.", documentType: "GIS Layer", sourceName: "Demo GIS overlay stack", sourceUrl: "Demo GIS layer stack: stormwater, viewshed, vegetation", status: "active", verifiedBy: "GIS Analyst", lastChecked: "2026-06-09" },
+      { name: "Sustainability initiative review", address: "Demo Parcel, Cold Climate Zone", parcelApn: "DEMO-R1-014520", jurisdiction: "Aalborg Municipality", result: "Solar-ready roof area, passive design measures, and rainwater retention landscape strategy may support expedited sustainability review once eligibility is confirmed.", documentType: "Zoning Policy", sourceName: "Demo Sustainable Building Incentive Guide", sourceUrl: "Demo Sustainable Building Incentive Guide p. 12", status: "needs review", verifiedBy: "", lastChecked: "2026-06-09" },
+      { name: "Flood and stormwater procedure", address: "Demo Parcel, Cold Climate Zone", parcelApn: "DEMO-R1-014520", jurisdiction: "Aalborg Municipality", result: "Primary massing should avoid the western low point and maintain a landscape/stormwater retention strategy before final grading assumptions.", documentType: "GIS Layer", sourceName: "Stormwater overlay and demo survey datum", sourceUrl: "Demo GIS layer stack / survey benchmark D-01", status: "active", verifiedBy: "GIS Analyst", lastChecked: "2026-06-09" }
     ],
     evidence: [
       { name: "Survey dataset", owner: "Land Surveyor", status: "verified", documentType: "Topographic Survey", otherDocumentType: "", sourceName: "Surveyor upload", verifiedBy: "Land Surveyor", lastChecked: "", value: "Parcel area 14,520 sq ft" },
@@ -655,6 +684,65 @@ function initialSiteSurvey() {
       { question: "What is missing?", answer: "Detailed geotechnical report, final utility capacity, easement confirmation, and surveyor-reviewed drainage documentation." },
       { question: "What can be decided now?", answer: "Initial site response, likely placement zones, information gaps, and which constraints must be protected in concept design." },
       { question: "What should wait?", answer: "Foundation strategy, final grading, exact service entry design, and permit-ready compliance claims." }
+    ],
+    caseStudies: [
+      {
+        title: "Outcome-Led Low-Energy Residence",
+        audience: "Client / design review",
+        desiredOutcome: "Warm, daylight-rich, low-energy residence with natural materials and a clear landscape relationship.",
+        focus: "Desired outcome + sustainability metrics",
+        sustainabilityMetrics: "Target pending ASHRAE model, low-carbon timber strategy, daylight score 82, embodied carbon comparison -14%.",
+        floodStrategy: "Keep the primary massing out of the western low point and pair landscape preservation with rainwater-supported planting.",
+        initiativeDevelopment: "Use solar-ready roof area, passive design evidence, and rainwater retention as initiative-based development supports.",
+        designResponse: "Orient primary living spaces toward west/southwest views while balancing glare, shading, and envelope performance.",
+        evidenceBasis: "Client brief, sun study V4, ASHRAE/sustainability result V4, material carbon comparison V2, stormwater GIS overlay.",
+        recommendedActions: "Resolve height/front setback conflicts, confirm ASHRAE target, document shading, and verify eligibility for expedited sustainability review.",
+        status: "source linked",
+        documentType: "Case Study",
+        sourceName: "ASTRA generated from saved project data",
+        sourceUrl: "",
+        verifiedBy: "ASTRA deterministic generator",
+        lastChecked: "2026-06-09",
+        generated: true
+      },
+      {
+        title: "Limited Flooding + Stormwater Resilience",
+        audience: "Planner / civil coordination",
+        desiredOutcome: "Limit flood exposure while preserving design quality and landscape value.",
+        focus: "Limited flooding + risk prevention",
+        sustainabilityMetrics: "Stormwater retention priority, rainwater-supported planting, western low-point mitigation, and open space preservation.",
+        floodStrategy: "Maintain a no-build/low-impact landscape zone at the western low point, route runoff through retention planting, and verify grading before foundation lock.",
+        initiativeDevelopment: "Frame stormwater management as a low-impact development initiative tied to landscape preservation and permitting readiness.",
+        designResponse: "Shift massing eastward/north-east, protect view corridors, and coordinate service entries away from mapped stormwater conflict areas.",
+        evidenceBasis: "Flood risk overlay, topographic survey benchmark, drainage notes, utility locate, and risk register.",
+        recommendedActions: "Request civil review, add stormwater details to GIS package, verify soil/geotechnical assumptions, and keep moisture monitoring as a digital twin item.",
+        status: "active",
+        documentType: "Case Study",
+        sourceName: "ASTRA generated from saved project data",
+        sourceUrl: "",
+        verifiedBy: "GIS Analyst / ASTRA",
+        lastChecked: "2026-06-09",
+        generated: true
+      },
+      {
+        title: "Initiative-Based Sustainable Development",
+        audience: "Permit / sustainability review",
+        desiredOutcome: "Use policy initiatives to improve permitting readiness and design quality without fragmenting the workflow.",
+        focus: "Initiative based development",
+        sustainabilityMetrics: "Solar-ready envelope, passive design measures, low embodied carbon material strategy, and rainwater retention package.",
+        floodStrategy: "Tie stormwater retention to landscape and flood-risk mitigation rather than treating it as a late civil correction.",
+        initiativeDevelopment: "Package solar-ready roof area, passive design, low-carbon timber, and rainwater retention as a coordinated initiative path.",
+        designResponse: "Create a policy-ready design narrative that explains why orientation, materials, envelope, and landscape are connected decisions.",
+        evidenceBasis: "Demo Sustainable Building Incentive Guide, verified policy rules, material intent, ASHRAE result, and Site Intelligence Package.",
+        recommendedActions: "Confirm initiative eligibility, attach source pages, update design model values, and export case study CSV for review tracking.",
+        status: "needs review",
+        documentType: "Case Study",
+        sourceName: "ASTRA generated from saved project data",
+        sourceUrl: "Demo Sustainable Building Incentive Guide p. 12",
+        verifiedBy: "",
+        lastChecked: "2026-06-09",
+        generated: true
+      }
     ],
     packageItems: [
       { name: "Executive summary", included: true },
@@ -684,13 +772,42 @@ function mergeSitePackageItems(baseItems, savedItems) {
   return [...mergedBase, ...extraSaved];
 }
 
+function mergeSiteFields(baseFields, savedFields) {
+  const saved = savedFields && typeof savedFields === "object" ? savedFields : {};
+  const merged = { ...baseFields };
+  Object.entries(saved).forEach(([key, value]) => {
+    const hasSavedValue = String(value ?? "").trim() !== "";
+    if (hasSavedValue || !baseFields[key]) merged[key] = value;
+  });
+  return merged;
+}
+
+function mergeSiteRecordsByName(baseItems, savedItems) {
+  if (!Array.isArray(savedItems)) return baseItems;
+  const keyFor = item => String(item.id || item.name || item.title || item.aspect || "").trim().toLowerCase();
+  const savedByKey = new Map(savedItems.map(item => [keyFor(item), item]));
+  const mergedBase = baseItems.map(baseItem => {
+    const savedItem = savedByKey.get(keyFor(baseItem));
+    if (!savedItem) return baseItem;
+    const merged = { ...baseItem };
+    Object.entries(savedItem).forEach(([key, value]) => {
+      const hasSavedValue = String(value ?? "").trim() !== "";
+      if (hasSavedValue || !baseItem[key]) merged[key] = value;
+    });
+    return merged;
+  });
+  const baseKeys = new Set(baseItems.map(keyFor));
+  const extraSaved = savedItems.filter(item => !baseKeys.has(keyFor(item)));
+  return [...mergedBase, ...extraSaved];
+}
+
 function mergeSiteSurvey(saved) {
   const base = initialSiteSurvey();
   if (!saved || typeof saved !== "object") return base;
   return {
     ...base,
     ...saved,
-    fields: { ...base.fields, ...(saved.fields || {}) },
+    fields: mergeSiteFields(base.fields, saved.fields),
     uploads: Array.isArray(saved.uploads) ? saved.uploads : base.uploads,
     environmental: Array.isArray(saved.environmental) ? saved.environmental : base.environmental,
     utilities: Array.isArray(saved.utilities) ? saved.utilities : base.utilities,
@@ -701,9 +818,10 @@ function mergeSiteSurvey(saved) {
     gisFindings: Array.isArray(saved.gisFindings) ? saved.gisFindings : base.gisFindings,
     hazards: Array.isArray(saved.hazards) ? saved.hazards : base.hazards,
     sensors: Array.isArray(saved.sensors) ? saved.sensors : base.sensors,
-    policyLookups: Array.isArray(saved.policyLookups) ? saved.policyLookups : base.policyLookups,
+    policyLookups: mergeSiteRecordsByName(base.policyLookups, saved.policyLookups),
     evidence: Array.isArray(saved.evidence) ? saved.evidence : base.evidence,
     aiInterpretation: Array.isArray(saved.aiInterpretation) ? saved.aiInterpretation : base.aiInterpretation,
+    caseStudies: mergeSiteRecordsByName(base.caseStudies, saved.caseStudies),
     packageItems: mergeSitePackageItems(base.packageItems, saved.packageItems)
   };
 }
@@ -736,6 +854,7 @@ const state = {
   authView: null,
   joinType: "freelance",
   lastResponse: null,
+  localAdviceHistory: [],
   screenshotMode: false
 };
 
@@ -758,9 +877,11 @@ const el = {
   canvasMode: document.getElementById("canvasMode"),
   assistantTitle: document.getElementById("assistantTitle"),
   assistantDescription: document.getElementById("assistantDescription"),
+  assistantRecommendations: document.getElementById("assistantRecommendations"),
   questionInput: document.getElementById("questionInput"),
   askButton: document.getElementById("askButton"),
   assistantOutput: document.getElementById("assistantOutput"),
+  adviceHistory: document.getElementById("adviceHistory"),
   annotationLayer: document.getElementById("annotationLayer"),
   sourceDrawer: document.getElementById("sourceDrawer"),
   sourceTraceBody: document.getElementById("sourceTraceBody"),
@@ -974,6 +1095,50 @@ function clampNumber(value, min, max) {
   return Math.max(min, Math.min(max, number));
 }
 
+function optionValue(value, options, fallback) {
+  const current = String(value || "");
+  return options.includes(current) ? current : fallback;
+}
+
+function siteAdjustmentSettings(survey) {
+  const fields = survey.fields || {};
+  const evidenceStrictness = optionValue(fields.evidenceStrictness, evidenceStrictnessOptions, "Balanced");
+  const riskTolerance = optionValue(fields.riskTolerance, riskToleranceOptions, "Conservative");
+  const opportunityThreshold = clampNumber(fields.opportunityThreshold || 75, 0, 100);
+  const policyConfidenceRequired = optionValue(fields.policyConfidenceRequired, policyConfidenceOptions, "Source linked");
+  const sustainabilityPriority = optionValue(fields.sustainabilityPriority, sustainabilityPriorityOptions, "Balanced performance");
+  const assistantMode = optionValue(fields.assistantMode, assistantModeOptions, "Qwen local + deterministic fallback");
+  const ragDepth = optionValue(fields.ragDepth, ragDepthOptions, "Evidence pack");
+  const reasoningSpecialist = optionValue(fields.reasoningSpecialist, reasoningSpecialistOptions, "DeepSeek R1 on complex checks");
+  const wcagPriority = optionValue(fields.wcagPriority, wcagPriorityOptions, "WCAG AA");
+
+  const strictnessProfiles = {
+    "Flexible concept": { verifiedWeight: 3.1, reviewPenalty: 1.1, missingPenalty: 4.5, riskPenalty: 2.4, note: "Concept guidance can use reviewed records, but it still labels them as non-final." },
+    Balanced: { verifiedWeight: 2.8, reviewPenalty: 2.4, missingPenalty: 7, riskPenalty: 3, note: "Balanced mode allows early design advice while keeping unresolved records visible." },
+    "Permit-ready": { verifiedWeight: 2.2, reviewPenalty: 4.2, missingPenalty: 10, riskPenalty: 4.6, note: "Permit-ready mode penalizes missing sources and review-needed records more heavily." }
+  };
+  const riskProfiles = {
+    Exploratory: { riskOffset: -1.2, note: "Exploratory mode keeps creative options open while flagging unresolved risk." },
+    Conservative: { riskOffset: 0, note: "Conservative mode protects against cost, permitting, and consultant surprises." },
+    "Permit cautious": { riskOffset: 1.6, note: "Permit cautious mode treats high risk and missing evidence as stronger blockers." }
+  };
+
+  return {
+    evidenceStrictness,
+    riskTolerance,
+    opportunityThreshold,
+    policyConfidenceRequired,
+    sustainabilityPriority,
+    assistantMode,
+    ragDepth,
+    reasoningSpecialist,
+    wcagPriority,
+    ...strictnessProfiles[evidenceStrictness],
+    riskPenalty: strictnessProfiles[evidenceStrictness].riskPenalty + riskProfiles[riskTolerance].riskOffset,
+    riskNote: riskProfiles[riskTolerance].note
+  };
+}
+
 function siteOpportunityScore(item, index = 0) {
   const defaults = [95, 90, 85, 82, 80, 76, 72, 68];
   return clampNumber(item.impact ?? defaults[index % defaults.length], 0, 100);
@@ -989,15 +1154,28 @@ function siteRiskSeverity(item) {
 }
 
 function siteIntelligenceStats(survey) {
+  const settings = siteAdjustmentSettings(survey);
   const evidence = siteEvidenceRecords(survey);
   const verified = evidence.filter(item => isVerifiedSiteStatus(item.status)).length;
   const missing = evidence.filter(item => String(item.status || "").toLowerCase().includes("missing")).length;
   const needsReview = evidence.filter(item => String(item.status || "").toLowerCase().includes("review") || String(item.status || "").toLowerCase().includes("pending")).length;
   const criticalRisks = (survey.hazards || []).filter(item => siteRiskSeverity(item).toLowerCase() === "high").length;
-  const opportunityAverage = survey.opportunities?.length
-    ? Math.round(survey.opportunities.reduce((sum, item, index) => sum + siteOpportunityScore(item, index), 0) / survey.opportunities.length)
+  const opportunityScores = (survey.opportunities || []).map((item, index) => siteOpportunityScore(item, index));
+  const opportunityAverage = opportunityScores.length
+    ? Math.round(opportunityScores.reduce((sum, score) => sum + score, 0) / opportunityScores.length)
     : 0;
-  const confidence = clampNumber(55 + verified * 2.8 - missing * 7 - needsReview * 2.4 - criticalRisks * 3 + opportunityAverage * 0.12, 34, 96);
+  const opportunityHits = opportunityScores.filter(score => score >= settings.opportunityThreshold).length;
+  const confidence = clampNumber(
+    55 +
+    verified * settings.verifiedWeight -
+    missing * settings.missingPenalty -
+    needsReview * settings.reviewPenalty -
+    criticalRisks * settings.riskPenalty +
+    opportunityAverage * 0.1 +
+    opportunityHits * 1.4,
+    28,
+    96
+  );
 
   return {
     evidenceTotal: evidence.length,
@@ -1006,8 +1184,375 @@ function siteIntelligenceStats(survey) {
     needsReview,
     criticalRisks,
     opportunityAverage,
-    confidence: Math.round(confidence)
+    opportunityHits,
+    confidence: Math.round(confidence),
+    settings
   };
+}
+
+function siteRecordName(item) {
+  return item.name || item.aspect || item.layerType || item.documentType || item.sourceName || "Unnamed record";
+}
+
+function siteRecordText(item) {
+  return item.value || item.finding || item.result || item.latestReading || item.notes || "";
+}
+
+function siteDisplayValue(value) {
+  const text = String(value ?? "").trim();
+  return text ? text : "--";
+}
+
+function siteFactRecord(records, terms) {
+  const list = Array.isArray(records) ? records : [];
+  const needles = terms.map(term => String(term || "").toLowerCase());
+  return list.find(item => {
+    const haystack = `${item.name || ""} ${item.aspect || ""} ${item.category || ""} ${item.documentType || ""} ${siteRecordText(item)}`.toLowerCase();
+    return needles.some(term => haystack.includes(term));
+  }) || null;
+}
+
+function siteFactValueFromRecord(records, terms, fallback = "") {
+  const record = siteFactRecord(records, terms);
+  return siteDisplayValue(record ? siteRecordText(record) : fallback);
+}
+
+function siteFactDetailFromRecord(record, fallback = "No saved fact yet") {
+  if (!record) return fallback;
+  const source = sourceStatusText(record);
+  const status = record.status ? `Status: ${record.status}` : "Status: --";
+  return `${status}${source && source !== "source pending" ? ` / ${source}` : ""}`;
+}
+
+function siteFactGrid(rows, label = "Saved facts") {
+  return `
+    <div class="site-fact-grid" aria-label="${escapeHtml(label)}">
+      ${rows.map(row => {
+        const value = siteDisplayValue(row.value);
+        const missing = value === "--";
+        const tone = missing ? "missing" : siteStatusClass(row.status || "active");
+        return `
+          <article class="${escapeHtml(tone)}">
+            <span>${escapeHtml(row.label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+            <p>${escapeHtml(row.detail || (missing ? "No saved fact yet" : "Saved project fact"))}</p>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function siteEvidenceFactRows(survey, stats) {
+  const records = siteEvidenceRecords(survey);
+  const latestSource = [
+    ...(survey.uploads || []),
+    ...(survey.sourceFindings || []),
+    ...(survey.evidence || [])
+  ].find(item => item.sourceName || item.sourceUrl || item.name || item.aspect);
+  const uncertain = stats.needsReview + stats.missing;
+
+  return [
+    {
+      label: "Uploaded sources",
+      value: (survey.uploads || []).length ? String((survey.uploads || []).length) : "--",
+      detail: (survey.uploads || []).length ? "Saved uploaded-source metadata" : "No uploaded source saved yet",
+      status: (survey.uploads || []).length ? "active" : "missing"
+    },
+    {
+      label: "Verified facts",
+      value: records.length ? String(stats.verified) : "--",
+      detail: records.length ? `${records.length} total saved evidence records` : "No evidence records saved yet",
+      status: stats.verified ? "verified" : "needs review"
+    },
+    {
+      label: "Needs review",
+      value: records.length ? String(uncertain) : "--",
+      detail: records.length ? "Pending, review-needed, or missing records" : "No review queue yet",
+      status: uncertain ? "needs review" : "verified"
+    },
+    {
+      label: "Latest source",
+      value: latestSource ? (latestSource.sourceName || latestSource.name || latestSource.aspect) : "--",
+      detail: siteFactDetailFromRecord(latestSource, "No saved source yet"),
+      status: latestSource?.status || "missing"
+    }
+  ];
+}
+
+function siteEnvironmentalFactRows(survey, fields) {
+  const records = survey.environmental || [];
+  const sun = siteFactRecord(records, ["sun", "solar", "daylight"]);
+  const climate = siteFactRecord(records, ["climate", "ashrae", "degree"]);
+  const wind = siteFactRecord(records, ["wind"]);
+  const water = siteFactRecord(records, ["water", "runoff", "precip", "drain"]);
+  const ecology = siteFactRecord(records, ["vegetation", "tree", "habitat", "species", "ecology"]);
+  const verified = records.filter(item => isVerifiedSiteStatus(item.status)).length;
+
+  return [
+    { label: "Solar / daylight", value: siteDisplayValue(sun ? siteRecordText(sun) : fields.daylightFactor), detail: siteFactDetailFromRecord(sun), status: sun?.status || "active" },
+    { label: "Climate basis", value: siteDisplayValue(climate ? siteRecordText(climate) : fields.climateZone), detail: siteFactDetailFromRecord(climate), status: climate?.status || "active" },
+    { label: "Wind cue", value: siteDisplayValue(wind ? siteRecordText(wind) : ""), detail: siteFactDetailFromRecord(wind), status: wind?.status || "active" },
+    { label: "Water / runoff", value: siteDisplayValue(water ? siteRecordText(water) : ""), detail: siteFactDetailFromRecord(water), status: water?.status || "active" },
+    { label: "Ecology / landscape", value: siteDisplayValue(ecology ? siteRecordText(ecology) : ""), detail: siteFactDetailFromRecord(ecology), status: ecology?.status || "active" },
+    { label: "Verified conditions", value: records.length ? String(verified) : "--", detail: records.length ? `${records.length} environmental records saved` : "No environmental records saved yet", status: verified ? "verified" : "needs review" }
+  ];
+}
+
+function siteUtilityFactRows(survey) {
+  const records = survey.utilities || [];
+  const water = siteFactRecord(records, ["water"]);
+  const sewer = siteFactRecord(records, ["sewer"]);
+  const electrical = siteFactRecord(records, ["electrical", "power", "grid"]);
+  const stormwater = siteFactRecord(records, ["stormwater", "drain"]);
+  const telecom = siteFactRecord(records, ["internet", "fiber", "telecom", "wireless"]);
+  const verified = records.filter(item => isVerifiedSiteStatus(item.status)).length;
+
+  return [
+    { label: "Water", value: siteFactValueFromRecord(records, ["water"]), detail: siteFactDetailFromRecord(water), status: water?.status || "missing" },
+    { label: "Sewer", value: siteFactValueFromRecord(records, ["sewer"]), detail: siteFactDetailFromRecord(sewer), status: sewer?.status || "missing" },
+    { label: "Electrical", value: siteFactValueFromRecord(records, ["electrical", "power", "grid"]), detail: siteFactDetailFromRecord(electrical), status: electrical?.status || "missing" },
+    { label: "Stormwater", value: siteFactValueFromRecord(records, ["stormwater", "drain"]), detail: siteFactDetailFromRecord(stormwater), status: stormwater?.status || "missing" },
+    { label: "Telecom / fiber", value: siteFactValueFromRecord(records, ["internet", "fiber", "telecom", "wireless"]), detail: siteFactDetailFromRecord(telecom), status: telecom?.status || "missing" },
+    { label: "Verified utilities", value: records.length ? String(verified) : "--", detail: records.length ? `${records.length} utility records saved` : "No utility records saved yet", status: verified ? "verified" : "needs review" }
+  ];
+}
+
+function siteStatusSummary(items) {
+  const records = Array.isArray(items) ? items : [];
+  const verified = records.filter(item => isVerifiedSiteStatus(item.status)).length;
+  const needsReview = records.filter(item => String(item.status || "").toLowerCase().includes("review") || String(item.status || "").toLowerCase().includes("pending")).length;
+  const missing = records.filter(item => String(item.status || "").toLowerCase().includes("missing")).length;
+  return `${records.length} entered / ${verified} verified or active / ${needsReview} review / ${missing} missing`;
+}
+
+function siteTopOpportunity(survey) {
+  const ranked = (survey.opportunities || [])
+    .map((item, index) => ({ ...item, score: siteOpportunityScore(item, index) }))
+    .sort((a, b) => b.score - a.score);
+  return ranked[0] || null;
+}
+
+function siteDominantRisk(survey) {
+  const severityRank = { high: 3, medium: 2, low: 1 };
+  const ranked = (survey.hazards || [])
+    .map(item => ({ ...item, severity: siteRiskSeverity(item) }))
+    .sort((a, b) => (severityRank[String(b.severity || "").toLowerCase()] || 0) - (severityRank[String(a.severity || "").toLowerCase()] || 0));
+  return ranked[0] || null;
+}
+
+function siteSectionInsightCard(title, body, basis = [], adjust = "", tone = "active") {
+  return `
+    <aside class="site-explain-card ${escapeHtml(siteStatusClass(tone))}">
+      <div>
+        <span class="mini-label">What this means</span>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(body)}</p>
+      </div>
+      ${basis.length ? `
+        <ul>
+          ${basis.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      ` : ""}
+      ${adjust ? `<em>${escapeHtml(adjust)}</em>` : ""}
+    </aside>
+  `;
+}
+
+function siteSubsectionIntro(symbol, title, detail) {
+  return `
+    <div class="site-subsection-intro">
+      <span>${escapeHtml(symbol)}</span>
+      <div>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </div>
+    </div>
+  `;
+}
+
+function siteDecisionIllustration(stats) {
+  const settings = stats.settings;
+  return `
+    <div class="site-logic-illustration" aria-label="Evidence to decision path">
+      <div>
+        <span>1</span>
+        <strong>Entered data</strong>
+        <p>${stats.evidenceTotal} evidence records and ${stats.criticalRisks} critical risks.</p>
+      </div>
+      <div>
+        <span>2</span>
+        <strong>RAG check</strong>
+        <p>${settings.ragDepth}; ${settings.evidenceStrictness.toLowerCase()} evidence strictness.</p>
+      </div>
+      <div>
+        <span>3</span>
+        <strong>Advisor</strong>
+        <p>${settings.assistantMode}; ${settings.reasoningSpecialist}.</p>
+      </div>
+      <div>
+        <span>4</span>
+        <strong>Decision</strong>
+        <p>${stats.confidence}% readiness, ${stats.opportunityHits} opportunities above threshold.</p>
+      </div>
+    </div>
+  `;
+}
+
+function siteExperienceArc(stats, survey, topOpportunity, dominantRisk) {
+  const settings = stats.settings;
+  const arc = [
+    {
+      key: "sense",
+      label: "Sense",
+      title: "Collect the site",
+      detail: `${stats.evidenceTotal} records, ${stats.verified} verified or active.`,
+      cue: "Evidence"
+    },
+    {
+      key: "read",
+      label: "Read",
+      title: "Understand the limits",
+      detail: dominantRisk ? `${dominantRisk.name}: ${dominantRisk.severity} risk.` : "Risk register is ready for entries.",
+      cue: "Risk"
+    },
+    {
+      key: "imagine",
+      label: "Imagine",
+      title: "Shape design direction",
+      detail: topOpportunity ? `${topOpportunity.name} leads at ${siteOpportunityScore(topOpportunity)} impact.` : "Score opportunities to reveal creative direction.",
+      cue: "Opportunity"
+    },
+    {
+      key: "ask",
+      label: "Ask",
+      title: "Use ASTRA as colleague",
+      detail: `${settings.ragDepth}; ${settings.evidenceStrictness.toLowerCase()} facts-first guidance.`,
+      cue: "AI"
+    },
+    {
+      key: "commit",
+      label: "Commit",
+      title: "Package what is ready",
+      detail: `${stats.confidence}% readiness, with uncertain claims kept reviewable.`,
+      cue: "Package"
+    }
+  ];
+
+  return `
+    <section class="site-experience-arc" aria-label="Site intelligence experience arc">
+      <div class="experience-arc-copy">
+        <span class="mini-label">Experience flow</span>
+        <h3>From facts to creative direction, without fragmenting the work.</h3>
+        <p>Each stage keeps evidence, design judgment, and ASTRA guidance in one connected path.</p>
+      </div>
+      <div class="experience-arc-track">
+        ${arc.map((item, index) => `
+          <article class="${escapeHtml(item.key)}">
+            <span>${String(index + 1).padStart(2, "0")}</span>
+            <em>${escapeHtml(item.cue)}</em>
+            <strong>${escapeHtml(item.title)}</strong>
+            <p>${escapeHtml(item.detail)}</p>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function siteAgentStackRows(stats) {
+  const settings = stats.settings;
+  return [
+    ["Main agent", settings.assistantMode.includes("Qwen") ? "Qwen via Ollama when configured" : settings.assistantMode, "Answers from the saved project, site survey, and evidence records first."],
+    ["Deep reasoning", settings.reasoningSpecialist, "Reserved for compliance conflicts, ASHRAE tradeoffs, material placement, sun study, and sustainability decisions."],
+    ["RAG memory", settings.ragDepth, `${stats.evidenceTotal} records available; citations stay attached to source names and verification status.`],
+    ["Fallback", "Deterministic evidence engine", "No API key is required. If Ollama is not connected, ASTRA still gives bounded guidance from entered data."]
+  ];
+}
+
+function siteAstraRecommendationRows(stats, survey, topOpportunity, dominantRisk) {
+  const settings = stats.settings;
+  return [
+    {
+      symbol: "NEXT",
+      title: stats.missing || stats.needsReview ? "Close the evidence gaps first" : "Use this package for early design",
+      detail: stats.missing || stats.needsReview
+        ? `${stats.missing} missing and ${stats.needsReview} review-needed records are holding back confidence.`
+        : "Verified records are strong enough for early massing, orientation, and package export.",
+      tone: stats.missing || stats.needsReview ? "review" : "ready",
+      question: "What is missing, and what should I investigate first?"
+    },
+    {
+      symbol: "DES",
+      title: topOpportunity ? topOpportunity.name : "Find a design driver",
+      detail: topOpportunity
+        ? `${siteOpportunityScore(topOpportunity)} impact; use it to guide massing, daylight, landscape, or material decisions.`
+        : "Add scored opportunities to turn raw data into creative design direction.",
+      tone: "creative",
+      question: "Which site opportunities should shape the massing strategy?"
+    },
+    {
+      symbol: "RISK",
+      title: dominantRisk ? `${dominantRisk.name} needs attention` : "Risk register is open",
+      detail: dominantRisk
+        ? `${dominantRisk.severity} severity under ${settings.riskTolerance.toLowerCase()} mode.`
+        : "No dominant hazard is entered yet; add risks before relying on site feasibility.",
+      tone: dominantRisk && String(dominantRisk.severity).toLowerCase() === "high" ? "critical" : "review",
+      question: "What can be designed today, and what needs consultant review?"
+    },
+    {
+      symbol: "AI",
+      title: "Keep ASTRA in the workflow",
+      detail: `${settings.assistantMode}; ${settings.ragDepth}; ${settings.sustainabilityPriority}.`,
+      tone: "ai",
+      question: "What sustainability decisions should be made from the current evidence?"
+    }
+  ];
+}
+
+function siteAstraRailMarkup(stats, survey, advisorPrompts, topOpportunity, dominantRisk) {
+  const recommendations = siteAstraRecommendationRows(stats, survey, topOpportunity, dominantRisk);
+  return `
+    <aside class="site-astra-rail" aria-label="ASTRA AI colleague">
+      <header class="astra-rail-head">
+        <span>AI</span>
+        <div>
+          <strong>ASTRA colleague</strong>
+          <p>Recommendations first, chat underneath. It reads the current section and the saved evidence.</p>
+        </div>
+      </header>
+      <div class="astra-rail-recommendations">
+        <span class="mini-label">Recommendations</span>
+        ${recommendations.map(item => `
+          <button type="button" class="astra-rec-card ${escapeHtml(item.tone)}" data-site-agent-question="${escapeHtml(item.question)}">
+            <span>${escapeHtml(item.symbol)}</span>
+            <strong>${escapeHtml(item.title)}</strong>
+            <p>${escapeHtml(item.detail)}</p>
+          </button>
+        `).join("")}
+      </div>
+      <div class="site-agent-stack compact-agent-stack">
+        ${siteAgentStackRows(stats).slice(0, 3).map(row => `
+          <article>
+            <span>${escapeHtml(row[0])}</span>
+            <strong>${escapeHtml(row[1])}</strong>
+            <p>${escapeHtml(row[2])}</p>
+          </article>
+        `).join("")}
+      </div>
+      <div class="astra-rail-chat">
+        <span class="mini-label">Ask ASTRA</span>
+        <textarea data-site-agent-input rows="5" placeholder="Ask about this section, evidence, policy, risk, sustainability, ASHRAE, Lumion, sun studies, or the next design move."></textarea>
+        <button class="add-row-button" data-site-agent-submit>Ask AI Colleague</button>
+        <div class="site-advisor-prompts">
+          ${advisorPrompts.slice(0, 4).map(prompt => `<button type="button" data-site-agent-question="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
+        </div>
+        <div id="siteAdvisorOutput" class="site-advisor-output" aria-live="polite" tabindex="0">
+          <div class="empty-state">ASTRA is ready. Ask for design direction, evidence gaps, policy implications, or next actions.</div>
+        </div>
+      </div>
+    </aside>
+  `;
 }
 
 function siteWorkflowSteps() {
@@ -1425,17 +1970,110 @@ function renderPageChrome() {
   const section = sectionById(state.activeSection);
   const isDashboard = state.activeSection === "dashboard";
   const shortTitle = section.title.split(" / ")[0];
+  const traceSection = ["design", "gis"].includes(state.activeSection);
 
   el.workspaceTitle.textContent = isDashboard ? "Project Flow Guide" : `${shortTitle} Workspace`;
   el.workspaceDescription.textContent = isDashboard
     ? "Choose a phase to enter its page."
-    : "Customer info, database, parcel map, and downloads.";
+    : traceSection
+      ? "Trace overlays are reserved for design review and GIS context."
+      : "Fact cards, saved inputs, ASTRA guidance, and exports stay in one workspace.";
   el.canvasMode.textContent = isDashboard ? "Flow navigation" : section.stage;
 
-  el.assistantTitle.textContent = `${shortTitle} Assistor`;
+  el.assistantTitle.textContent = isDashboard ? "ASTRA AI Colleague" : `${shortTitle} + ASTRA`;
   el.assistantDescription.textContent = isDashboard
-    ? "Available after entering a project page."
-    : `Works inside ${section.stage.toLowerCase()} with project memory and source checks.`;
+    ? "Ask where to start, how to find a process, or what the next fact-backed step should be."
+    : `Always-on factual direction, design critique, and source checks for ${section.stage.toLowerCase()}.`;
+  renderAssistantRecommendations(section, isDashboard);
+}
+
+function assistantRecommendationRows(section, isDashboard) {
+  const project = state.project;
+  const current = isDashboard ? "the overall project flow" : section.title;
+  const rows = [
+    {
+      symbol: "FIND",
+      title: isDashboard ? "Find the process" : "Find where this fits",
+      detail: isDashboard
+        ? "Ask where to start or which page holds the workflow you need."
+        : `Ask how this page connects to the overall ASTRA process and what evidence supports the next move.`,
+      question: isDashboard
+        ? "How do I find the right process, and where should I start?"
+        : `Where does ${section.title} fit in the overall process?`,
+      tone: "source"
+    },
+    {
+      symbol: "NEXT",
+      title: isDashboard ? "Choose the next workspace" : "Guide the next move",
+      detail: isDashboard
+        ? "Ask ASTRA which workflow should come first based on risk, missing data, and design priority."
+        : `Use ${section.stage.toLowerCase()} context to decide what to do next without leaving this page.`,
+      question: isDashboard
+        ? "Which project section should I open next, and why?"
+        : `What should I do next in ${section.title}?`,
+      tone: "direction"
+    },
+    {
+      symbol: "LOOK",
+      title: "Check what looks off",
+      detail: "Use this when a massing, render, diagram, material board, or workflow feels wrong but the reason is unclear.",
+      question: "Does anything look off in the current design or visual workspace?",
+      tone: "visual",
+      screenshot: true
+    },
+    {
+      symbol: "DES",
+      title: "Improve the design choice",
+      detail: "Ask for a higher-quality option that protects client goals, site constraints, creativity, and simplicity.",
+      question: `What design choice would improve ${current} without adding cognitive load?`,
+      tone: "creative"
+    },
+    {
+      symbol: "SRC",
+      title: "Verify before deciding",
+      detail: "Find what is missing, uncertain, or consultant-bound before it becomes a weak decision.",
+      question: `What evidence is missing before I trust decisions in ${current}?`,
+      tone: "source"
+    }
+  ];
+
+  if (project && section.id === "design") {
+    rows.unshift({
+      symbol: "WARN",
+      title: "Review massing conflicts",
+      detail: `${project.designModel.frontDistanceFt} ft front distance, ${project.designModel.heightFt} ft height, and ${project.designModel.southGlazingPercent}% south glazing need design judgment.`,
+      question: "What looks off in the current massing, placement, height, or glazing?",
+      tone: "critical",
+      screenshot: true
+    });
+  }
+
+  if (section.id === "survey" || section.id === "gis" || section.id === "policy") {
+    rows.unshift({
+      symbol: "SITE",
+      title: "Turn evidence into direction",
+      detail: "Ask which entered data can guide design today and which items should stay review-only.",
+      question: "What can be designed today, and what needs consultant review?",
+      tone: "source"
+    });
+  }
+
+  return rows.slice(0, 5);
+}
+
+function renderAssistantRecommendations(section, isDashboard) {
+  if (!el.assistantRecommendations) return;
+  const rows = assistantRecommendationRows(section, isDashboard);
+  el.assistantRecommendations.innerHTML = `
+    <span class="mini-label">ASTRA recommendations</span>
+    ${rows.map(item => `
+      <button type="button" class="assistant-rec ${escapeHtml(item.tone)}" data-question="${escapeHtml(item.question)}" ${item.screenshot ? 'data-screenshot-question="true"' : ""}>
+        <span>${escapeHtml(item.symbol)}</span>
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.detail)}</p>
+      </button>
+    `).join("")}
+  `;
 }
 
 function renderProjectHeader() {
@@ -3061,11 +3699,19 @@ function siteSurveySurface(project) {
     documentType: "GIS Layer"
   }));
   const stats = siteIntelligenceStats(survey);
+  const settings = stats.settings;
   const evidenceCategoryRows = siteEvidenceCategoryRows(survey);
+  const evidenceFactRows = siteEvidenceFactRows(survey, stats);
+  const environmentalFactRows = siteEnvironmentalFactRows(survey, fields);
+  const utilityFactRows = siteUtilityFactRows(survey);
   const layerRows = siteLayerRows(survey);
   const riskRows = (survey.hazards || []).map(item => ({ ...item, severity: siteRiskSeverity(item) }));
   const digitalTwinRows = siteDigitalTwinRows(survey);
   const advisorPrompts = siteAdvisorPrompts();
+  const topOpportunity = siteTopOpportunity(survey);
+  const dominantRisk = siteDominantRisk(survey);
+  const setbackConstraint = (survey.constraints || []).find(item => `${item.name || ""} ${item.value || ""}`.toLowerCase().includes("setback")) || {};
+  const activePolicyLookup = (survey.policyLookups || []).find(item => isVerifiedSiteStatus(item.status)) || (survey.policyLookups || [])[0] || {};
 
   return `
     <div class="surface-pad site-survey-workspace">
@@ -3088,7 +3734,7 @@ function siteSurveySurface(project) {
           ["Verified Evidence", stats.verified, `${stats.evidenceTotal} total records`],
           ["Missing Inputs", stats.missing, `${stats.needsReview} need review`],
           ["Critical Risks", stats.criticalRisks, "consultant attention"],
-          ["Opportunity Score", stats.opportunityAverage, "average impact"]
+          ["Opportunity Score", stats.opportunityAverage, `${stats.opportunityHits} above ${settings.opportunityThreshold}`]
         ].map(item => `
           <article>
             <span>${escapeHtml(item[0])}</span>
@@ -3107,12 +3753,37 @@ function siteSurveySurface(project) {
         `).join("")}
       </section>
 
+      ${siteExperienceArc(stats, survey, topOpportunity, dominantRisk)}
+
+      <section class="site-adjustment-panel" aria-label="Adjustable AI decision settings">
+        <div class="site-adjustment-copy">
+          <span class="mini-label">Adjustable decision model</span>
+          <h3>Tune how strict ASTRA should be before it recommends action.</h3>
+          <p>${escapeHtml(settings.note)} ${escapeHtml(settings.riskNote)} The page recalculates readiness and explanation text from the saved inputs.</p>
+        </div>
+        <div class="site-adjustment-grid">
+          ${siteFieldSelect("evidenceStrictness", "Evidence strictness", evidenceStrictnessOptions)}
+          ${siteFieldSelect("riskTolerance", "Risk tolerance", riskToleranceOptions)}
+          ${siteFieldInput("opportunityThreshold", "Opportunity threshold", "number")}
+          ${siteFieldSelect("policyConfidenceRequired", "Policy confidence required", policyConfidenceOptions)}
+          ${siteFieldSelect("sustainabilityPriority", "Sustainability priority", sustainabilityPriorityOptions)}
+          ${siteFieldSelect("wcagPriority", "Accessibility target", wcagPriorityOptions)}
+          ${siteFieldSelect("assistantMode", "AI agent mode", assistantModeOptions)}
+          ${siteFieldSelect("ragDepth", "RAG retrieval scope", ragDepthOptions)}
+          ${siteFieldSelect("reasoningSpecialist", "Reasoning specialist", reasoningSpecialistOptions)}
+        </div>
+        ${siteDecisionIllustration(stats)}
+      </section>
+
+      <div class="site-workbench-layout">
+        <main class="site-main-stack" aria-label="Site intelligence sections">
       <section class="site-survey-section site-intake-panel">
         <div>
           <span class="mini-label">Section 1 / Project overview</span>
           <h3>Project Information, Goals + KPIs</h3>
           <p>Basic project identity anchors every survey, GIS, code, AI, cost, and design decision that follows.</p>
         </div>
+        ${siteSubsectionIntro("ID", "Project identity", "Keep the stable facts together so every downstream policy, survey, cost, and AI response references the same project basis.")}
         <div class="site-intake-grid">
           ${siteFieldInput("projectName", "Project name")}
           ${siteFieldInput("clientName", "Client")}
@@ -3130,9 +3801,11 @@ function siteSurveySurface(project) {
           ${siteFieldTextarea("architectNotes", "Architect / client notes")}
           ${siteFieldTextarea("clientGoals", "Client goals")}
         </div>
+        ${siteSubsectionIntro("GOAL", "Design priorities", "Use these as simple decision filters, not another long checklist. ASTRA can weigh them when advising on massing, daylight, access, carbon, and budget.")}
         <div class="site-goal-grid">
           ${["Daylight", "Energy Efficiency", "Low Carbon", "Accessibility", "Landscape Preservation", "Budget Target"].map(goal => `<span>${escapeHtml(goal)}</span>`).join("")}
         </div>
+        ${siteSubsectionIntro("KPI", "Success measures", "The KPI cards turn client intent into measurable targets so design quality can be discussed without splitting into separate tools.")}
         <div class="site-kpi-grid">
           ${siteKpiRows(fields).map(row => `
             <article>
@@ -3141,6 +3814,16 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        ${siteSectionInsightCard(
+          "The brief is now part of the reasoning layer",
+          `${fields.projectStage || "The current stage"} uses the client goals and KPI fields as decision filters before ASTRA recommends massing, materials, sun study moves, or consultant review.`,
+          [
+            `Client goals: ${fields.clientGoals || "pending"}`,
+            `Sustainability priority: ${settings.sustainabilityPriority}`,
+            `Accessibility target: ${settings.wcagPriority}`
+          ],
+          "Adjust the goals or KPI fields above to change how the advisor weighs daylight, energy, carbon, access, landscape, and budget."
+        )}
       </section>
 
       <section class="site-survey-section survey-upload-panel">
@@ -3155,6 +3838,7 @@ function siteSurveySurface(project) {
             <input type="file" multiple data-site-upload>
           </label>
         </div>
+        ${siteSubsectionIntro("SRC", "Source identity", "Name the document, author, URL, and verification state before the system treats an item as evidence.")}
         <div class="site-intake-grid">
           ${siteFieldSelect("uploadDocumentType", "Document type for upload", siteDocumentTypeOptions)}
           ${siteFieldInput("uploadOtherDocumentType", "Other document type")}
@@ -3163,16 +3847,30 @@ function siteSurveySurface(project) {
           ${siteFieldInput("uploadUploadedBy", "Uploaded by")}
           ${siteFieldSelect("uploadVerificationStatus", "Verification status", siteVerificationStatusOptions)}
         </div>
+        ${siteSubsectionIntro("LIB", "Evidence coverage", "The category tiles show which parts of the project have support and which parts still need review.")}
+        ${siteFactGrid(evidenceFactRows, "Evidence facts")}
         <div class="evidence-category-grid">
           ${evidenceCategoryRows.map(item => `
             <article class="${escapeHtml(siteStatusClass(item.status))}">
               <span>${escapeHtml(item.category)}</span>
-              <strong>${escapeHtml(item.status)}</strong>
-              <p>${escapeHtml(item.total)} evidence record${item.total === 1 ? "" : "s"}</p>
+              <strong>${escapeHtml(item.total ? item.status : "--")}</strong>
+              <p>${item.total ? `${escapeHtml(item.total)} evidence record${item.total === 1 ? "" : "s"}` : "--"}</p>
             </article>
           `).join("")}
         </div>
+        ${siteSectionInsightCard(
+          "Evidence controls what the AI may claim",
+          `${stats.verified} records are verified or active, while ${stats.needsReview + stats.missing} remain uncertain. In ${settings.evidenceStrictness.toLowerCase()} mode, uncertain records reduce the confidence score before ASTRA recommends design action.`,
+          [
+            `Evidence library: ${siteStatusSummary(siteEvidenceRecords(survey))}`,
+            `Policy confidence required: ${settings.policyConfidenceRequired}`,
+            `RAG scope: ${settings.ragDepth}`
+          ],
+          "Add source URLs, document names, verification status, and reviewer names to turn uncertain claims into traceable project knowledge.",
+          stats.missing ? "needs review" : "active"
+        )}
         ${survey.uploads.length ? `
+          ${siteSubsectionIntro("FILE", "Uploaded records", "Uploaded file metadata stays visible here so the user can see what ASTRA can reference later.")}
           <div class="uploaded-evidence-list uploaded-evidence-cards">
             ${survey.uploads.map((file, index) => `
               <article>
@@ -3185,6 +3883,7 @@ function siteSurveySurface(project) {
             `).join("")}
           </div>
         ` : ""}
+        ${siteSubsectionIntro("FACT", "Extracted claims", "Pull only the exact facts needed for decisions. This keeps the AI grounded and keeps the user from hunting through documents.")}
         <div class="survey-section-head compact-head">
           <div>
             <span class="mini-label">Evidence-backed findings</span>
@@ -3204,6 +3903,7 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        ${siteSubsectionIntro("TYPE", "Accepted evidence types", "Use this checklist as a lightweight mental model for what belongs in the evidence library.")}
         <div class="survey-upload-grid">
           ${surveyUploadItems().map(item => `
             <article>
@@ -3221,6 +3921,7 @@ function siteSurveySurface(project) {
           <h3>Boundary, Topography + Hydrology Conditions</h3>
           <p>The surveyor can enter field-confirmed boundaries, easements, encroachments, structures, elevation range, contour interval, slope, and drainage notes before the AI treats them as design inputs.</p>
         </div>
+        ${siteSubsectionIntro("FIELD", "Field verification", "Record who confirmed the survey and what datum/source confidence ASTRA should use before translating field data into design advice.")}
         <div class="site-intake-grid">
           ${siteFieldInput("surveyorName", "Surveyor name")}
           ${siteFieldInput("surveyorCompany", "Company / license")}
@@ -3239,6 +3940,17 @@ function siteSurveySurface(project) {
           ${siteFieldTextarea("easementNotes", "Easements / encumbrances")}
           ${siteFieldTextarea("drainageNotes", "Drainage / hydrology notes")}
         </div>
+        ${siteSectionInsightCard(
+          "Survey data sets the buildable starting point",
+          `ASTRA is reading ${fields.averageSlope || "unknown slope"} toward ${fields.slopeDirection || "unknown direction"} with ${fields.drainageNotes || "drainage notes pending"}. This affects grading, foundation assumptions, stormwater, access, and early placement.`,
+          [
+            `Benchmark: ${fields.benchmarkDatum || "pending"}`,
+            `Elevation range: ${fields.minElevation || "min pending"} to ${fields.maxElevation || "max pending"}`,
+            `Contour interval: ${fields.contourInterval || "pending"}`
+          ],
+          "Enter surveyor-confirmed elevation and hydrology values before treating the placement as engineer-ready.",
+          fields.minElevation && fields.maxElevation ? "verified" : "needs review"
+        )}
       </section>
 
       <section class="site-survey-section gis-context-panel">
@@ -3250,6 +3962,7 @@ function siteSurveySurface(project) {
           </div>
           <div class="map-status">${escapeHtml(project.site.verifiedBy)} verified</div>
         </div>
+        ${siteSubsectionIntro("LAY", "Layer status", "Scan which spatial layers are active, missing, or review-only before relying on GIS for design moves.")}
         <div class="gis-layer-status-grid">
           ${layerRows.map(item => `
             <article class="${escapeHtml(siteStatusClass(item.status))}">
@@ -3263,6 +3976,7 @@ function siteSurveySurface(project) {
           <button class="add-row-button" data-download="gis">Export GIS Data</button>
           <button class="add-row-button" data-download="parcel">Generate GIS Report</button>
         </div>
+        ${siteSubsectionIntro("LOOK", "Parcel and jurisdiction lookup", "Keep address, coordinates, zoning, overlays, and source URLs together so policy interpretation remains traceable.")}
         <div class="site-intake-grid">
           ${siteFieldInput("addressLookup", "Lookup address")}
           ${siteFieldInput("parcelApn", "Parcel / APN")}
@@ -3287,18 +4001,33 @@ function siteSurveySurface(project) {
           <button class="add-row-button" data-add-site-row="policyLookups">Add Custom Policy Record</button>
           <button class="add-row-button" data-add-site-row="gisFindings">Add Custom GIS Finding</button>
         </div>
+        ${siteSubsectionIntro("RULE", "Policy interpretation", "Turn zoning and overlay facts into design implications only when the supporting lookup record is visible.")}
         <div class="policy-interpretation-card">
           <span class="mini-label">Section 5 / Policy intelligence</span>
           <h3>AI Policy Interpretation</h3>
           <div>
-            <strong>Front Setback</strong>
-            <p>20 ft verified rule. Impact: reduces the buildable area at the frontage and keeps the first massing move away from the street edge.</p>
+            <strong>${escapeHtml(setbackConstraint.name || "Setback / buildable limit")}</strong>
+            <p>${escapeHtml(setbackConstraint.value || activePolicyLookup.result || "Policy rule pending. Add a source-backed zoning or code record before permit-ready claims.")}</p>
           </div>
           <div>
             <strong>Design Recommendation</strong>
-            <p>Shift or trim the building envelope before permit review, then keep the source-linked rule visible in CAD/Rhino and the Site Intelligence Package.</p>
+            <p>${escapeHtml(isVerifiedSiteStatus(setbackConstraint.status || activePolicyLookup.status)
+              ? "Use this rule in early massing, CAD/Rhino checks, and the Site Intelligence Package while keeping the source citation visible."
+              : "Treat this as a planning assumption until the jurisdiction, source URL, and verification status are confirmed.")}</p>
           </div>
         </div>
+        ${siteSectionInsightCard(
+          "GIS and policy are linked before design advice",
+          `${gisFindings.length} GIS findings and ${survey.policyLookups.length} policy lookup records are feeding the map, layer status, and zoning recommendation. The assistant should only make compliance claims when the lookup status meets the selected confidence target.`,
+          [
+            `Jurisdiction: ${fields.jurisdiction || fields.municipality || "pending"}`,
+            `Zoning district: ${fields.zoningDistrict || "pending"}`,
+            `Known overlays: ${fields.overlays || "none entered"}`
+          ],
+          "Add municipal GIS, policy PDF, or parcel viewer citations to make zoning and overlay guidance dependable.",
+          fields.policyLookupStatus
+        )}
+        ${siteSubsectionIntro("CODE", "Policy records", "Store each rule as an adjustable record so ASTRA can cite, question, or downgrade uncertain compliance claims.")}
         <div class="site-ai-question-grid policy-record-grid">
           ${survey.policyLookups.map((item, index) => `
             <article>
@@ -3313,6 +4042,7 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        ${siteSubsectionIntro("MAP", "Spatial findings and viewer", "Connect visible map context to the exact GIS records being used for survey, feasibility, and policy decisions.")}
         <div class="survey-section-head compact-head">
           <div>
             <span class="mini-label">GIS findings feeding this section</span>
@@ -3361,6 +4091,8 @@ function siteSurveySurface(project) {
           </div>
           <button class="add-row-button" data-add-site-row="environmental">Add Custom Condition</button>
         </div>
+        ${siteSubsectionIntro("CLIM", "Climate and solar cues", "Use compact environmental records to guide ASHRAE assumptions, sun studies, Lumion context, material exposure, and passive design.")}
+        ${siteFactGrid(environmentalFactRows, "Environmental facts")}
         <div class="environment-grid">
           ${survey.environmental.map((item, index) => `
             <article>
@@ -3370,6 +4102,16 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        ${siteSectionInsightCard(
+          "Environmental records drive ASHRAE, Lumion, and sun study choices",
+          `${survey.environmental.length} environmental conditions are entered. ASTRA uses them to decide what belongs in sun path review, climate assumptions, wind response, material exposure, and simulation notes.`,
+          [
+            `Solar/daylight cue: ${(survey.environmental.find(item => `${item.name || ""}`.toLowerCase().includes("sun")) || {}).value || fields.daylightFactor || "pending"}`,
+            `Climate cue: ${(survey.environmental.find(item => `${item.name || ""}`.toLowerCase().includes("climate")) || {}).value || "pending"}`,
+            `Sustainability priority: ${settings.sustainabilityPriority}`
+          ],
+          "Edit the environmental rows when ASHRAE climate, Lumion scene context, or sun study conclusions change."
+        )}
       </section>
 
       <section class="site-survey-section utilities-panel">
@@ -3381,6 +4123,8 @@ function siteSurveySurface(project) {
           </div>
           <button class="add-row-button" data-add-site-row="utilities">Add Custom Utility</button>
         </div>
+        ${siteSubsectionIntro("SERV", "Service readiness", "Keep capacity, distance, upgrade need, renewable potential, and IoT readiness in one place before cost or placement advice is trusted.")}
+        ${siteFactGrid(utilityFactRows, "Utility facts")}
         <div class="utility-review-grid">
           ${survey.utilities.map((item, index) => `
             <div>
@@ -3390,6 +4134,17 @@ function siteSurveySurface(project) {
             </div>
           `).join("")}
         </div>
+        ${siteSectionInsightCard(
+          "Utility certainty changes cost and placement advice",
+          `Utilities are currently ${siteStatusSummary(survey.utilities)}. Capacity, distance, and upgrade risk should affect service-entry placement, electrical room planning, renewable readiness, and civil coordination.`,
+          [
+            `Water/electrical clue: ${survey.utilities.slice(0, 4).map(siteRecordName).join(", ") || "pending"}`,
+            `Risk tolerance: ${settings.riskTolerance}`,
+            `Consultant boundary: utility capacity and fire access remain review items until verified.`
+          ],
+          "Mark utility capacity and service distances as verified before using them for final cost or construction planning.",
+          survey.utilities.some(item => String(item.status || "").toLowerCase().includes("missing")) ? "needs review" : "active"
+        )}
       </section>
 
       <section class="site-survey-section hazards-panel">
@@ -3401,6 +4156,7 @@ function siteSurveySurface(project) {
           </div>
           <button class="add-row-button" data-add-site-row="hazards">Add Custom Hazard</button>
         </div>
+        ${siteSubsectionIntro("RISK", "Risk dashboard", "Start with severity and status so users can quickly see what blocks design, what needs review, and what can keep moving.")}
         <div class="risk-dashboard-grid">
           ${riskRows.map(item => `
             <article class="${escapeHtml(siteStatusClass(item.severity))}">
@@ -3411,6 +4167,20 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        ${siteSectionInsightCard(
+          "Risk severity changes what can be designed today",
+          dominantRisk
+            ? `${dominantRisk.name} is the strongest current risk signal at ${dominantRisk.severity} severity. In ${settings.riskTolerance.toLowerCase()} mode, this reduces readiness until mitigation or consultant review is recorded.`
+            : "No hazards are entered yet, so ASTRA cannot evaluate site risk beyond the base project memory.",
+          [
+            `Risk register: ${siteStatusSummary(survey.hazards)}`,
+            `Critical risks counted: ${stats.criticalRisks}`,
+            `Readiness impact: ${stats.confidence}% current confidence`
+          ],
+          "Lower the severity only when a source-backed mitigation, consultant review, or new evidence changes the risk record.",
+          dominantRisk?.severity || "active"
+        )}
+        ${siteSubsectionIntro("MIT", "Mitigation records", "Edit the underlying records when new evidence, consultant review, or mitigation actions change the risk picture.")}
         <div class="site-ai-question-grid hazard-record-grid">
           ${survey.hazards.map((item, index) => `
             <article>
@@ -3432,6 +4202,7 @@ function siteSurveySurface(project) {
           </div>
           <button class="add-row-button" data-add-site-row="sensors">Add Sensor Reading</button>
         </div>
+        ${siteSubsectionIntro("LIVE", "Live feed overview", "Show only the current signal first, then let detailed sensor records expand below when the data affects design or construction decisions.")}
         <div class="digital-twin-grid">
           ${digitalTwinRows.map(item => `
             <article class="${escapeHtml(siteStatusClass(item.status))}">
@@ -3441,6 +4212,17 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        ${siteSectionInsightCard(
+          "Live readings become evidence when they are timestamped",
+          `${survey.sensors.length} sensor or manual reading records are entered. ASTRA treats readings without timestamps or active status as context, not verified live data.`,
+          [
+            `Digital twin: ${siteStatusSummary(survey.sensors)}`,
+            `Most recent feed: ${digitalTwinRows.find(item => item.update !== "No update")?.feed || "none connected"}`,
+            `Use case: weather, noise, moisture, traffic, air quality, energy, and water decisions.`
+          ],
+          "Add timestamps and source names when readings influence site placement, material exposure, or construction sequencing."
+        )}
+        ${siteSubsectionIntro("LOG", "Sensor records", "Timestamped records can become evidence; untimestamped readings stay contextual until verified.")}
         <div class="site-ai-question-grid sensor-record-grid">
           ${survey.sensors.map((item, index) => `
             <article>
@@ -3459,6 +4241,7 @@ function siteSurveySurface(project) {
 
       <section class="site-survey-section constraint-opportunity-panel">
         <div>
+          ${siteSubsectionIntro("LIMIT", "Constraints to protect", "Use this side for rules and physical limits that should shape the envelope before creative options are scored.")}
           <div class="survey-section-head compact-head">
             <div>
               <span class="mini-label">Policy + design constraints</span>
@@ -3477,6 +4260,7 @@ function siteSurveySurface(project) {
           </div>
         </div>
         <div>
+          ${siteSubsectionIntro("IDEA", "Opportunities to amplify", "Score design opportunities so creativity stays connected to evidence instead of becoming a separate brainstorming pile.")}
           <div class="survey-section-head compact-head">
             <div>
               <span class="mini-label">Section 9 / Opportunity intelligence</span>
@@ -3499,6 +4283,18 @@ function siteSurveySurface(project) {
               </article>
             `).join("")}
           </div>
+          ${siteSectionInsightCard(
+            "Opportunities are scored before they shape design",
+            topOpportunity
+              ? `${topOpportunity.name} is the strongest opportunity at ${siteOpportunityScore(topOpportunity)} impact. Opportunities at or above ${settings.opportunityThreshold} are treated as design drivers.`
+              : "No opportunities are entered yet, so ASTRA cannot prioritize passive design, views, renewables, construction efficiency, or user experience.",
+            [
+              `Average impact: ${stats.opportunityAverage}`,
+              `Above threshold: ${stats.opportunityHits}`,
+              `Sustainability filter: ${settings.sustainabilityPriority}`
+            ],
+            "Raise or lower impact scores to change which ideas become massing, material, sun-study, or sustainability drivers."
+          )}
         </div>
       </section>
 
@@ -3511,6 +4307,7 @@ function siteSurveySurface(project) {
           </div>
           <button class="add-row-button" data-add-site-row="evidence">Add Evidence Record</button>
         </div>
+        ${siteSubsectionIntro("TRUST", "Trust register", "Use this to make missing, pending, conflicting, and verified claims obvious before ASTRA or the team acts on them.")}
         <div class="evidence-register">
           ${survey.evidence.map((item, index) => `
             <div>
@@ -3532,6 +4329,7 @@ function siteSurveySurface(project) {
           </div>
           <button class="add-row-button" data-add-site-row="additionalAspects">Add Additional Aspect</button>
         </div>
+        ${siteSubsectionIntro("CUSTOM", "Project-specific records", "Add unusual project intelligence here without breaking the flow or forcing users into another tool.")}
         <div class="site-ai-question-grid additional-aspects-grid">
           ${survey.additionalAspects.map((item, index) => `
             <article>
@@ -3553,19 +4351,17 @@ function siteSurveySurface(project) {
           </div>
           <button class="add-row-button" data-add-site-row="aiInterpretation">Add AI Question</button>
         </div>
-        <div class="site-advisor-dashboard">
-          <div>
-            <span class="mini-label">Ask ASTRA</span>
-            <textarea data-site-agent-input rows="3" placeholder="Ask about verified evidence, design readiness, policy, sustainability, risk, cost, or next steps."></textarea>
-            <button class="add-row-button" data-site-agent-submit>Run Free Site Advisor</button>
-          </div>
-          <div class="site-advisor-prompts">
-            ${advisorPrompts.map(prompt => `<button type="button" data-site-agent-question="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
-          </div>
-          <div id="siteAdvisorOutput" class="site-advisor-output">
-            <div class="empty-state">ASTRA local advisor is ready. No API key is required for evidence-based guidance.</div>
-          </div>
-        </div>
+        ${siteSectionInsightCard(
+          "AI is part of the workflow, not an afterthought",
+          "ASTRA stays visible in the right rail so the user can ask questions while working through each section. This keeps process guidance, design insight, source memory, and recommendations in one flow.",
+          [
+            `Current agent mode: ${settings.assistantMode}`,
+            `Retrieval scope: ${settings.ragDepth}`,
+            `Confidence score: ${stats.confidence}%`
+          ],
+          "Use the right-side recommendations and chat while editing each section; this avoids jumping between fragmented tools."
+        )}
+        ${siteSubsectionIntro("ASK", "Always-on checks", "ASTRA surfaces what is verified, missing, risky, design-ready, permit-sensitive, or cost-sensitive while the user stays in the same workspace.")}
         <div class="site-ai-checks">
           ${assistantFindings.map(item => `
             <article class="ai-check-card ${escapeHtml(item.level.replace(/\s+/g, "-"))}">
@@ -3575,6 +4371,7 @@ function siteSurveySurface(project) {
             </article>
           `).join("")}
         </div>
+        ${siteSubsectionIntro("Q", "Reusable advisor prompts", "Store recurring project questions so the same reasoning can be updated as facts, policy, and site data change.")}
         <div class="site-ai-question-grid">
           ${survey.aiInterpretation.map((item, index) => `
             <article>
@@ -3591,6 +4388,7 @@ function siteSurveySurface(project) {
           <h3>Automated Final Deliverable</h3>
           <p>The page produces a reusable package for design, sun studies, ASHRAE/material sustainability, zoning, engineering, compliance, permit review, BIM handoff, and ASTRA project memory.</p>
         </div>
+        ${siteSubsectionIntro("OUT", "Deliverable scope", "Select what should move forward so the final package is complete without forcing the user through separate export screens.")}
         <div class="package-grid">
           ${survey.packageItems.map((item, index) => `
             <label>
@@ -3599,6 +4397,7 @@ function siteSurveySurface(project) {
             </label>
           `).join("")}
         </div>
+        ${siteSubsectionIntro("EXP", "Exports", "Send the same verified knowledge package to reports, spreadsheets, GIS, BIM, and ASTRA project memory.")}
         <div class="download-actions">
           <button data-download="parcel">PDF-ready Report JSON</button>
           <button data-download="csv">CSV</button>
@@ -3607,6 +4406,8 @@ function siteSurveySurface(project) {
           <button data-download="astra">ASTRA Project Package</button>
         </div>
       </section>
+        </main>
+      </div>
 
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
@@ -4137,17 +4938,701 @@ function tableSurface(title, rows) {
   `;
 }
 
-function policySurface(project) {
+function policyPrimaryLookup(survey) {
+  const records = Array.isArray(survey?.policyLookups) ? survey.policyLookups : [];
+  return records.find(item => isVerifiedSiteStatus(item.status))
+    || records.find(item => item.address || item.jurisdiction || item.result)
+    || records[0]
+    || null;
+}
+
+function policyFieldStatus(value, fallbackStatus = "missing") {
+  return siteDisplayValue(value) === "--" ? fallbackStatus : "saved";
+}
+
+function policyRuleValue(rule) {
+  const value = siteDisplayValue(rule?.value);
+  const unit = String(rule?.unit || "").trim();
+  return value === "--" ? "--" : `${value}${unit ? ` ${unit}` : ""}`;
+}
+
+function policyRuleImpactRows(project) {
+  const design = project.designModel || {};
+  return (project.verifiedRules || []).map(rule => {
+    const ruleValue = Number(rule.value);
+    const status = String(rule.verificationStatus || "needs_review").toLowerCase();
+    let measured = "--";
+    let outOfNorm = false;
+    let impact = "This rule should remain visible while the design is being developed.";
+    let improve = "Keep the exact source, page, reviewer, and status attached before making permit-ready claims.";
+
+    if (rule.ruleType === "front_setback") {
+      measured = Number.isFinite(Number(design.frontDistanceFt)) ? `${design.frontDistanceFt} ft current front distance` : "--";
+      outOfNorm = Number.isFinite(ruleValue) && Number(design.frontDistanceFt) < ruleValue;
+      impact = outOfNorm
+        ? "The current massing appears inside the required front setback, which can reduce buildable area and delay permitting."
+        : "The current front distance appears compatible with the entered rule, pending source review.";
+      improve = outOfNorm
+        ? "Shift the building envelope back, reduce projections, or mark this as variance-review before design lock."
+        : "Keep this rule connected to the survey boundary and update it if the parcel line changes.";
+    }
+
+    if (rule.ruleType === "side_setback") {
+      measured = Number.isFinite(Number(design.sideDistanceFt)) ? `${design.sideDistanceFt} ft current side distance` : "--";
+      outOfNorm = Number.isFinite(ruleValue) && Number(design.sideDistanceFt) < ruleValue;
+      impact = outOfNorm
+        ? "The side yard assumption may affect wall placement, service access, openings, and neighbor privacy."
+        : "The side yard appears usable for early layout, pending source and survey confirmation.";
+      improve = outOfNorm
+        ? "Compress the side massing, move service entries, or verify whether projections are exempt."
+        : "Use this as a layout guardrail while checking easements and fire/service access.";
+    }
+
+    if (rule.ruleType === "height_limit") {
+      measured = Number.isFinite(Number(design.heightFt)) ? `${design.heightFt} ft current massing height` : "--";
+      outOfNorm = Number.isFinite(ruleValue) && Number(design.heightFt) > ruleValue;
+      impact = outOfNorm
+        ? "The current massing exceeds the entered height rule, which can trigger redesign, variance, or review delay."
+        : "The height appears compatible with the entered limit, pending how the jurisdiction measures height.";
+      improve = outOfNorm
+        ? "Lower roof volume, step the massing, verify grade-plane measurement, or route this to variance review."
+        : "Confirm the jurisdiction's height measurement method before final elevations.";
+    }
+
+    if (rule.ruleType === "incentive") {
+      measured = policyRuleValue(rule);
+      outOfNorm = status.includes("review") || status.includes("pending");
+      impact = "This may improve permitting speed or sustainability review if the project documents the required measures.";
+      improve = "Attach the incentive guide, confirm eligibility, and connect it to solar, roof area, passive design, and energy modeling evidence.";
+    }
+
+    return {
+      rule,
+      label: outOfNorm ? "Reconsider" : status.includes("review") ? "Verify" : "Use",
+      measured,
+      outOfNorm,
+      impact,
+      improve
+    };
+  });
+}
+
+function policyFactRows(project, survey) {
+  const fields = survey.fields || {};
+  const lookup = policyPrimaryLookup(survey);
+  const rules = project.verifiedRules || [];
+  const hazards = survey.hazards || [];
+  const verifiedRules = rules.filter(rule => isVerifiedSiteStatus(rule.verificationStatus)).length;
+  const elevationBasis = [
+    fields.minElevation ? `Min ${fields.minElevation}` : "",
+    fields.maxElevation ? `Max ${fields.maxElevation}` : "",
+    fields.averageSlope ? `Slope ${fields.averageSlope}` : "",
+    fields.slopeDirection ? `Toward ${fields.slopeDirection}` : ""
+  ].filter(Boolean).join(" / ");
+  const hazardSummary = hazards.length
+    ? hazards.map(item => `${item.name || "Hazard"} (${siteRiskSeverity(item)})`).slice(0, 3).join(" / ")
+    : "";
+
+  return [
+    { label: "Address", value: fields.addressLookup || fields.parcelAddress, detail: "Entered lookup basis for parcel and zoning discovery", status: policyFieldStatus(fields.addressLookup || fields.parcelAddress) },
+    { label: "Jurisdiction", value: fields.jurisdiction || fields.municipality, detail: "Policy authority used for zoning, code, and procedure checks", status: policyFieldStatus(fields.jurisdiction || fields.municipality) },
+    { label: "Zone", value: fields.detectedZoneArea || fields.zoningDistrict, detail: "Detected or entered zone/policy area", status: fields.policyLookupStatus || policyFieldStatus(fields.detectedZoneArea || fields.zoningDistrict) },
+    { label: "Overlays", value: fields.overlays, detail: "Overlay districts, mapped policy areas, or risk layers", status: policyFieldStatus(fields.overlays) },
+    { label: "Initiatives", value: fields.zoneInitiatives, detail: "Local incentives, sustainability initiatives, or design-supportive programs", status: policyFieldStatus(fields.zoneInitiatives) },
+    { label: "Policies", value: fields.policySummary || lookup?.result, detail: lookup ? siteFactDetailFromRecord(lookup) : "No saved policy lookup yet", status: lookup?.status || policyFieldStatus(fields.policySummary) },
+    { label: "Building codes", value: fields.buildingCodeSummary || (rules.length ? `${verifiedRules}/${rules.length} verified rule records` : ""), detail: "Code basis or verified rule coverage", status: rules.length ? "saved" : policyFieldStatus(fields.buildingCodeSummary) },
+    { label: "Elevation", value: fields.elevationPolicy || elevationBasis, detail: "Elevation, slope, datum, or flood-related height basis", status: policyFieldStatus(fields.elevationPolicy || elevationBasis) },
+    { label: "Risk prevention", value: fields.riskPrevention, detail: "Preventive actions for known zoning, hazard, utility, or permit risks", status: policyFieldStatus(fields.riskPrevention) },
+    { label: "Recovery procedure", value: fields.issueRecoveryProcedures, detail: "What to do when a review, hazard, or field conflict appears", status: policyFieldStatus(fields.issueRecoveryProcedures) },
+    { label: "Permit speed", value: fields.permittingSpeed, detail: "Expected review speed, bottlenecks, or expedited path notes", status: policyFieldStatus(fields.permittingSpeed) },
+    { label: "Environmental hazards", value: fields.environmentalHazards || hazardSummary, detail: hazards.length ? `${hazards.length} hazard records saved` : "No hazard records saved yet", status: hazards.length ? "saved" : policyFieldStatus(fields.environmentalHazards) }
+  ];
+}
+
+function policyCommandRows(project, survey) {
+  const fields = survey.fields || {};
+  const rules = project.verifiedRules || [];
+  const verifiedRules = rules.filter(rule => isVerifiedSiteStatus(rule.verificationStatus)).length;
+  const lookup = policyPrimaryLookup(survey);
+  const hazardCount = Array.isArray(survey.hazards) ? survey.hazards.length : 0;
+
+  return [
+    ["Zone", fields.detectedZoneArea || fields.zoningDistrict || "--", fields.jurisdiction || fields.municipality || "jurisdiction pending"],
+    ["Policy Sources", lookup ? sourceStatusText(lookup) : "--", lookup?.status || "lookup pending"],
+    ["Rules", rules.length ? `${verifiedRules}/${rules.length}` : "--", "verified rule records"],
+    ["Risks", hazardCount ? String(hazardCount) : "--", "hazards / prevention items"]
+  ];
+}
+
+function policyProcedureRows(survey) {
+  const fields = survey.fields || {};
+  return [
+    { label: "Prevent", value: fields.riskPrevention, detail: "Reduce code, hazard, utility, or permit risk before design lock." },
+    { label: "Recover", value: fields.issueRecoveryProcedures, detail: "Steps to take when zoning, site, consultant, or hazard issues appear." },
+    { label: "Procedure", value: fields.permittingProcedures, detail: "Review sequence, required contacts, submittals, and approvals." },
+    { label: "Speed", value: fields.permittingSpeed, detail: "Expected review duration, expedited review path, or likely bottleneck." }
+  ];
+}
+
+function policyHazardRows(survey) {
+  return (survey.hazards || []).map(item => ({
+    name: item.name || "Hazard",
+    severity: siteRiskSeverity(item),
+    value: siteRecordText(item),
+    status: item.status || "needs review",
+    source: sourceStatusText(item)
+  }));
+}
+
+function caseStudyRecords() {
+  return Array.isArray(state.siteSurvey.caseStudies) ? state.siteSurvey.caseStudies : [];
+}
+
+function caseStudyMetricSummary(project, survey) {
+  const fields = survey.fields || {};
+  const analysis = project?.analysisResults || {};
+  return [
+    fields.annualEnergyUse ? `Energy: ${fields.annualEnergyUse}` : "",
+    fields.embodiedCarbon ? `Carbon: ${fields.embodiedCarbon}` : "",
+    fields.daylightFactor ? `Daylight: ${fields.daylightFactor}` : "",
+    fields.stormwaterRetention ? `Stormwater: ${fields.stormwaterRetention}` : "",
+    analysis.sunStudy?.daylightScore ? `Sun study daylight score ${analysis.sunStudy.daylightScore}` : "",
+    analysis.ashrae?.coolingImpactPercent ? `ASHRAE cooling impact +${analysis.ashrae.coolingImpactPercent}%` : "",
+    analysis.carbon?.embodiedCarbonChange ? `Embodied carbon ${analysis.carbon.embodiedCarbonChange}` : ""
+  ].filter(Boolean).join(" / ");
+}
+
+function buildGeneratedCaseStudies(project) {
+  const survey = state.siteSurvey;
+  const fields = survey.fields || {};
+  const discovery = state.projectDiscovery || {};
+  const analysis = project.analysisResults || {};
+  const topOpportunity = siteTopOpportunity(survey);
+  const dominantRisk = siteDominantRisk(survey);
+  const metrics = caseStudyMetricSummary(project, survey);
+  const floodFact = fields.environmentalHazards || fields.drainageNotes || siteRecordText((survey.hazards || []).find(item => String(item.name || "").toLowerCase().includes("flood"))) || "--";
+  const initiative = fields.zoneInitiatives || "Initiative path pending";
+  const desiredOutcome = fields.desiredFutureUse || discovery.outcomes || project.clientIntent.summary;
+  const today = new Date().toISOString().slice(0, 10);
+  const sourceName = "ASTRA generated from saved project data";
+
+  return [
+    {
+      title: "Desired Outcome Case Study",
+      audience: "Client / design review",
+      desiredOutcome,
+      focus: "Desired outcome, client intent, and design quality",
+      sustainabilityMetrics: metrics || "--",
+      floodStrategy: floodFact,
+      initiativeDevelopment: initiative,
+      designResponse: fields.policyDesignImplications || `Use ${topOpportunity?.name || "the strongest saved opportunity"} as the design driver while keeping ${dominantRisk?.name || "known risks"} visible.`,
+      evidenceBasis: [
+        "Client brief",
+        fields.projectStage || "Project stage",
+        analysis.sunStudy?.sourceTitle,
+        analysis.ashrae?.sourceTitle,
+        analysis.carbon?.sourceTitle
+      ].filter(Boolean).join(" / "),
+      recommendedActions: "Confirm measurable targets, revise massing conflicts, and export this case study for client or reviewer alignment.",
+      status: "source linked",
+      documentType: "Case Study",
+      sourceName,
+      sourceUrl: "",
+      verifiedBy: "ASTRA deterministic generator",
+      lastChecked: today,
+      generated: true
+    },
+    {
+      title: "Limited Flooding + Resilience Case Study",
+      audience: "Planner / civil coordination",
+      desiredOutcome: "Limit flooding and stormwater exposure without reducing the creative quality of the design.",
+      focus: "Limited flooding, elevation, stormwater, and recovery procedure",
+      sustainabilityMetrics: fields.stormwaterRetention || metrics || "--",
+      floodStrategy: `${floodFact}. ${fields.riskPrevention || ""}`.trim(),
+      initiativeDevelopment: "Use stormwater retention and landscape preservation as a low-impact development strategy.",
+      designResponse: "Keep the primary mass out of the western low point, preserve the view corridor, and coordinate grading before foundation assumptions are locked.",
+      evidenceBasis: "Flood risk overlay / topographic survey / drainage notes / hazard register",
+      recommendedActions: fields.issueRecoveryProcedures || "Route unresolved stormwater, soil, or grading conflicts to civil/geotechnical review.",
+      status: dominantRisk ? dominantRisk.status || "active" : "active",
+      documentType: "Case Study",
+      sourceName,
+      sourceUrl: fields.gisSourceUrl || "",
+      verifiedBy: "ASTRA deterministic generator",
+      lastChecked: today,
+      generated: true
+    },
+    {
+      title: "Initiative-Based Development Case Study",
+      audience: "Permit / sustainability review",
+      desiredOutcome: "Use incentives and policy initiatives to make the design more sustainable and easier to explain.",
+      focus: "Initiative based development",
+      sustainabilityMetrics: metrics || fields.zoneInitiatives || "--",
+      floodStrategy: fields.stormwaterRetention || "Stormwater retention strategy pending",
+      initiativeDevelopment: initiative,
+      designResponse: "Package solar-ready roof area, passive design, low-carbon material intent, and rainwater retention as one coordinated development path.",
+      evidenceBasis: `${fields.policySourceUrl || "Policy source pending"} / verified policy rules / Site Intelligence Package`,
+      recommendedActions: "Verify initiative eligibility, attach source pages, update model values, and export case-study CSV for review tracking.",
+      status: fields.policyLookupStatus || "needs review",
+      documentType: "Case Study",
+      sourceName,
+      sourceUrl: fields.policySourceUrl || "",
+      verifiedBy: "",
+      lastChecked: today,
+      generated: true
+    },
+    {
+      title: "Sustainability Metrics Case Study",
+      audience: "ASHRAE / material review",
+      desiredOutcome: "Translate energy, daylight, carbon, and material goals into design decisions that can be checked.",
+      focus: "Sustainability metrics and material performance",
+      sustainabilityMetrics: metrics || "--",
+      floodStrategy: fields.environmentalHazards || "--",
+      initiativeDevelopment: fields.zoneInitiatives || "--",
+      designResponse: `${analysis.ashrae?.summary || "ASHRAE result pending"} ${analysis.carbon?.summary || "Carbon comparison pending"}`.trim(),
+      evidenceBasis: "ASHRAE / Sustainability Result V4 / Material Carbon Comparison V2 / Sun Study Result V4",
+      recommendedActions: "Pair daylight expansion with shading, verify envelope assumptions, and keep embodied-carbon claims tied to the material comparison.",
+      status: "needs review",
+      documentType: "Case Study",
+      sourceName,
+      sourceUrl: "",
+      verifiedBy: "ASTRA deterministic generator",
+      lastChecked: today,
+      generated: true
+    }
+  ];
+}
+
+function caseStudyCsv(project) {
+  const rows = [
+    ["title", "audience", "desired_outcome", "focus", "sustainability_metrics", "flood_strategy", "initiative_development", "design_response", "evidence_basis", "recommended_actions", "status", "source"]
+  ];
+  caseStudyRecords().forEach(item => {
+    rows.push([
+      item.title,
+      item.audience,
+      item.desiredOutcome,
+      item.focus,
+      item.sustainabilityMetrics,
+      item.floodStrategy,
+      item.initiativeDevelopment,
+      item.designResponse,
+      item.evidenceBasis,
+      item.recommendedActions,
+      item.status,
+      sourceStatusText(item)
+    ]);
+  });
+  return rows.map(row => row.map(csvValue).join(",")).join("\n");
+}
+
+function caseStudyJson(project) {
+  return JSON.stringify({
+    exportedAt: new Date().toISOString(),
+    project: project.project,
+    desiredOutcome: state.siteSurvey.fields.desiredFutureUse,
+    sustainabilityMetrics: caseStudyMetricSummary(project, state.siteSurvey),
+    caseStudies: caseStudyRecords()
+  }, null, 2);
+}
+
+function dataStorageStats(project) {
+  const survey = state.siteSurvey;
+  const evidence = siteEvidenceRecords(survey);
+  const records = [
+    ...Object.keys(survey.fields || {}),
+    ...(survey.uploads || []),
+    ...(survey.environmental || []),
+    ...(survey.utilities || []),
+    ...(survey.constraints || []),
+    ...(survey.opportunities || []),
+    ...(survey.sourceFindings || []),
+    ...(survey.additionalAspects || []),
+    ...(survey.gisFindings || []),
+    ...(survey.hazards || []),
+    ...(survey.sensors || []),
+    ...(survey.policyLookups || []),
+    ...(survey.evidence || []),
+    ...(survey.caseStudies || []),
+    ...(state.programSpaces || []),
+    ...(project.verifiedRules || []),
+    ...(project.gisLayers || [])
+  ];
+  const verified = evidence.filter(item => isVerifiedSiteStatus(item.status)).length;
+  const review = evidence.filter(item => String(item.status || "").toLowerCase().includes("review") || String(item.status || "").toLowerCase().includes("pending")).length;
+  return {
+    total: records.length,
+    verified,
+    review,
+    cases: caseStudyRecords().length,
+    csvRows: projectCsv(project).split("\n").length - 1
+  };
+}
+
+function dataStorageFactRows(project) {
+  const fields = state.siteSurvey.fields || {};
+  return [
+    { label: "Desired outcome", value: fields.desiredFutureUse || state.projectDiscovery.outcomes, detail: "Primary narrative basis for generated case studies", status: policyFieldStatus(fields.desiredFutureUse || state.projectDiscovery.outcomes) },
+    { label: "Sustainability metrics", value: caseStudyMetricSummary(project, state.siteSurvey), detail: "Energy, carbon, daylight, stormwater, ASHRAE, and material facts", status: "saved" },
+    { label: "Limited flooding", value: fields.environmentalHazards || fields.drainageNotes, detail: "Flood, slope, stormwater, and recovery data for resilience case studies", status: policyFieldStatus(fields.environmentalHazards || fields.drainageNotes) },
+    { label: "Initiatives", value: fields.zoneInitiatives, detail: "Initiative-based development and expedited review notes", status: fields.policyLookupStatus || policyFieldStatus(fields.zoneInitiatives) },
+    { label: "Policy zone", value: fields.detectedZoneArea || fields.zoningDistrict, detail: fields.policySourceUrl || "Policy source pending", status: fields.policyLookupStatus || "needs review" },
+    { label: "Case records", value: caseStudyRecords().length ? String(caseStudyRecords().length) : "--", detail: "Custom case studies saved in project memory", status: caseStudyRecords().length ? "active" : "missing" }
+  ];
+}
+
+function dataStorageSurface(project) {
+  const stats = dataStorageStats(project);
+  const caseStudies = caseStudyRecords();
+
   return `
-    <div class="surface-pad policy-grid">
-      ${project.verifiedRules.map(rule => `
-        <div class="policy-rule ${rule.verificationStatus === "needs_review" ? "needs" : ""}">
-          <div class="mini-label">${escapeHtml(rule.sourceTitle)} | page ${escapeHtml(rule.page)}</div>
-          <strong>${escapeHtml(rule.section)}</strong>
-          <p>${escapeHtml(rule.exactText)}</p>
-          <span class="status-token ${escapeHtml(rule.verificationStatus)}">${escapeHtml(rule.verificationStatus)}</span>
+    <div class="surface-pad site-survey-workspace data-storage-workspace">
+      <header class="site-survey-hero data-storage-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Data storage / CSV</span>
+          <h3>Project Data + Custom Case Study Exports</h3>
+          <p>Store project facts, sustainability metrics, flood-limitation strategies, policy initiatives, and generated case studies in one exportable system.</p>
         </div>
-      `).join("")}
+        <div class="site-output-card">
+          <span>Output</span>
+          <strong>JSON + CSV Data Package</strong>
+          <p>${stats.csvRows} CSV rows and ${stats.cases} case-study records are ready for download.</p>
+        </div>
+      </header>
+
+      <section class="site-command-grid data-command-grid" aria-label="Data storage summary">
+        ${[
+          ["Stored Records", stats.total, "fields, evidence, rules, GIS, cases"],
+          ["Verified Evidence", stats.verified, "active or source-linked records"],
+          ["Needs Review", stats.review, "pending or review records"],
+          ["Case Studies", stats.cases, "custom generated narratives"]
+        ].map(item => `
+          <article>
+            <span>${escapeHtml(item[0])}</span>
+            <strong>${escapeHtml(item[1])}</strong>
+            <p>${escapeHtml(item[2])}</p>
+          </article>
+        `).join("")}
+      </section>
+
+      <div class="site-workbench-layout">
+        <main class="site-main-stack" aria-label="Data storage and case study sections">
+          <section class="site-survey-section data-export-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">1. Export center</span>
+                <h3>Download Stored Data</h3>
+                <p>Export the full project package or just the custom case-study library for review, reporting, external databases, or spreadsheet workflows.</p>
+              </div>
+              <button class="add-row-button" data-case-study-generate>Generate Case Studies From Current Data</button>
+            </div>
+            <div class="data-export-grid">
+              <button data-download="parcel"><span>JSON</span><strong>Full ASTRA Project</strong><em>Project, site survey, rules, GIS, model, and cases</em></button>
+              <button data-download="csv"><span>CSV</span><strong>Project Data Table</strong><em>All saved records in a spreadsheet-ready table</em></button>
+              <button data-download="case-json"><span>JSON</span><strong>Case Studies</strong><em>Custom generated narratives with source fields</em></button>
+              <button data-download="case-csv"><span>CSV</span><strong>Case Study Table</strong><em>Desired outcome, metrics, flood, initiatives, actions</em></button>
+            </div>
+            ${siteFactGrid(dataStorageFactRows(project), "Data storage facts")}
+          </section>
+
+          <section class="site-survey-section data-generator-panel">
+            <div>
+              <span class="mini-label">2. Generator inputs</span>
+              <h3>Case Study Basis</h3>
+              <p>These saved fields are the inputs for custom case studies. Update them, generate again, and the JSON/CSV export will reflect the current project direction.</p>
+            </div>
+            <div class="site-intake-grid case-study-input-grid">
+              ${siteFieldTextarea("desiredFutureUse", "Desired outcome / future use", 3)}
+              ${siteFieldTextarea("clientGoals", "Client goals", 3)}
+              ${siteFieldInput("annualEnergyUse", "Annual energy use target")}
+              ${siteFieldInput("embodiedCarbon", "Embodied carbon target")}
+              ${siteFieldInput("daylightFactor", "Daylight / sun metric")}
+              ${siteFieldInput("stormwaterRetention", "Stormwater retention metric")}
+              ${siteFieldTextarea("environmentalHazards", "Flooding / environmental hazards", 3)}
+              ${siteFieldTextarea("zoneInitiatives", "Initiative-based development", 3)}
+              ${siteFieldTextarea("policyDesignImplications", "Design implications", 3)}
+            </div>
+          </section>
+
+          <section class="site-survey-section case-study-library-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">3. Custom case studies</span>
+                <h3>Saved Case Study Library</h3>
+                <p>Each case study is editable and stored with the project, then exported as JSON or CSV for downstream reports and reviews.</p>
+              </div>
+              <button class="add-row-button" data-add-site-row="caseStudies">Add Custom Case Study</button>
+            </div>
+            <div class="site-ai-question-grid case-study-record-grid">
+              ${caseStudies.map((item, index) => `
+                <article>
+                  ${siteRowInput("caseStudies", index, "title", item.title || "", "Title")}
+                  ${siteRowInput("caseStudies", index, "audience", item.audience || "", "Audience")}
+                  ${siteRowInput("caseStudies", index, "focus", item.focus || "", "Focus")}
+                  ${siteRowTextarea("caseStudies", index, "desiredOutcome", item.desiredOutcome || "", "Desired outcome", 3)}
+                  ${siteRowTextarea("caseStudies", index, "sustainabilityMetrics", item.sustainabilityMetrics || "", "Sustainability metrics", 3)}
+                  ${siteRowTextarea("caseStudies", index, "floodStrategy", item.floodStrategy || "", "Limited flooding / resilience strategy", 3)}
+                  ${siteRowTextarea("caseStudies", index, "initiativeDevelopment", item.initiativeDevelopment || "", "Initiative-based development", 3)}
+                  ${siteRowTextarea("caseStudies", index, "designResponse", item.designResponse || "", "Design response", 3)}
+                  ${siteRowTextarea("caseStudies", index, "evidenceBasis", item.evidenceBasis || "", "Evidence basis", 3)}
+                  ${siteRowTextarea("caseStudies", index, "recommendedActions", item.recommendedActions || "", "Recommended actions", 3)}
+                  ${siteSourceControls("caseStudies", index, item, ["Case Study", ...siteDocumentTypeOptions])}
+                </article>
+              `).join("") || `<div class="empty-state">No case studies saved yet. Generate from current data to create the first set.</div>`}
+            </div>
+          </section>
+
+          <section class="site-survey-section data-schema-panel">
+            <div>
+              <span class="mini-label">4. Storage map</span>
+              <h3>What the CSV Contains</h3>
+              <p>The export keeps data reusable across AI retrieval, GIS, sustainability review, policy checks, case studies, and reporting.</p>
+            </div>
+            <div class="database-list data-schema-list">
+              ${[
+                ["site_survey_form", "All intake, policy, sustainability, elevation, and case-study input fields", "saved"],
+                ["site_policy_lookup", "Address, zone, source, status, policy result, and reviewer metadata", "source linked"],
+                ["site_hazard", "Flooding, slope, soil, utility, severity, source, and mitigation data", "risk"],
+                ["site_case_study", "Desired outcome, sustainability metrics, flood strategy, initiatives, evidence, actions", "exportable"],
+                ["policy_rule", "Verified rules, values, units, sections, and source titles", "verified"],
+                ["gis_layer", "GIS overlay name, status, finding, source, and downstream use", "active"]
+              ].map(row => `
+                <div>
+                  <strong>${escapeHtml(row[0])}</strong>
+                  <span>${escapeHtml(row[1])}</span>
+                  <em>${escapeHtml(row[2])}</em>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        </main>
+      </div>
+      <div id="annotationLayer" class="annotation-layer"></div>
+    </div>
+  `;
+}
+
+function policySurface(project) {
+  const survey = state.siteSurvey;
+  const fields = survey.fields || {};
+  const stats = siteIntelligenceStats(survey);
+  const lookup = policyPrimaryLookup(survey);
+  const factRows = policyFactRows(project, survey);
+  const commandRows = policyCommandRows(project, survey);
+  const ruleRows = policyRuleImpactRows(project);
+  const procedureRows = policyProcedureRows(survey);
+  const hazardRows = policyHazardRows(survey);
+
+  return `
+    <div class="surface-pad site-survey-workspace policy-workspace">
+      <header class="site-survey-hero policy-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">ASTRA policy intelligence</span>
+          <h3>Address, Zone, Code + Risk Procedure Finder</h3>
+          <p>Enter a site address, identify the zone, record policy and code sources, then connect risk prevention, recovery procedures, environmental hazards, and elevation constraints to design decisions.</p>
+        </div>
+        <div class="site-output-card">
+          <span>Output</span>
+          <strong>Policy Intelligence Package</strong>
+          <p>${stats.confidence}% readiness. Missing facts remain shown as -- so ASTRA does not turn assumptions into claims.</p>
+        </div>
+      </header>
+
+      <section class="site-command-grid policy-command-grid" aria-label="Policy intelligence summary">
+        ${commandRows.map(item => `
+          <article>
+            <span>${escapeHtml(item[0])}</span>
+            <strong>${escapeHtml(item[1])}</strong>
+            <p>${escapeHtml(item[2])}</p>
+          </article>
+        `).join("")}
+      </section>
+
+      <div class="site-workbench-layout">
+        <main class="site-main-stack" aria-label="Policy intelligence sections">
+          <section class="site-survey-section policy-discovery-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">1. Address to zone</span>
+                <h3>Discover the Jurisdiction + Zone</h3>
+                <p>Use the address as the starting point, then save the jurisdiction, zoning district, overlays, source URL, lookup method, and verification state as a traceable policy record.</p>
+              </div>
+              <button class="add-row-button" data-policy-lookup-create>Save / Discover Zone Record</button>
+            </div>
+            ${siteSubsectionIntro("ADR", "Location lookup", "The section can only be as factual as the entered parcel, municipal GIS, zoning map, or policy PDF source. Unknown values stay visible as --.")}
+            <div class="policy-discovery-grid">
+              <div class="site-intake-grid policy-address-form">
+                ${siteFieldInput("addressLookup", "Address")}
+                ${siteFieldInput("parcelApn", "Parcel / APN")}
+                ${siteFieldInput("cityCounty", "City / county")}
+                ${siteFieldInput("stateRegion", "State / region")}
+                ${siteFieldInput("country", "Country")}
+                ${siteFieldInput("latitude", "Latitude")}
+                ${siteFieldInput("longitude", "Longitude")}
+                ${siteFieldInput("jurisdiction", "Jurisdiction")}
+                ${siteFieldInput("zoningDistrict", "Zoning district")}
+                ${siteFieldInput("detectedZoneArea", "Zone / policy area")}
+                ${siteFieldSelect("lookupMethod", "Lookup method", lookupMethodOptions)}
+                ${siteFieldSelect("policyLookupStatus", "Lookup status", siteVerificationStatusOptions)}
+                ${siteFieldInput("policySourceUrl", "Policy source URL / citation")}
+                ${siteFieldInput("lastPolicyCheck", "Last checked", "date")}
+                ${siteFieldTextarea("overlays", "Overlay districts / mapped policy areas")}
+              </div>
+              <aside class="policy-zone-snapshot">
+                <span class="mini-label">Current policy read</span>
+                <strong>${escapeHtml(siteDisplayValue(fields.detectedZoneArea || fields.zoningDistrict))}</strong>
+                <p><b>Jurisdiction</b>${escapeHtml(siteDisplayValue(fields.jurisdiction || fields.municipality))}</p>
+                <p><b>Source</b>${escapeHtml(lookup ? sourceStatusText(lookup) : siteDisplayValue(fields.policySourceUrl))}</p>
+                <p><b>Status</b>${escapeHtml(fields.policyLookupStatus || lookup?.status || "--")}</p>
+              </aside>
+            </div>
+            ${siteFactGrid(factRows, "Policy facts")}
+            ${siteSectionInsightCard(
+              "Facts drive the policy assistant",
+              `${siteDisplayValue(fields.addressLookup || fields.parcelAddress)} is the current lookup basis. ASTRA can explain implications from entered policy records, but missing source URLs, zoning districts, or verification states should remain non-final.`,
+              [
+                `Zone: ${siteDisplayValue(fields.detectedZoneArea || fields.zoningDistrict)}`,
+                `Overlays: ${siteDisplayValue(fields.overlays)}`,
+                `Lookup status: ${fields.policyLookupStatus || "--"}`
+              ],
+              "Add a municipal source, parcel viewer link, policy PDF, or reviewer name before treating the result as permit-ready.",
+              fields.policyLookupStatus
+            )}
+          </section>
+
+          <section class="site-survey-section policy-rules-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">2. Rules + initiatives</span>
+                <h3>Zoning, Policy Initiatives + Design Impact</h3>
+                <p>Each rule is shown as a design review item so the user sees what is verified, what looks off, and how to improve the design response.</p>
+              </div>
+              <button class="add-row-button" data-add-site-row="policyLookups">Add Policy Record</button>
+            </div>
+            ${siteSubsectionIntro("RULE", "Rule impact review", "These cards compare saved policy rules with the current design model where a measurable check exists. They are advisory, not a substitute for jurisdiction review.")}
+            <div class="policy-rule-review-grid">
+              ${ruleRows.map(item => `
+                <article class="${item.outOfNorm ? "reconsider" : escapeHtml(siteStatusClass(item.rule.verificationStatus))}">
+                  <span class="status-token ${escapeHtml(item.outOfNorm ? "attention" : item.rule.verificationStatus || "needs_review")}">${escapeHtml(item.label)}</span>
+                  <strong>${escapeHtml(item.rule.section || item.rule.ruleType || "Policy rule")}</strong>
+                  <p><b>What I see:</b> ${escapeHtml(item.measured)} against ${escapeHtml(policyRuleValue(item.rule))}.</p>
+                  <p><b>How I think it will impact the design:</b> ${escapeHtml(item.impact)}</p>
+                  <p><b>How I could improve it:</b> ${escapeHtml(item.improve)}</p>
+                  <em>${escapeHtml(item.rule.sourceTitle || "Source pending")}${item.rule.page ? ` / page ${escapeHtml(item.rule.page)}` : ""}</em>
+                </article>
+              `).join("") || `<div class="empty-state">No verified policy rules have been added yet.</div>`}
+            </div>
+            ${siteSubsectionIntro("INIT", "Local initiatives and policy notes", "Record incentives, sustainability initiatives, code programs, and design implications in plain language so the assistant can reuse them.")}
+            <div class="site-intake-grid policy-notes-grid">
+              ${siteFieldTextarea("zoneInitiatives", "Zone initiatives / incentives", 4)}
+              ${siteFieldTextarea("policySummary", "Policy and zoning summary", 4)}
+              ${siteFieldTextarea("policyDesignImplications", "Design implications", 4)}
+            </div>
+          </section>
+
+          <section class="site-survey-section policy-code-panel">
+            <div>
+              <span class="mini-label">3. Building code + review process</span>
+              <h3>Codes, Procedures, Speed + Evidence</h3>
+              <p>Keep building-code basis and review procedure in the same workspace as zoning so the user does not fragment between policy, permit, and design decisions.</p>
+            </div>
+            ${siteSubsectionIntro("CODE", "Code and permit basis", "Use this area for building-code references, required procedures, review speed, and any path to expedited or delayed review.")}
+            <div class="site-intake-grid policy-notes-grid">
+              ${siteFieldTextarea("buildingCodeSummary", "Building code basis / applicable code notes", 4)}
+              ${siteFieldTextarea("permittingProcedures", "Procedures, contacts, submittals, and review sequence", 4)}
+              ${siteFieldTextarea("permittingSpeed", "Expected review speed / bottlenecks / expedited paths", 3)}
+            </div>
+            <div class="policy-procedure-grid">
+              ${procedureRows.map(item => {
+                const value = siteDisplayValue(item.value);
+                return `
+                  <article class="${value === "--" ? "missing" : "saved"}">
+                    <span>${escapeHtml(item.label)}</span>
+                    <strong>${escapeHtml(value)}</strong>
+                    <p>${escapeHtml(item.detail)}</p>
+                  </article>
+                `;
+              }).join("")}
+            </div>
+          </section>
+
+          <section class="site-survey-section policy-risk-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">4. Elevation, hazards + prevention</span>
+                <h3>Risk Prevention and Recovery</h3>
+                <p>Connect topography, environmental hazards, and policy issues to prevention and recovery actions before they become late-stage surprises.</p>
+              </div>
+              <button class="add-row-button" data-add-site-row="hazards">Add Hazard</button>
+            </div>
+            ${siteSubsectionIntro("ELEV", "Elevation and hazard logic", "Elevation rules, flood concerns, slope limits, and hazard overlays should be explained with source-backed data whenever possible.")}
+            <div class="site-intake-grid policy-notes-grid">
+              ${siteFieldTextarea("elevationPolicy", "Elevation / slope / flood policy basis", 3)}
+              ${siteFieldTextarea("environmentalHazards", "Environmental hazards from policy, GIS, or field review", 4)}
+              ${siteFieldTextarea("riskPrevention", "Risk prevention actions", 4)}
+              ${siteFieldTextarea("issueRecoveryProcedures", "Issue recovery procedures", 4)}
+            </div>
+            <div class="risk-dashboard-grid policy-hazard-grid">
+              ${hazardRows.map(item => `
+                <article class="${escapeHtml(String(item.severity || "").toLowerCase())}">
+                  <span>${escapeHtml(item.status)}</span>
+                  <strong>${escapeHtml(item.name)}</strong>
+                  <em>${escapeHtml(item.severity)} severity</em>
+                  <p>${escapeHtml(siteDisplayValue(item.value))}</p>
+                  <small>${escapeHtml(item.source)}</small>
+                </article>
+              `).join("") || `<div class="empty-state">No hazard records saved yet.</div>`}
+            </div>
+          </section>
+
+          <section class="site-survey-section policy-record-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">5. Source-backed records</span>
+                <h3>Policy Lookup Library</h3>
+                <p>Every policy claim should have a source type, URL or source name, status, reviewer, and last-checked date.</p>
+              </div>
+              <button class="add-row-button" data-add-site-row="policyLookups">Add Custom Policy Record</button>
+            </div>
+            <div class="site-ai-question-grid policy-record-grid">
+              ${(survey.policyLookups || []).map((item, index) => `
+                <article>
+                  ${siteRowInput("policyLookups", index, "name", item.name || "", "Policy / lookup name")}
+                  ${siteRowInput("policyLookups", index, "address", item.address || "", "Address")}
+                  ${siteRowInput("policyLookups", index, "parcelApn", item.parcelApn || "", "Parcel / APN")}
+                  ${siteRowInput("policyLookups", index, "jurisdiction", item.jurisdiction || "", "Jurisdiction")}
+                  ${siteRowTextarea("policyLookups", index, "result", item.result || "", "Lookup result / rule found")}
+                  ${siteRowSelect("policyLookups", index, "sourceName", item.sourceName || "Manual reviewer entry", "Lookup source type", policySourceOptions)}
+                  ${siteRowInput("policyLookups", index, "sourceUrl", item.sourceUrl || "", "Source URL / citation")}
+                  ${siteSourceControls("policyLookups", index, item)}
+                </article>
+              `).join("")}
+            </div>
+          </section>
+
+          <section class="site-survey-section policy-agent-panel">
+            <div>
+              <span class="mini-label">6. Ask ASTRA from policy context</span>
+              <h3>Policy Advice That Stays Grounded</h3>
+              <p>Use these prompts when the user is unsure what to do next, what fact is missing, or why a policy condition affects the design.</p>
+            </div>
+            <div class="site-advisor-prompts">
+              ${[
+                "What zoning facts are verified for this address?",
+                "What is missing before this can guide permit-ready design?",
+                "Which policy issue could delay permitting the most?",
+                "How should the design respond to the elevation and hazard facts?",
+                "Which code or initiative could improve design quality?"
+              ].map(prompt => `<button data-site-agent-question="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
+            </div>
+            <div class="download-actions">
+              <button data-download="parcel">Download Policy JSON</button>
+              <button data-download="csv">Download Project CSV</button>
+            </div>
+          </section>
+        </main>
+      </div>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
@@ -4414,16 +5899,20 @@ function renderSurface() {
     ? journeySurface(project)
     : state.activeSection === "clientele"
     ? clientSurface(project)
+    : state.activeSection === "data"
+    ? dataStorageSurface(project)
     : state.activeSection === "survey"
     ? siteSurveySurface(project)
     : state.activeSection === "gis"
     ? gisSurface(project)
+    : state.activeSection === "policy"
+    ? policySurface(project)
     : projectPageSurface(project, section);
   document.getElementById("visualWorkspace").innerHTML = html;
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
-  if (state.activeSection === "survey" || state.activeSection === "gis") bindSiteSurveyPage();
+  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
@@ -4483,6 +5972,7 @@ function projectCsv(project) {
     ...state.siteSurvey.policyLookups.map(item => ["site_policy_lookup", item.name, `${item.address || ""} | ${item.jurisdiction || ""} | ${item.result || ""} | ${item.sourceUrl || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.evidence.map(item => ["site_evidence", item.name, `${item.owner || ""}: ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.aiInterpretation.map(item => ["site_ai_interpretation", item.question, item.answer, "saved"]),
+    ...caseStudyRecords().map(item => ["site_case_study", item.title, `${item.audience || ""} | ${item.focus || ""} | desired: ${item.desiredOutcome || ""} | metrics: ${item.sustainabilityMetrics || ""} | flood: ${item.floodStrategy || ""} | initiative: ${item.initiativeDevelopment || ""} | actions: ${item.recommendedActions || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.packageItems.map(item => ["site_package_item", item.name, item.included ? "included" : "excluded", "saved"]),
     ...state.programSpaces.flatMap(space => [
       ["program_space", space.name, `${space.area} sq ft`, "saved"],
@@ -4576,6 +6066,26 @@ function newSiteSurveyRow(group) {
     }),
     hazards: () => ({ name: "Custom hazard", severity: "Medium", value: "", ...common }),
     evidence: () => ({ name: "Custom evidence record", owner: "", value: "", ...common }),
+    caseStudies: () => ({
+      title: "Custom case study",
+      audience: "Client / review team",
+      desiredOutcome: state.siteSurvey.fields.desiredFutureUse || "",
+      focus: "Desired outcome",
+      sustainabilityMetrics: caseStudyMetricSummary(state.project, state.siteSurvey),
+      floodStrategy: state.siteSurvey.fields.environmentalHazards || state.siteSurvey.fields.drainageNotes || "",
+      initiativeDevelopment: state.siteSurvey.fields.zoneInitiatives || "",
+      designResponse: "",
+      evidenceBasis: "",
+      recommendedActions: "",
+      status: "draft",
+      documentType: "Case Study",
+      otherDocumentType: "",
+      sourceName: "Manual case study entry",
+      sourceUrl: "",
+      verifiedBy: "",
+      lastChecked: today,
+      generated: false
+    }),
     policyLookups: () => ({
       name: "Custom policy lookup",
       address: state.siteSurvey.fields.addressLookup || "",
@@ -4650,6 +6160,12 @@ function bindSimpleProjectPage() {
       if (button.dataset.download === "csv") {
         triggerDownload("hct-project-data.csv", "text/csv", projectCsv(state.project));
       }
+      if (button.dataset.download === "case-json") {
+        triggerDownload("astra-case-studies.json", "application/json", caseStudyJson(state.project));
+      }
+      if (button.dataset.download === "case-csv") {
+        triggerDownload("astra-case-studies.csv", "text/csv", caseStudyCsv(state.project));
+      }
       if (button.dataset.download === "gis") {
         triggerDownload("astra-gis-package.json", "application/json", JSON.stringify({
           site: state.project.site,
@@ -4723,6 +6239,18 @@ function bindSiteSurveyPage() {
       state.siteSurvey.policyLookups = [
         createPolicyLookupRecordFromFields(),
         ...(Array.isArray(state.siteSurvey.policyLookups) ? state.siteSurvey.policyLookups : [])
+      ];
+      persistSiteSurvey();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-case-study-generate]").forEach(button => {
+    button.addEventListener("click", () => {
+      const manualCases = caseStudyRecords().filter(item => !item.generated);
+      state.siteSurvey.caseStudies = [
+        ...buildGeneratedCaseStudies(state.project),
+        ...manualCases
       ];
       persistSiteSurvey();
       render();
@@ -5079,6 +6607,11 @@ function bindClientBriefPage() {
 
 function renderAnnotations() {
   if (!el.annotationLayer) return;
+  const traceSection = ["design", "gis"].includes(state.activeSection);
+  if (!traceSection) {
+    el.annotationLayer.innerHTML = "";
+    return;
+  }
   const annotations = state.lastResponse ? state.lastResponse.annotations : [];
   el.annotationLayer.innerHTML = annotations.map(anno => {
     const rect = anno.rect || { x: 40, y: 40, w: 20, h: 20 };
@@ -5115,11 +6648,249 @@ function renderAnnotations() {
   });
 }
 
+function humanizeToken(value) {
+  return String(value || "current design")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function firstSentence(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return "";
+  const match = raw.match(/^(.{1,180}?[.!?])(\s|$)/);
+  return match ? match[1] : raw.slice(0, 180);
+}
+
+function impactCopyForReview(item, response) {
+  const lens = String(item.lens || item.type || "").toLowerCase();
+  const severity = String(item.severity || item.status || "").toLowerCase();
+  const message = String(item.message || item.text || "").toLowerCase();
+
+  if (severity === "critical" || message.includes("setback") || message.includes("height")) {
+    return "This can block permitting, force massing changes, or make downstream documentation unreliable until corrected.";
+  }
+  if (lens.includes("performance") || message.includes("glazing") || message.includes("ashrae") || message.includes("cooling")) {
+    return "This can improve daylight or expression, but may increase glare, cooling load, comfort issues, or facade complexity.";
+  }
+  if (lens.includes("spatial") || message.includes("drainage") || message.includes("flood") || message.includes("slope")) {
+    return "This can affect placement, grading, stormwater strategy, constructability, and consultant review timing.";
+  }
+  if (severity.includes("review") || severity.includes("estimate")) {
+    return "This is useful as design guidance, but it should not become a final claim until the metric or source is verified.";
+  }
+  return `This changes the confidence of the decision. Current response confidence: ${response.confidence || "not stated"}.`;
+}
+
+function improvementCopyForReview(item, response) {
+  const target = String(item.target || item.type || item.label || "").toLowerCase();
+  const message = String(item.message || item.text || item.detail || "").toLowerCase();
+  const next = (response.recommendedNext || []).slice(0, 3).join(", ");
+
+  if (target.includes("front") || message.includes("setback")) {
+    return "Move the building edge back, reduce projections, or keep the assumption marked as variance-review until the policy source allows it.";
+  }
+  if (target.includes("height") || message.includes("height")) {
+    return "Lower or step the massing, redistribute program area, or confirm an exception before advancing permit-ready drawings.";
+  }
+  if (target.includes("glaz") || message.includes("glaz") || message.includes("daylight")) {
+    return "Balance the window rhythm, add exterior shading, test glare, and verify the ASHRAE or sun-study metric before adding more glass.";
+  }
+  if (message.includes("missing") || message.includes("review")) {
+    return "Add the missing source, reviewer, date, and status; keep the item as advisory until evidence is verified.";
+  }
+  return next ? `Use the next-step path: ${next}.` : "Ask ASTRA for a focused comparison, then record the decision and source basis.";
+}
+
+function severityLabel(value) {
+  const severity = String(value || "").toLowerCase();
+  if (["critical", "high", "needs_review", "visual_estimate", "missing", "conflict"].some(term => severity.includes(term))) {
+    return "Reconsider";
+  }
+  if (["medium", "computed", "pending"].some(term => severity.includes(term))) {
+    return "Review";
+  }
+  return "Monitor";
+}
+
+function buildReviewItems(response) {
+  const annotations = (response.annotations || []).map(anno => ({
+    id: anno.id,
+    label: severityLabel(anno.severity),
+    tone: anno.severity || "medium",
+    what: anno.message || "Area needs review",
+    where: `${humanizeToken(anno.target)} / ${humanizeToken(anno.lens)}`,
+    impact: impactCopyForReview(anno, response),
+    improve: improvementCopyForReview(anno, response),
+    itsImpact: `${humanizeToken(anno.severity)} severity. Trace opens ${anno.sourceIds?.length || 0} source reference${anno.sourceIds?.length === 1 ? "" : "s"}.`,
+    sourceIds: anno.sourceIds || []
+  }));
+
+  const flaggedClaims = (response.claims || [])
+    .filter(claim => /needs_review|visual_estimate|computed_result|ai_interpretation/i.test(claim.type || ""))
+    .slice(0, 2)
+    .map(claim => ({
+      id: claim.id,
+      label: severityLabel(claim.type),
+      tone: claim.type || "needs_review",
+      what: claim.text || "Metric or interpretation needs review",
+      where: humanizeToken(claim.type),
+      impact: impactCopyForReview({ ...claim, status: claim.type }, response),
+      improve: improvementCopyForReview(claim, response),
+      itsImpact: `${humanizeToken(claim.type)}. Keep this tied to its source before treating it as final.`,
+      sourceIds: claim.sourceIds || []
+    }));
+
+  const flaggedChecks = (response.selfCheck || [])
+    .filter(check => /needs_review|visual_estimate|missing|conflict/i.test(check.status || ""))
+    .slice(0, 1)
+    .map(check => ({
+      id: `check-${normalizeLabel(check.label)}`,
+      label: "Reconsider",
+      tone: check.status || "needs_review",
+      what: `${check.label}: ${check.detail || check.status}`,
+      where: "self check",
+      impact: "This may be out of the normal evidence path, use the wrong certainty level, or need another source before the design relies on it.",
+      improve: "Confirm the metric, add the source or reviewer, then ask ASTRA to reassess the same decision.",
+      itsImpact: `${humanizeToken(check.status)} status in ASTRA's response check.`,
+      sourceIds: []
+    }));
+
+  const combined = [...annotations, ...flaggedClaims, ...flaggedChecks];
+  if (!combined.length && response.answer) {
+    combined.push({
+      id: "general-review",
+      label: "Review",
+      tone: "medium",
+      what: firstSentence(response.answer),
+      where: "current section",
+      impact: `This is advice with ${response.confidence || "unknown"} confidence.`,
+      improve: improvementCopyForReview({}, response),
+      itsImpact: "Use the sources and next actions before committing.",
+      sourceIds: []
+    });
+  }
+
+  const seen = new Set();
+  return combined.filter(item => {
+    const key = `${item.label}-${item.what}-${item.where}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 4);
+}
+
+function reviewItemsMarkup(response) {
+  const items = buildReviewItems(response);
+  if (!items.length) return "";
+  return `
+    <section class="astra-review-stack" aria-label="ASTRA review cards">
+      <div class="review-stack-head">
+        <span class="mini-label">ASTRA review</span>
+        <strong>Issues, improvements, and impact</strong>
+      </div>
+      ${items.map(item => `
+        <article class="astra-review-card ${escapeHtml(siteStatusClass(item.tone))}">
+          <div class="review-card-title">
+            <span>${escapeHtml(item.label)}</span>
+            <strong>${escapeHtml(item.where)}</strong>
+          </div>
+          <dl>
+            <dt>What I see</dt>
+            <dd>${escapeHtml(item.what)}</dd>
+            <dt>How I think it will impact the design</dt>
+            <dd>${escapeHtml(item.impact)}</dd>
+            <dt>How I could improve it</dt>
+            <dd>${escapeHtml(item.improve)}</dd>
+            <dt>Its impact</dt>
+            <dd>${escapeHtml(item.itsImpact)}</dd>
+          </dl>
+        </article>
+      `).join("")}
+    </section>
+  `;
+}
+
+function combinedAdviceHistory() {
+  const records = [
+    ...(state.localAdviceHistory || []),
+    ...(state.project?.aiTranscript || [])
+  ];
+  const seen = new Set();
+  return records.filter(item => {
+    const key = item.id || `${item.timestamp || ""}-${item.question || ""}-${item.answer || ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function adviceHistoryMarkup() {
+  const transcript = combinedAdviceHistory();
+  if (!transcript.length) {
+    return `
+      <div class="history-empty">
+        <span class="mini-label">Advice history</span>
+        <p>ASTRA's recent advice will stay here after you ask a question.</p>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="history-head">
+      <span class="mini-label">Advice history</span>
+      <strong>Look back</strong>
+    </div>
+    <div class="history-list">
+      ${transcript.slice(0, 6).map((item, index) => `
+        <button type="button" class="history-item" data-advice-history="${index}">
+          <span>${escapeHtml(item.confidence || "review")}</span>
+          <strong>${escapeHtml(item.question || "ASTRA advice")}</strong>
+          <p>${escapeHtml(firstSentence(item.answer || ""))}</p>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderAdviceHistory() {
+  if (!el.adviceHistory) return;
+  el.adviceHistory.innerHTML = adviceHistoryMarkup();
+}
+
+function renderArchivedAdvice(item) {
+  if (!item || !el.assistantOutput) return;
+  el.assistantOutput.innerHTML = `
+    <div class="answer-box archived-answer">
+      <span class="mini-label">Advice history</span>
+      <p>${escapeHtml(item.answer || "No saved answer text.")}</p>
+      <div class="meta-row">
+        <span class="chip computed">confidence: ${escapeHtml(item.confidence || "unknown")}</span>
+        <span class="chip">section: ${escapeHtml(item.section || "saved advice")}</span>
+      </div>
+    </div>
+    ${(item.recommendedNext || []).length ? `
+      <div class="source-list">
+        <div class="claim-card">
+          <strong>Recommended next actions</strong>
+          <span>${item.recommendedNext.map(action => escapeHtml(action)).join(" / ")}</span>
+        </div>
+      </div>
+    ` : ""}
+  `;
+}
+
 function renderAssistantOutput(response) {
   if (!response) return;
-  el.aiMode.textContent = response.mode.includes("gemini") ? "Gemini + tools" : "ASTRA local";
+  el.aiMode.textContent = response.mode.includes("ollama")
+    ? "Qwen / Ollama"
+    : response.mode.includes("gemini")
+      ? "Gemini + tools"
+      : "ASTRA local";
 
   const outputHtml = `
+    ${reviewItemsMarkup(response)}
+
     <div class="answer-box">
       <p>${escapeHtml(response.answer)}</p>
       <div class="meta-row">
@@ -5127,6 +6898,7 @@ function renderAssistantOutput(response) {
         <span class="chip">mode: ${escapeHtml(response.mode)}</span>
       </div>
       ${response.geminiError ? `<div class="meta-row"><span class="chip needs_review">${escapeHtml(response.geminiError)}</span></div>` : ""}
+      ${response.ollamaError ? `<div class="meta-row"><span class="chip needs_review">${escapeHtml(response.ollamaError)}</span></div>` : ""}
     </div>
 
     <div class="chip-row">
@@ -5176,6 +6948,7 @@ function renderAssistantOutput(response) {
       });
     });
   });
+  renderAdviceHistory();
 }
 
 function openTraceForSource(sourceId) {
@@ -5259,6 +7032,17 @@ async function askAssistant(question, screenshotMode = false) {
     }
     state.lastResponse = result;
     state.screenshotMode = screenshotMode;
+    if (result.saved && state.project) {
+      state.localAdviceHistory = [
+        result.saved,
+        ...(state.localAdviceHistory || []).filter(item => item.id !== result.saved.id)
+      ].slice(0, 30);
+      const existing = state.project.aiTranscript || [];
+      state.project.aiTranscript = [
+        result.saved,
+        ...existing.filter(item => item.id !== result.saved.id)
+      ].slice(0, 30);
+    }
     renderAssistantOutput(result);
     renderAnnotations();
     await refreshProject();
@@ -5266,7 +7050,7 @@ async function askAssistant(question, screenshotMode = false) {
     setAssistantStatus(`<div class="empty-state">Assistant error: ${escapeHtml(error.message)}</div>`);
   } finally {
     el.askButton.disabled = false;
-    el.askButton.textContent = "Ask Assistor";
+    el.askButton.textContent = "Ask ASTRA";
   }
 }
 
@@ -5296,6 +7080,7 @@ async function refreshProject() {
   const response = await fetch("/api/project");
   state.project = await response.json();
   renderProjectHeader();
+  renderAdviceHistory();
 }
 
 function render() {
@@ -5320,11 +7105,20 @@ async function init() {
     openTraceForAnnotation(anno);
   };
 
-  document.querySelectorAll("[data-question]").forEach(button => {
-    button.addEventListener("click", () => {
-      el.questionInput.value = button.dataset.question;
-      askAssistant(button.dataset.question, false);
-    });
+  document.querySelector(".assistant-panel")?.addEventListener("click", event => {
+    const historyButton = event.target.closest("[data-advice-history]");
+    if (historyButton) {
+      const index = Number(historyButton.dataset.adviceHistory);
+      const item = combinedAdviceHistory()[index];
+      renderArchivedAdvice(item);
+      return;
+    }
+
+    const button = event.target.closest("[data-question]");
+    if (!button) return;
+    const question = button.dataset.question || "";
+    el.questionInput.value = question;
+    askAssistant(question, button.dataset.screenshotQuestion === "true");
   });
 
   el.askButton.addEventListener("click", () => askAssistant(el.questionInput.value, false));

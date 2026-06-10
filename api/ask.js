@@ -59,6 +59,19 @@ function sourceFromSite() {
   };
 }
 
+function sourceFromProcessMap() {
+  return {
+    id: "astra-process-map",
+    type: "app_navigation",
+    title: "ASTRA Project Flow Guide",
+    section: "Home / Project Flow Guide",
+    page: null,
+    exactText: "The home page contains the Project Flow Guide, section navigation, current/last-completed status, and the always-visible ASTRA assistant for process questions.",
+    verificationStatus: "app_structure",
+    rightClickAction: "Open project guide"
+  };
+}
+
 function annotation(id, type, severity, target, message, rect, sourceIds, lens) {
   return {
     id,
@@ -243,8 +256,184 @@ function opportunityScore(item, index) {
   return Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : fallback;
 }
 
+function surveySettings(survey) {
+  const fields = survey.fields || {};
+  const opportunityThreshold = Number(fields.opportunityThreshold);
+  return {
+    evidenceStrictness: fields.evidenceStrictness || "Balanced",
+    riskTolerance: fields.riskTolerance || "Conservative",
+    opportunityThreshold: Number.isFinite(opportunityThreshold) ? Math.max(0, Math.min(100, opportunityThreshold)) : 75,
+    policyConfidenceRequired: fields.policyConfidenceRequired || "Source linked",
+    sustainabilityPriority: fields.sustainabilityPriority || "Balanced performance",
+    assistantMode: fields.assistantMode || "Qwen local + deterministic fallback",
+    ragDepth: fields.ragDepth || "Evidence pack",
+    reasoningSpecialist: fields.reasoningSpecialist || "DeepSeek R1 on complex checks",
+    wcagPriority: fields.wcagPriority || "WCAG AA"
+  };
+}
+
+function surveyRecordName(item) {
+  return item.name || item.aspect || item.layerType || item.documentType || item.sourceName || "Unnamed site record";
+}
+
+function surveyRecordText(item) {
+  return item.value || item.finding || item.result || item.latestReading || item.notes || "";
+}
+
+function sourceFromSurveyRecord(item, index) {
+  const title = surveyRecordName(item);
+  return {
+    id: `site-input-${index + 1}`,
+    type: item.category || item.documentType || "site_survey_input",
+    title,
+    section: item.category || item.layerType || item.documentType || "Site Intelligence",
+    page: null,
+    exactText: surveyRecordText(item) || item.sourceName || title,
+    verificationStatus: item.status || "unverified",
+    rightClickAction: "Open entered site evidence"
+  };
+}
+
+function surveySources(survey, limit = 10) {
+  return payloadRecords(survey)
+    .slice(0, limit)
+    .map((item, index) => sourceFromSurveyRecord(item, index));
+}
+
+function compactRagContext(payload, fallback) {
+  const survey = payloadSiteSurvey(payload);
+  const settings = surveySettings(survey);
+  const records = payloadRecords(survey).map((item, index) => ({
+    id: `site-input-${index + 1}`,
+    name: surveyRecordName(item),
+    type: item.documentType || item.category || item.layerType || "site input",
+    status: item.status || "unverified",
+    sourceName: item.sourceName || item.owner || item.verifiedBy || "",
+    sourceUrl: item.sourceUrl || "",
+    value: surveyRecordText(item)
+  }));
+  return {
+    question: payload.question,
+    section: payload.section || project.project.currentSection,
+    settings,
+    clientIntent: project.clientIntent,
+    site: project.site,
+    verifiedRules: project.verifiedRules,
+    designModel: project.designModel,
+    analysisResults: project.analysisResults,
+    gisLayers: project.gisLayers,
+    siteSurveyFields: survey.fields || {},
+    siteRecords: records,
+    safeFallback: fallback
+  };
+}
+
+function questionNeedsReasoner(payload) {
+  const text = String(payload.question || "").toLowerCase();
+  return ["conflict", "tradeoff", "ashrae", "sun", "lumion", "compliance", "policy", "code", "material", "carbon", "sustainability", "which option", "why"].some(term => text.includes(term));
+}
+
+function cleanModelText(text) {
+  return String(text || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+}
+
+function parseModelJson(text) {
+  const cleaned = cleanModelText(text).replace(/^```json\s*|\s*```$/g, "");
+  const first = cleaned.indexOf("{");
+  const last = cleaned.lastIndexOf("}");
+  if (first === -1 || last === -1 || last <= first) return null;
+  return JSON.parse(cleaned.slice(first, last + 1));
+}
+
+function ollamaBaseUrl() {
+  if (process.env.HCT_FORCE_MOCK === "1") return "";
+  const raw = process.env.OLLAMA_BASE_URL || (process.env.ASTRA_OLLAMA_ENABLED === "1" ? "http://localhost:11434" : "");
+  if (!raw) return "";
+  if (process.env.VERCEL && /^(http:\/\/)?(localhost|127\.0\.0\.1)(:|\/|$)/i.test(raw)) return "";
+  return raw.replace(/\/+$/, "");
+}
+
+async function maybeUseOllama(payload, fallback) {
+  const survey = payloadSiteSurvey(payload);
+  const settings = surveySettings(survey);
+  if (settings.assistantMode === "Deterministic only") return fallback;
+
+  const baseUrl = ollamaBaseUrl();
+  if (!baseUrl) return fallback;
+
+  const useReasoner = settings.reasoningSpecialist.includes("DeepSeek") && questionNeedsReasoner(payload);
+  const model = useReasoner
+    ? process.env.OLLAMA_REASONER_MODEL || "deepseek-r1:8b"
+    : process.env.OLLAMA_MODEL || "qwen3:8b";
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), Number(process.env.OLLAMA_TIMEOUT_MS || 18000));
+
+  try {
+    const response = await fetch(`${baseUrl}/api/chat`, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        stream: false,
+        options: { temperature: 0.2, num_ctx: 8192 },
+        messages: [
+          {
+            role: "system",
+            content: [
+              "You are ASTRA, a grounded architectural site-intelligence agent.",
+              "Use retrieval-style reasoning over the provided siteRecords and project context.",
+              "All information offered must be based on provided facts, saved project data, visible app structure, or clearly labeled interpretation.",
+              "Do not invent zoning, code, measurements, ASHRAE, GIS, or material facts.",
+              "Return only valid JSON with keys: answer, confidence, claims, selfCheck, annotations, sources, recommendedNext.",
+              "Every factual claim must reference available source ids from siteRecords, verifiedRules, site, designModel, or analysisResults.",
+              "If evidence is missing, say what is missing and keep the claim as needs_review.",
+              "Give approachable, plain-language guidance that supports WCAG-friendly understanding."
+            ].join("\n")
+          },
+          {
+            role: "user",
+            content: JSON.stringify(compactRagContext(payload, fallback))
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      return { ...fallback, mode: "deterministic_orchestrator_ollama_unavailable", ollamaError: `Ollama returned HTTP ${response.status}; deterministic fallback used.` };
+    }
+
+    const data = await response.json();
+    const text = data.message?.content || data.response || "";
+    const parsed = parseModelJson(text);
+    if (!parsed) {
+      return { ...fallback, mode: "deterministic_orchestrator_ollama_non_json", ollamaError: "Ollama returned non-JSON; deterministic fallback used." };
+    }
+
+    return {
+      ...fallback,
+      ...parsed,
+      mode: useReasoner ? "ollama_deepseek_r1_rag_site_agent" : "ollama_qwen_rag_site_agent",
+      sources: Array.isArray(parsed.sources) && parsed.sources.length ? parsed.sources : fallback.sources,
+      claims: Array.isArray(parsed.claims) ? parsed.claims : fallback.claims,
+      selfCheck: Array.isArray(parsed.selfCheck) ? parsed.selfCheck : fallback.selfCheck,
+      annotations: Array.isArray(parsed.annotations) ? parsed.annotations : fallback.annotations,
+      recommendedNext: Array.isArray(parsed.recommendedNext) ? parsed.recommendedNext : fallback.recommendedNext
+    };
+  } catch (error) {
+    return {
+      ...fallback,
+      mode: "deterministic_orchestrator_ollama_unavailable",
+      ollamaError: error.name === "AbortError" ? "Ollama timed out; deterministic fallback used." : "Ollama is not reachable; deterministic fallback used."
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function astraSiteAdvisorAnswer(payload) {
   const survey = payloadSiteSurvey(payload);
+  const settings = surveySettings(survey);
   const records = payloadRecords(survey);
   const verified = records.filter(item => verifiedStatus(item.status));
   const needsReview = records.filter(item => String(item.status || "").toLowerCase().includes("review") || String(item.status || "").toLowerCase().includes("pending"));
@@ -257,29 +446,33 @@ function astraSiteAdvisorAnswer(payload) {
   const setback = rule("front_setback");
   const height = rule("height_limit");
   const topOpportunities = opportunities.slice(0, 4).map(item => `${item.name} ${item.score}`).join(", ") || "solar orientation, views, stormwater reuse, passive cooling";
+  const aboveThreshold = opportunities.filter(item => item.score >= settings.opportunityThreshold).length;
   const missingNames = missing.slice(0, 4).map(item => item.name || item.aspect || "unnamed record").join(", ") || "geotechnical report, utility capacity, official zoning source, current sensor readings";
   const riskNames = highRisks.slice(0, 4).map(item => item.name).join(", ") || "flooding, soil unknowns, utility conflict";
+  const sourceInputs = surveySources(survey, 8);
 
   return {
     mode: "astra_free_local_site_agent",
-    answer: `ASTRA can support early site-based decisions now, but it should label them as feasibility guidance until missing evidence is closed. Verified or active records: ${verified.length}. Records needing review: ${needsReview.length}. Missing records: ${missing.length}. Design can move forward on orientation, early massing zones, risk visibility, and sustainability strategy. Consultant review should stay open for ${missingNames}. Highest watchlist items: ${riskNames}. Strongest design opportunities are ${topOpportunities}.`,
+    answer: `ASTRA can support early site-based decisions now, but it should label them as feasibility guidance until missing evidence is closed. Verified or active records: ${verified.length}. Records needing review: ${needsReview.length}. Missing records: ${missing.length}. Evidence strictness is ${settings.evidenceStrictness}; risk tolerance is ${settings.riskTolerance}; opportunity threshold is ${settings.opportunityThreshold}. Design can move forward on orientation, early massing zones, risk visibility, sustainability strategy, and accessible explanation. Consultant review should stay open for ${missingNames}. Highest watchlist items: ${riskNames}. Strongest design opportunities are ${topOpportunities}; ${aboveThreshold} are above the active threshold.`,
     confidence: missing.length || needsReview.length ? "medium" : "high",
     claims: [
       { id: "claim-astra-evidence-readiness", type: "project_memory", text: `${verified.length} submitted site evidence records are verified or active.`, sourceIds: ["survey-001"] },
       { id: "claim-astra-missing-evidence", type: "needs_review", text: `Missing or review-needed records should stay out of permit-ready claims: ${missingNames}.`, sourceIds: ["survey-001"] },
       { id: "claim-astra-opportunities", type: "ai_interpretation", text: `Top opportunity scores: ${topOpportunities}.`, sourceIds: ["gis-views-001", "sun-004"] },
+      { id: "claim-astra-settings", type: "project_memory", text: `Decision settings: ${settings.evidenceStrictness} evidence, ${settings.riskTolerance} risk, ${settings.sustainabilityPriority} sustainability, ${settings.wcagPriority} accessibility.`, sourceIds: ["survey-001"] },
       { id: "claim-astra-policy-watch", type: "verified_fact", text: `Setback and height rules remain active compliance checks.`, sourceIds: [setback.id, height.id] }
     ],
     selfCheck: selfCheck([
-      ["Free local agent", "pass", "No API key is required; deterministic project memory checks are used."],
+      ["Free local agent", "pass", "Qwen/Ollama can be used when configured; deterministic project memory checks remain available with no API key."],
       ["Evidence reviewed", "pass", `${records.length} submitted site records were included.`],
       ["Missing information", missing.length ? "needs_review" : "pass", missing.length ? missingNames : "No submitted records are marked missing."],
+      ["RAG scope", "pass", `${settings.ragDepth} retrieval with ${settings.policyConfidenceRequired} policy confidence target.`],
       ["Consultant boundary", "pass", "Geotechnical, civil utility capacity, and permit conclusions remain review items."]
     ]),
     annotations: [
       annotation("anno-astra-site-ready", "site-advisor", "medium", "current_design_state", "Design-ready with evidence gaps tracked", { x: 24, y: 26, w: 52, h: 50 }, ["survey-001", setback.id, height.id, "gis-views-001"], "site_advisor")
     ],
-    sources: [sourceFromSite(), sourceFromRule(setback), sourceFromRule(height), sourceFromAnalysis("sunStudy")],
+    sources: [sourceFromSite(), sourceFromRule(setback), sourceFromRule(height), sourceFromAnalysis("sunStudy"), ...sourceInputs],
     recommendedNext: ["Upload missing evidence", "Verify policy lookup", "Request consultant review", "Export Site Intelligence Package"]
   };
 }
@@ -306,13 +499,74 @@ function generalAnswer() {
   };
 }
 
+function processGuidanceAnswer(payload) {
+  const processSource = sourceFromProcessMap();
+  const section = payload.section || project.project.currentSection || "Project Flow Guide";
+  return {
+    mode: "fact_backed_process_colleague",
+    answer: `Fact-backed navigation: start from the Project Flow Guide on the home page when you are unsure what to do. It is the process map for the application. Use the current section label, last-completed status, critical count, and ASTRA recommendations to decide where to go next. If you are looking for site facts, open Site Intelligence Module. If you are looking for zoning or code logic, open Zoning + Policy Intelligence. If you are judging whether the design looks off, use CAD / Rhino Design Workspace or Lumion Visualization and ask ASTRA for visual critique. Current context: ${section}.`,
+    confidence: "high",
+    claims: [
+      { id: "claim-process-home", type: "app_navigation", text: "The home page is the Project Flow Guide for finding the process.", sourceIds: [processSource.id] },
+      { id: "claim-process-ai", type: "app_navigation", text: "The ASTRA assistant is available for process questions, next-step direction, source checks, and design critique.", sourceIds: [processSource.id] },
+      { id: "claim-process-boundary", type: "needs_review", text: "Design, zoning, sustainability, and site advice should stay tied to project records or be labeled as interpretation.", sourceIds: [processSource.id, project.site.sourceId] }
+    ],
+    selfCheck: selfCheck([
+      ["App structure", "pass", "Answer references visible ASTRA navigation and workflow pages."],
+      ["Fact boundary", "pass", "Process guidance is separated from design or code claims."],
+      ["Current context", "pass", section],
+      ["Next-step support", "pass", "User can ask ASTRA where to start from the home page."]
+    ]),
+    annotations: [
+      annotation("anno-process-guide", "process-direction", "low", "current_design_state", "Use the Project Flow Guide when unsure where to start", { x: 24, y: 18, w: 52, h: 18 }, [processSource.id], "process_navigation")
+    ],
+    sources: [processSource, sourceFromSite()],
+    recommendedNext: ["Open Project Flow Guide", "Ask ASTRA where to start", "Use Site Intelligence for site facts", "Use CAD / Rhino or Lumion for visual critique"]
+  };
+}
+
+function designDirectionAnswer(payload) {
+  const setback = rule("front_setback");
+  const height = rule("height_limit");
+  const frontDeficit = Math.max(0, setback.value - project.designModel.frontDistanceFt);
+  const heightExcess = Math.max(0, project.designModel.heightFt - height.value);
+  return {
+    mode: payload.screenshotMode ? "visual_design_colleague" : "design_direction_colleague",
+    answer: `ASTRA's design read: the current direction has promise, but a few things should be checked before the team commits. The massing is ${frontDeficit} ft short of the front setback and ${heightExcess} ft over the height limit, so the form may look confident while still carrying approval risk. The south glazing supports daylight, but it also needs shading and heat-gain review. For quality without extra cognitive load, simplify the next move: fix placement/height first, keep the west/southwest view strategy, then review glazing and material warmth against the client goals. Treat visual comments as design advice unless they are backed by a measured source.`,
+    confidence: "medium",
+    claims: [
+      { id: "claim-design-direction-setback", type: "verified_fact", text: `Front setback requires ${setback.value} ft; current model is ${project.designModel.frontDistanceFt} ft from the line.`, sourceIds: [setback.id] },
+      { id: "claim-design-direction-height", type: "verified_fact", text: `Height limit is ${height.value} ft; current model is ${project.designModel.heightFt} ft.`, sourceIds: [height.id] },
+      { id: "claim-design-direction-daylight", type: "computed_or_imported", text: project.analysisResults.sunStudy.summary, sourceIds: [project.analysisResults.sunStudy.id] },
+      { id: "claim-design-direction-quality", type: "ai_interpretation", text: "Prioritize one clear correction path before adding more options, so the workflow stays creative without becoming fragmented.", sourceIds: ["client-goal-daylight", project.site.sourceId] }
+    ],
+    selfCheck: selfCheck([
+      ["Design critique boundary", "pass", "Visual and composition advice is labeled as interpretation."],
+      ["Measured constraints", "pass", "Setback and height advice uses structured project data."],
+      ["Source-linked performance", "pass", "Daylight and heat-gain advice references the sun study."],
+      ["Next action clarity", "pass", "Direction is staged to reduce cognitive load."]
+    ]),
+    annotations: [
+      annotation("anno-design-direction-front", "design-direction", "critical", "front_building_edge", "Placement looks too close to the front constraint", { x: 30, y: 74, w: 40, h: 9 }, [setback.id], "design_critique"),
+      annotation("anno-design-direction-height", "design-direction", "critical", "building_mass", "Height reads ambitious but exceeds verified limit", { x: 42, y: 31, w: 20, h: 34 }, [height.id], "design_critique"),
+      annotation("anno-design-direction-glazing", "design-direction", "medium", "south_glazing", "Daylight strategy needs shading and heat-gain balance", { x: 43, y: 51, w: 18, h: 10 }, [project.analysisResults.sunStudy.id], "visual_estimate")
+    ],
+    sources: [sourceFromClient("client-goal-daylight"), sourceFromSite(), sourceFromRule(setback), sourceFromRule(height), sourceFromAnalysis("sunStudy")],
+    recommendedNext: ["Adjust massing placement", "Resolve height", "Review shading strategy", "Ask ASTRA to compare design options"]
+  };
+}
+
 function deterministicAssistant(payload) {
   const question = String(payload.question || "").toLowerCase();
+  const sectionContext = String(payload.section || "").toLowerCase();
+  const asksHomeNext = question.includes("what should i do next") && sectionContext.includes("project flow");
+  if (question.includes("where should i start") || question.includes("where to start") || question.includes("how do i find") || question.includes("find the right process") || question.includes("find process") || question.includes("where is the process") || asksHomeNext || question.includes("home page") || question.includes("project guide")) return processGuidanceAnswer(payload);
+  if (question.includes("look off") || question.includes("looks off") || question.includes("visual critique") || question.includes("design choice") || question.includes("design direction") || question.includes("improve quality") || question.includes("current design")) return designDirectionAnswer(payload);
   if (question.includes("setback") || question.includes("street") || question.includes("closer")) return setbackAnswer();
   if (question.includes("height") || question.includes("tall")) return heightAnswer();
   if (question.includes("window") || question.includes("glazing") || question.includes("daylight") || question.includes("light")) return glazingAnswer(Boolean(payload.screenshotMode));
   if (question.includes("material") || question.includes("sku") || question.includes("wood") || question.includes("timber") || question.includes("procure")) return materialAnswer();
-  if (question.includes("verified") || question.includes("missing") || question.includes("consultant") || question.includes("designed today") || question.includes("next action") || question.includes("opportun") || question.includes("permit") || question.includes("delay") || question.includes("cost") || question.includes("sustainability") || question.includes("advisor") || question.includes("package")) return astraSiteAdvisorAnswer(payload);
+  if (question.includes("verified") || question.includes("missing") || question.includes("consultant") || question.includes("designed today") || question.includes("next action") || question.includes("opportun") || question.includes("permit") || question.includes("delay") || question.includes("cost") || question.includes("sustainability") || question.includes("advisor") || question.includes("package") || question.includes("ashrae") || question.includes("lumion") || question.includes("rag") || question.includes("qwen")) return astraSiteAdvisorAnswer(payload);
   if (question.includes("site") || question.includes("soil") || question.includes("slope") || question.includes("gis") || question.includes("underground") || question.includes("flood")) return siteAnswer();
   return generalAnswer();
 }
@@ -326,6 +580,7 @@ async function maybeUseGemini(payload, fallback) {
     "You are the HCT project-aware AI assistor for an architecture prototype.",
     "Return only valid JSON with keys: answer, confidence, claims, selfCheck, annotations, sources, recommendedNext.",
     "Do not invent code, zoning, measurements, or source facts. Use provided context and fallback evidence.",
+    "All information offered must be based on provided facts, saved project data, visible app structure, or clearly labeled interpretation.",
     "If a statement is subjective visual advice, label it as ai_interpretation or visual_estimate.",
     "If a statement is factual, connect it to a source id.",
     "Keep annotations compatible with the provided schema."
@@ -387,7 +642,8 @@ module.exports = async function handler(req, res) {
   }
 
   const fallback = deterministicAssistant(payload);
-  const result = await maybeUseGemini(payload, fallback);
+  const ollamaResult = await maybeUseOllama(payload, fallback);
+  const result = ollamaResult === fallback ? await maybeUseGemini(payload, fallback) : ollamaResult;
   return send(res, 200, {
     ...result,
     saved: {

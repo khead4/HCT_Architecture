@@ -209,6 +209,157 @@
   ],
   "aiTranscript": [
     {
+      "id": "msg-905275a0-26d1-4de3-85d9-7c84d716a9bb",
+      "timestamp": "2026-06-10T02:47:23.514Z",
+      "section": "Site Intelligence Module",
+      "question": "hat is the ground elevation? Wher can I find ths?",
+      "screenshotMode": false,
+      "answer": "I checked the active project memory against your question. The strongest current issues are the front setback conflict, the height limit conflict, and the south glazing performance tradeoff. If you are asking about a visual design choice, I can annotate the current design canvas as an advisory critique. If you are asking about code, physics, or policy, I will only state a fact when the source or calculation is available.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "survey-001",
+        "rule-front-setback",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-general-attention"
+      ],
+      "recommendedNext": [
+        "Zoning + Policy Intelligence",
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis"
+      ]
+    },
+    {
+      "id": "msg-196d2359-16c8-449e-ba9e-1518d34724b0",
+      "timestamp": "2026-06-10T02:47:14.348Z",
+      "section": "Site Intelligence Module",
+      "question": "hat is the ground elevation?",
+      "screenshotMode": false,
+      "answer": "I checked the active project memory against your question. The strongest current issues are the front setback conflict, the height limit conflict, and the south glazing performance tradeoff. If you are asking about a visual design choice, I can annotate the current design canvas as an advisory critique. If you are asking about code, physics, or policy, I will only state a fact when the source or calculation is available.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "survey-001",
+        "rule-front-setback",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-general-attention"
+      ],
+      "recommendedNext": [
+        "Zoning + Policy Intelligence",
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis"
+      ]
+    },
+    {
+      "id": "msg-9dc7a43d-2e3a-43b1-8ba4-4aa7e4598b8e",
+      "timestamp": "2026-06-10T02:47:13.486Z",
+      "section": "Site Intelligence Module",
+      "question": "hat is the ground elevation?",
+      "screenshotMode": false,
+      "answer": "I checked the active project memory against your question. The strongest current issues are the front setback conflict, the height limit conflict, and the south glazing performance tradeoff. If you are asking about a visual design choice, I can annotate the current design canvas as an advisory critique. If you are asking about code, physics, or policy, I will only state a fact when the source or calculation is available.",
+      "confidence": "medium",
+      "sourceIds": [
+        "client-goal-daylight",
+        "survey-001",
+        "rule-front-setback",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-general-attention"
+      ],
+      "recommendedNext": [
+        "Zoning + Policy Intelligence",
+        "Sun Studies",
+        "ASHRAE / Sustainability Analysis"
+      ]
+    },
+    {
+      "id": "msg-4fcb3874-8b7f-41d8-963b-97c3fbc86b72",
+      "timestamp": "2026-06-10T02:46:45.240Z",
+      "section": "Site Intelligence Module",
+      "question": "What is verified, missing, and risky in the Site Intelligence Package?",
+      "screenshotMode": false,
+      "answer": "ASTRA can support early site-based decisions now, but it should label them as feasibility guidance until missing evidence is closed. Verified or active records: 10. Records needing review: 6. Missing records: 1. Evidence strictness is Balanced; risk tolerance is Conservative; opportunity threshold is 75. Design can move forward on orientation, early massing zones, risk visibility, sustainability strategy, and accessible explanation. Consultant review should stay open for Soil unknown. Highest watchlist items: Flooding, Soil unknown. Strongest design opportunities are Solar orientation 95, Views to preserve 90, Stormwater reuse 85, Passive cooling 82; 6 are above the active threshold.",
+      "confidence": "medium",
+      "sourceIds": [
+        "survey-001",
+        "rule-front-setback",
+        "rule-height-limit",
+        "sun-004",
+        "site-input-1",
+        "site-input-2",
+        "site-input-3",
+        "site-input-4",
+        "site-input-5",
+        "site-input-6",
+        "site-input-7",
+        "site-input-8"
+      ],
+      "annotationIds": [
+        "anno-astra-site-ready"
+      ],
+      "recommendedNext": [
+        "Upload missing evidence",
+        "Verify policy lookup",
+        "Request consultant review",
+        "Export Site Intelligence Package"
+      ]
+    },
+    {
+      "id": "msg-517d57e2-dd83-4493-9e65-bd61d27dc1c7",
+      "timestamp": "2026-06-10T00:42:58.303Z",
+      "section": "Site Intelligence Module",
+      "question": "What can be designed today from the site survey?",
+      "screenshotMode": false,
+      "answer": "ASTRA can support early site-based decisions now, but it should label them as feasibility guidance until missing evidence is closed. Verified or active records: 1. Records needing review: 0. Missing records: 1. Evidence strictness is Permit-ready; risk tolerance is Permit cautious; opportunity threshold is 85. Design can move forward on orientation, early massing zones, risk visibility, sustainability strategy, and accessible explanation. Consultant review should stay open for Soil unknown. Highest watchlist items: Soil unknown. Strongest design opportunities are Solar orientation 95; 1 are above the active threshold.",
+      "confidence": "medium",
+      "sourceIds": [
+        "survey-001",
+        "rule-front-setback",
+        "rule-height-limit",
+        "sun-004",
+        "site-input-1",
+        "site-input-2"
+      ],
+      "annotationIds": [
+        "anno-astra-site-ready"
+      ],
+      "recommendedNext": [
+        "Upload missing evidence",
+        "Verify policy lookup",
+        "Request consultant review",
+        "Export Site Intelligence Package"
+      ]
+    },
+    {
+      "id": "msg-436c6b5f-1da3-4efa-a95d-a35f3d8541a4",
+      "timestamp": "2026-06-10T00:41:48.920Z",
+      "section": "Site Intelligence Module",
+      "question": "What can be designed today from the site survey?",
+      "screenshotMode": false,
+      "answer": "ASTRA can support early site-based decisions now, but it should label them as feasibility guidance until missing evidence is closed. Verified or active records: 1. Records needing review: 0. Missing records: 1. Design can move forward on orientation, early massing zones, risk visibility, and sustainability strategy. Consultant review should stay open for Soil unknown. Highest watchlist items: Soil unknown. Strongest design opportunities are Solar orientation 95.",
+      "confidence": "medium",
+      "sourceIds": [
+        "survey-001",
+        "rule-front-setback",
+        "rule-height-limit",
+        "sun-004"
+      ],
+      "annotationIds": [
+        "anno-astra-site-ready"
+      ],
+      "recommendedNext": [
+        "Upload missing evidence",
+        "Verify policy lookup",
+        "Request consultant review",
+        "Export Site Intelligence Package"
+      ]
+    },
+    {
       "id": "msg-2e2e7633-b43b-4bf9-a8a5-480c1bbb2ed8",
       "timestamp": "2026-06-07T15:56:13.507Z",
       "section": "Clientele / Project Brief",

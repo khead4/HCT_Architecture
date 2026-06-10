@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ASTRA Site Intelligence Platform</title>
-    <link rel="stylesheet" href="/styles.css?v=90">
+    <link rel="stylesheet" href="/styles.css?v=99">
   </head>
   <body>
     <div class="app-shell">
@@ -108,32 +108,36 @@
             </section>
           </div>
 
-          <aside class="assistant-panel" aria-label="AI assistant">
+          <aside class="assistant-panel" aria-label="ASTRA AI colleague">
             <div class="assistant-header">
               <div>
-                <h2 id="assistantTitle">Project-Aware AI</h2>
-                <p id="assistantDescription">Retrieves sources, runs checks, annotates, and saves reasoning.</p>
+                <h2 id="assistantTitle">ASTRA AI Colleague</h2>
+                <p id="assistantDescription">Fact-backed recommendations, design critique, source checks, and process direction stay visible.</p>
               </div>
               <span id="aiMode" class="mode-chip">Mock</span>
             </div>
 
+            <div id="assistantRecommendations" class="assistant-recommendations" aria-label="ASTRA recommendations"></div>
+
             <div class="quick-prompts">
-              <button data-question="What is verified, missing, and risky in the Site Intelligence Package?">Site readiness</button>
-              <button data-question="What can be designed today, and what needs consultant review?">Next actions</button>
-              <button data-question="Which site opportunities should shape the massing strategy?">Design opportunities</button>
-              <button data-question="What zoning or policy constraints could delay permitting?">Permit risk</button>
-              <button data-question="What sustainability decisions should be made from the current evidence?">Sustainability</button>
+              <button data-question="How do I find the right process, and where should I start?">Find process</button>
+              <button data-question="What should I do next in this section?">Direction</button>
+              <button data-question="Does anything look off in the current design or visual workspace?" data-screenshot-question="true">Looks off?</button>
+              <button data-question="What design choice would improve quality without adding cognitive load?">Design advice</button>
+              <button data-question="What evidence is missing before I trust this decision?">Evidence gaps</button>
             </div>
 
-            <label class="field-label" for="questionInput">Architect question</label>
-            <textarea id="questionInput" rows="4" placeholder="Ask about design, policy, site, physics, sustainability, or visual direction."></textarea>
-            <button id="askButton" class="primary-button full">Ask Assistor</button>
+            <label class="field-label" for="questionInput">Ask ASTRA</label>
+            <textarea id="questionInput" rows="4" placeholder="Ask where to start, how to find a process, what facts support a decision, or what looks off."></textarea>
+            <button id="askButton" class="primary-button full">Ask ASTRA</button>
 
             <div id="assistantOutput" class="assistant-output">
               <div class="empty-state">
-                Ask a question to generate a source-linked answer, self-checks, and visual annotations.
+                Ask a question to get fact-backed guidance, source checks, visual annotations, and next-step direction.
               </div>
             </div>
+
+            <div id="adviceHistory" class="advice-history" aria-label="ASTRA advice history"></div>
           </aside>
         </section>
       </main>
@@ -150,6 +154,6 @@
       </aside>
     </div>
 
-    <script src="/app.js?v=90"></script>
+    <script src="/app.js?v=99"></script>
   </body>
 </html>
