@@ -28,12 +28,12 @@ const sections = [
   },
   {
     id: "data",
-    title: "Data Storage / CSV",
-    stage: "Data organization",
-    desc: "Clean, validate, export, and reuse structured project data.",
-    goal: "Keep project information reusable across GIS, AI, design, and reports.",
-    actions: ["Validate fields", "Export CSV", "Review duplicates", "Check verification"],
-    ai: ["Detects missing data", "Checks conflicts", "Explains downstream risks"]
+    title: "Data Storage / Case Study Exports",
+    stage: "Structured memory",
+    desc: "Store project facts, sustainability metrics, flood strategy, initiative data, custom case studies, and JSON/CSV exports.",
+    goal: "Keep project information reusable across GIS, AI, design, reports, case studies, and external tools.",
+    actions: ["Validate fields", "Generate case studies", "Export JSON", "Export CSV"],
+    ai: ["Detects missing data", "Builds case records", "Explains export-ready evidence"]
   },
   {
     id: "policy",
@@ -2930,7 +2930,7 @@ function renumberJourney(stages) {
 roleJourneys.architect.stages = renumberJourney([
   makeJourneyStage("clientele", "Brief", "Capture the client brief, priorities, budget, and design values.", "Start here when the architect needs to understand what the project should become.", ["Customer info", "Priorities"]),
   makeJourneyStage("survey", "Survey", "Review parcel facts, utilities, slope, soil, and boundary conditions.", "Use this before design moves depend on site facts.", ["Parcel", "Survey"]),
-  makeJourneyStage("data", "Database", "Clean project records and prepare reusable data fields and CSV outputs.", "Use this when information needs to move cleanly between tools.", ["Database", "CSV"]),
+  makeJourneyStage("data", "Data Hub", "Store project facts, sustainability metrics, flood strategy, initiatives, custom case studies, and JSON/CSV exports.", "Use this when information needs to move cleanly between tools or become downloadable project and case-study data.", ["Data", "Cases", "JSON", "CSV"]),
   makeJourneyStage("policy", "Policy", "Check zoning, setbacks, height, incentives, and cited policy rules.", "Use this before committing to a massing move that may conflict with code.", ["Rules", "Sources"]),
   makeJourneyStage("gis", "GIS", "Compare mapped layers, overlays, risks, views, and spatial opportunities.", "Use this when design direction depends on where something happens on the parcel.", ["GIS", "Parcel map"]),
   makeJourneyStage("design", "Design", "Develop massing, placement, openings, and the core concept model.", "Use this for the main architectural design workspace.", ["Model", "Map"]),
@@ -2970,7 +2970,7 @@ roleJourneys.client.stages = renumberJourney([
 ]);
 
 roleJourneys.planner.stages = renumberJourney([
-  makeJourneyStage("data", "Intake", "Confirm project records, submitted fields, and application data.", "Use this when intake completeness needs to be checked.", ["Database", "CSV"]),
+  makeJourneyStage("data", "Intake + Cases", "Confirm records, sustainability/flood facts, initiative data, and export-ready case-study evidence.", "Use this when intake completeness or downloadable review data needs to be checked.", ["Data", "Cases", "CSV"]),
   makeJourneyStage("survey", "Parcel", "Review parcel area, boundaries, survey facts, utilities, and slope.", "Use this when policy review depends on parcel facts.", ["Survey", "Parcel"]),
   makeJourneyStage("policy", "Policy", "Verify zoning, overlays, setbacks, height limits, incentives, and citations.", "Use this when the reviewer needs to know exactly which rules apply.", ["Rules", "Sources"]),
   makeJourneyStage("gis", "Map", "Review mapped constraints, overlays, flood paths, and spatial implications.", "Use this when a decision depends on location or overlay geography.", ["GIS", "Map"]),
@@ -2982,7 +2982,7 @@ roleJourneys.planner.stages = renumberJourney([
 ]);
 
 roleJourneys.gis.stages = renumberJourney([
-  makeJourneyStage("data", "Data", "Load and clean project records, parcel fields, and CSV-ready values.", "Use this before mapping or exporting any project data.", ["Database", "CSV"]),
+  makeJourneyStage("data", "Data Hub", "Load parcel records, GIS-ready fields, case studies, and JSON/CSV export values.", "Use this before mapping, exporting, or sharing structured project data.", ["Data", "JSON", "CSV"]),
   makeJourneyStage("survey", "Survey", "Confirm survey facts, utilities, slope, and verified site values.", "Use this when GIS layers need a trusted survey baseline.", ["Survey", "Parcel"]),
   makeJourneyStage("gis", "Layers", "Toggle layers, compare overlays, and identify site risks or opportunities.", "Use this for the main spatial analysis workflow.", ["GIS", "Layers"]),
   makeJourneyStage("policy", "Rules", "Connect zoning, overlays, and policy rules to mapped parcel conditions.", "Use this when policy checks need map-backed evidence.", ["Policy", "Map"]),
@@ -2995,7 +2995,7 @@ roleJourneys.surveyor.stages = renumberJourney([
   makeJourneyStage("survey", "Field", "Confirm parcel measurements, utilities, slope, soil notes, and survey status.", "Use this when field data needs to become trusted project evidence.", ["Survey", "Utilities"]),
   makeJourneyStage("gis", "Boundary", "Review parcel edges, GIS alignment, mapped features, and view corridors.", "Use this when the survey needs to be checked visually against the parcel map.", ["Parcel map", "GIS"]),
   makeJourneyStage("policy", "Rules", "Connect survey facts to setbacks, easements, overlays, and buildable area.", "Use this when survey information affects rule interpretation.", ["Policy", "Setbacks"]),
-  makeJourneyStage("data", "Records", "Prepare clean survey fields for the database and CSV export.", "Use this when survey data needs to be reused by design or permit tools.", ["Database", "CSV"]),
+  makeJourneyStage("data", "Records + Cases", "Prepare survey fields, flood strategy, initiative notes, and case-study exports.", "Use this when survey data needs to be reused by design, permit, or reporting tools.", ["Data", "Cases", "CSV"]),
   makeJourneyStage("archive", "Deliver", "Package the verified parcel record and source-linked survey evidence.", "Use this when the surveyor needs to hand off a clean deliverable.", ["Archive", "Parcel"])
 ]);
 
@@ -3003,7 +3003,7 @@ roleJourneys.reviewer.label = "Reviewer";
 roleJourneys.reviewer.title = "Reviewer";
 roleJourneys.reviewer.intro = "Review plans against zoning, code, safety, accessibility, completeness, and submission standards.";
 roleJourneys.reviewer.stages = renumberJourney([
-  makeJourneyStage("data", "Intake", "Confirm application records, project data, and required attachments.", "Use this when the review package first arrives.", ["Database", "Checklist"]),
+  makeJourneyStage("data", "Data Intake", "Confirm application records, project facts, case-study evidence, JSON/CSV outputs, and required attachments.", "Use this when the review package first arrives or needs export-ready structure.", ["Data", "Cases", "Checklist"]),
   makeJourneyStage("survey", "Parcel", "Check parcel facts, survey values, utilities, and verified conditions.", "Use this when standards review depends on survey or site facts.", ["Survey", "Parcel"]),
   makeJourneyStage("policy", "Standards", "Review zoning, overlays, code language, setbacks, and height limits.", "Use this when the design review depends on standards, rule language, or cited code.", ["Policy", "Sources"]),
   makeJourneyStage("gis", "Map", "Check mapped constraints, overlay geography, and parcel context.", "Use this when compliance findings depend on location.", ["GIS", "Map"]),
@@ -3015,7 +3015,7 @@ roleJourneys.reviewer.stages = renumberJourney([
 ]);
 
 roleJourneys.inspector.stages = renumberJourney([
-  makeJourneyStage("data", "Assignment", "Confirm inspection type, project records, required documents, and current approval status.", "Use this when the inspector needs to understand what must be checked on site.", ["Database", "Permit"]),
+  makeJourneyStage("data", "Assignment Data", "Confirm inspection type, project records, case-study summaries, required documents, and approval status.", "Use this when the inspector needs export-ready context for what must be checked on site.", ["Data", "Permit", "CSV"]),
   makeJourneyStage("survey", "Site", "Verify access, boundaries, utilities, slope, visible site conditions, and survey evidence.", "Use this when field observations need to be tied back to parcel facts.", ["Survey", "Field"]),
   makeJourneyStage("gis", "Context", "Review parcel map, mapped constraints, access routes, risk layers, and site context.", "Use this when inspection findings depend on location or mapped conditions.", ["GIS", "Parcel map"]),
   makeJourneyStage("policy", "Standards", "Check observed conditions against applicable standards, permit conditions, and cited rules.", "Use this when the inspector needs to know what passes, what fails, or what needs follow-up.", ["Standards", "Sources"]),
