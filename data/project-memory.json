@@ -196,9 +196,9 @@
     },
     {
       "id": "materials",
-      "name": "Material / SKU Database",
+      "name": "EC3 / Material Carbon Database",
       "status": "mock-connected",
-      "purpose": "Product matching and cost/performance data"
+      "purpose": "Embodied-carbon factors, EPD/source links, product matching, and cost/performance data"
     },
     {
       "id": "permit",

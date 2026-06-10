@@ -73,11 +73,11 @@ const sections = [
   },
   {
     id: "ashrae",
-    title: "ASHRAE / Material Sustainability",
+    title: "ASHRAE + EC3 Sustainability",
     stage: "Material sustainability",
-    desc: "Material sustainability, envelope assumptions, embodied impact, green-energy metrics, and climate performance.",
+    desc: "ASHRAE-style energy assumptions, EC3-ready embodied-carbon review, material sustainability, and climate performance.",
     goal: "Evaluate whether material and envelope choices support sustainable performance.",
-    actions: ["Load assumptions", "Review sustainability metrics", "Compare material impacts", "Revise strategy"],
+    actions: ["Load assumptions", "Review energy metrics", "Compare EC3 material impacts", "Revise strategy"],
     ai: ["Explains green metrics", "Marks weak points", "Separates computed facts from advice"]
   },
   {
@@ -5165,6 +5165,50 @@ function policyHazardRows(survey) {
   }));
 }
 
+function gisPolicyShowcaseRows(project, survey) {
+  const fields = survey.fields || {};
+  const ruleRows = policyRuleImpactRows(project);
+  const primaryRule = ruleRows.find(item => item.outOfNorm) || ruleRows[0];
+  const stormwater = (survey.hazards || []).find(item => `${item.name || ""} ${siteRecordText(item)}`.toLowerCase().includes("flood")) || (survey.hazards || [])[0];
+  const lookup = policyPrimaryLookup(survey);
+  const initiative = fields.zoneInitiatives || "";
+
+  return [
+    {
+      label: "Zone",
+      value: fields.detectedZoneArea || fields.zoningDistrict,
+      status: fields.policyLookupStatus || "needs review",
+      see: `${siteDisplayValue(fields.jurisdiction || fields.municipality)} / ${siteDisplayValue(fields.policySourceUrl || lookup?.sourceUrl)}`,
+      impact: fields.policySummary || lookup?.result || "Policy summary is not saved yet.",
+      improve: "Keep the zone, source, reviewer, and last-checked date attached before using this as a final rule basis."
+    },
+    {
+      label: primaryRule ? primaryRule.label : "Rule check",
+      value: primaryRule ? (primaryRule.rule.section || primaryRule.rule.ruleType || "Policy rule") : "--",
+      status: primaryRule ? primaryRule.rule.verificationStatus : "missing",
+      see: primaryRule ? primaryRule.measured : "--",
+      impact: primaryRule ? primaryRule.impact : "No measurable policy rule has been saved yet.",
+      improve: primaryRule ? primaryRule.improve : "Add setback, height, FAR, lot coverage, or overlay rules with source citations."
+    },
+    {
+      label: "Overlay risk",
+      value: stormwater ? stormwater.name || "Hazard" : "--",
+      status: stormwater ? stormwater.status : "missing",
+      see: stormwater ? siteRecordText(stormwater) : "No saved hazard layer yet.",
+      impact: fields.riskPrevention || "Risk prevention notes are not saved yet.",
+      improve: "Tie the overlay to placement, grading, consultant review, and recovery procedure fields."
+    },
+    {
+      label: "Initiative",
+      value: initiative || "--",
+      status: initiative ? fields.policyLookupStatus || "needs review" : "missing",
+      see: fields.permittingSpeed || "Permit speed note is not saved yet.",
+      impact: "This can support a clearer policy narrative when sustainability, stormwater, and passive design evidence are complete.",
+      improve: "Link the initiative to ASHRAE, EC3/material carbon, SunCalc, stormwater, and the downloadable case-study record."
+    }
+  ];
+}
+
 function safeExternalMapUrl(value) {
   const text = String(value || "").trim();
   if (!text) return "";
@@ -5995,6 +6039,7 @@ function gisSurface(project) {
   const qgisDownloadUrl = safeExternalMapUrl(fields.qgisDownloadUrl) || "https://qgis.org/download/";
   const proInstallUrl = safeExternalMapUrl(fields.arcgisProInstallUrl) || "https://doc.esri.com/en/arcgis-pro/latest/get-started/install-and-sign-in-to-arcgis-pro.html";
   const proProductUrl = safeExternalMapUrl(fields.arcgisProProductUrl) || "https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview";
+  const policyShowcaseRows = gisPolicyShowcaseRows(project, survey);
 
   return `
     <div class="surface-pad site-survey-workspace gis-workspace">
@@ -6042,10 +6087,44 @@ function gisSurface(project) {
         </div>
       </section>
 
+      <section class="site-survey-section gis-policy-ai-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">2. AI policy GIS</span>
+            <h3>Policy-Aware Map Intelligence</h3>
+            <p>ASTRA reads the GIS layer stack against saved policy records so zoning, overlays, hazards, incentives, and rule impacts stay visible in one map-driven decision view.</p>
+          </div>
+          <button class="add-row-button" type="button" data-section="policy">Open Policy Page</button>
+        </div>
+        <div class="ai-policy-gis-grid">
+          <div class="ai-policy-map" aria-label="AI GIS policy overlay">
+            <div class="ai-policy-parcel">Parcel</div>
+            <div class="ai-policy-envelope">Buildable envelope</div>
+            <div class="ai-policy-water">Stormwater overlay</div>
+            <div class="ai-policy-view">View / solar opportunity</div>
+            <div class="ai-policy-setback front">Front setback</div>
+            <div class="ai-policy-setback side">Side setback</div>
+            <div class="ai-policy-callout zone">${escapeHtml(siteDisplayValue(fields.detectedZoneArea || fields.zoningDistrict))}</div>
+            <div class="ai-policy-callout source">${escapeHtml(siteDisplayValue(fields.policyLookupStatus))}</div>
+          </div>
+          <div class="ai-policy-card-grid">
+            ${policyShowcaseRows.map(item => `
+              <article class="${escapeHtml(siteStatusClass(item.status))}">
+                <span>${escapeHtml(item.label)}</span>
+                <strong>${escapeHtml(siteDisplayValue(item.value))}</strong>
+                <p><b>What I see:</b> ${escapeHtml(siteDisplayValue(item.see))}</p>
+                <p><b>How I think it impacts design:</b> ${escapeHtml(siteDisplayValue(item.impact))}</p>
+                <p><b>How I could improve it:</b> ${escapeHtml(siteDisplayValue(item.improve))}</p>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+      </section>
+
       <section class="site-survey-section gis-arcgis-install-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">2. Desktop GIS engine</span>
+            <span class="mini-label">3. Desktop GIS engine</span>
             <h3>Use QGIS Now, Keep ArcGIS Optional</h3>
             <p>QGIS keeps the GIS workflow free and closer to an all-in-one platform. ArcGIS Pro can still be tracked when a student or professional license is available.</p>
           </div>
@@ -6092,7 +6171,7 @@ function gisSurface(project) {
       <section class="site-survey-section gis-arcgis-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">3. Web map + optional ArcGIS</span>
+            <span class="mini-label">4. Web map + optional ArcGIS</span>
             <h3>Embedded Web Map + Licensed Pro Handoff</h3>
             <p>Use this when an ArcGIS Online, Enterprise, or student-license workflow is available. Otherwise, keep the project in the QGIS handoff path above.</p>
           </div>
@@ -6159,7 +6238,7 @@ function gisSurface(project) {
       <section class="site-survey-section gis-map-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">4. GIS map</span>
+            <span class="mini-label">5. GIS map</span>
             <h3>Mapped Conditions</h3>
             <p>The visual map shows the current parcel context while the editable layer stack below records the source-linked findings that become project memory.</p>
           </div>
@@ -6184,7 +6263,7 @@ function gisSurface(project) {
       <section class="site-survey-section gis-layer-editor">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">5. Layer findings</span>
+            <span class="mini-label">6. Layer findings</span>
             <h3>Data Found Through GIS</h3>
             <p>Every spatial finding can be used by the survey page, policy page, design workspace, and final handoff once its source and status are recorded.</p>
           </div>
@@ -6206,7 +6285,7 @@ function gisSurface(project) {
 
       <section class="site-survey-section package-panel">
         <div>
-          <span class="mini-label">6. Connected outputs</span>
+          <span class="mini-label">7. Connected outputs</span>
           <h3>Send GIS Data Forward</h3>
           <p>ArcGIS, GIS findings, and Pro handoff data are saved into the same project memory used by Site + Survey Intelligence, Zoning + Policy Intelligence, CAD/Rhino review, and export downloads.</p>
         </div>
@@ -6234,10 +6313,16 @@ function sunSurface(project) {
   const sunStudy = project.analysisResults.sunStudy || {};
   const ashrae = project.analysisResults.ashrae || {};
   const model = project.designModel || {};
+  const frontRule = (project.verifiedRules || []).find(rule => rule.ruleType === "front_setback");
+  const heightRule = (project.verifiedRules || []).find(rule => rule.ruleType === "height_limit");
   const lat = siteDisplayValue(fields.latitude);
   const lon = siteDisplayValue(fields.longitude);
   const orientation = siteDisplayValue(model.orientation || fields.detectedZoneArea || "southwest");
   const solarReadout = solarPositionReadout(fields.latitude, fields.longitude);
+  const coolingImpact = siteDisplayValue(ashrae.coolingImpactPercent);
+  const coolingLabel = coolingImpact === "--" ? "--" : `+${coolingImpact}%`;
+  const frontDistance = siteDisplayValue(model.frontDistanceFt);
+  const heightValue = siteDisplayValue(model.heightFt);
   const sunSummary = siteDisplayValue(sunFact ? siteRecordText(sunFact) : sunStudy.summary);
   const orientationSummary = siteDisplayValue(solarOpportunity ? siteRecordText(solarOpportunity) : "Solar orientation needs a saved opportunity record.");
   const viewSummary = siteDisplayValue(viewFinding ? siteRecordText(viewFinding) : "No saved view corridor finding yet.");
@@ -6273,11 +6358,11 @@ function sunSurface(project) {
       title: "Massing + Opening Direction",
       value: orientation,
       path: "Building orientation -> south glazing percent -> roof / facade exposure -> views, shade, cooling impact, and passive-design opportunity.",
-      takeaway: `${orientationSummary} Current south glazing is ${siteDisplayValue(model.southGlazingPercent)}% and ASHRAE cooling impact is +${siteDisplayValue(ashrae.coolingImpactPercent)}%, so shading and envelope quality should stay linked to orientation decisions.`,
+      takeaway: `${orientationSummary} Current south glazing is ${siteDisplayValue(model.southGlazingPercent)}% and ASHRAE cooling impact is ${coolingLabel}, so shading and envelope quality should stay linked to orientation decisions.`,
       metrics: [
         ["Orientation", orientation],
         ["South glazing", `${siteDisplayValue(model.southGlazingPercent)}%`],
-        ["Cooling impact", `+${siteDisplayValue(ashrae.coolingImpactPercent)}%`]
+        ["Cooling impact", coolingLabel]
       ]
     }
   ];
@@ -6296,6 +6381,49 @@ function sunSurface(project) {
           <strong>${escapeHtml(siteDisplayValue(sunStudy.daylightScore))}</strong>
           <em>Glare risk: ${escapeHtml(siteDisplayValue(sunStudy.glareRisk))}</em>
         </div>
+      </section>
+
+      <section class="cad-sun-composer">
+        <div class="cad-sun-canvas" aria-label="CAD massing with SunCalc overlay">
+          <div class="cad-grid-lines" aria-hidden="true"></div>
+          <div class="cad-policy-line cad-front-line">Front setback ${escapeHtml(frontRule ? `${frontRule.value} ${frontRule.unit}` : "--")}</div>
+          <div class="cad-policy-line cad-height-line">Height limit ${escapeHtml(heightRule ? `${heightRule.value} ${heightRule.unit}` : "--")}</div>
+          <div class="cad-site-water">Stormwater low point</div>
+          <div class="cad-site-view">View corridor</div>
+          <div class="cad-sun-path-line">SunCalc path</div>
+          <div class="cad-sun-building">
+            <strong>${escapeHtml(model.name || "Current CAD model")}</strong>
+            <span>${escapeHtml(orientation)} orientation</span>
+            <em>${escapeHtml(siteDisplayValue(model.selectedElement || "selected element pending"))}</em>
+          </div>
+        </div>
+        <aside class="cad-sun-readout">
+          <span class="mini-label">CAD design + SunCalc</span>
+          <h3>Placement And Solar Consequence</h3>
+          <p>The design view keeps the current massing, policy lines, stormwater risk, view corridor, and SunCalc readout together so the solar study is not detached from the CAD decision.</p>
+          <div class="cad-sun-metrics">
+            <article>
+              <span>Model height</span>
+              <strong>${escapeHtml(heightValue)} ft</strong>
+              <p>${escapeHtml(heightRule ? `Compared with ${heightRule.value} ${heightRule.unit} entered height limit.` : "Height rule is not saved yet.")}</p>
+            </article>
+            <article>
+              <span>Front distance</span>
+              <strong>${escapeHtml(frontDistance)} ft</strong>
+              <p>${escapeHtml(frontRule ? `Compared with ${frontRule.value} ${frontRule.unit} entered front setback.` : "Front setback rule is not saved yet.")}</p>
+            </article>
+            <article>
+              <span>SunCalc noon</span>
+              <strong>${escapeHtml(solarReadout.altitude)}</strong>
+              <p>${escapeHtml(`${solarReadout.dayLength} daylight / ${solarReadout.shadow}`)}</p>
+            </article>
+            <article>
+              <span>Design risk</span>
+              <strong>${escapeHtml(coolingLabel)}</strong>
+              <p>Cooling impact from the current glazing and envelope assumption.</p>
+            </article>
+          </div>
+        </aside>
       </section>
 
       <section class="sun-diagram-card">
@@ -6356,20 +6484,163 @@ function sunSurface(project) {
   `;
 }
 
+function ec3MaterialRows(project) {
+  const carbon = project.analysisResults.carbon || {};
+  const model = project.designModel || {};
+  return [
+    {
+      name: "Light timber frame",
+      scope: "Structure",
+      result: carbon.embodiedCarbonChange || "--",
+      status: "under review",
+      path: "CAD material intent -> structural category -> EC3/EPD factor -> baseline comparison",
+      takeaway: carbon.summary || "Carbon comparison is not saved yet."
+    },
+    {
+      name: "Triple-pane glazing",
+      scope: "Envelope",
+      result: `${siteDisplayValue(model.southGlazingPercent)}% south glazing`,
+      status: "needs review",
+      path: "Facade quantity -> product EPD -> thermal benefit -> embodied and operational tradeoff",
+      takeaway: "High-performance glazing can reduce heat loss, but product-specific carbon and glare/cooling effects still need review."
+    },
+    {
+      name: "Mineral plaster",
+      scope: "Finish",
+      result: "EPD pending",
+      status: "missing",
+      path: "Finish specification -> product EPD -> replacement cycle -> low-carbon finish comparison",
+      takeaway: "Keep the material as a design intent until a product, quantity, and EPD source are entered."
+    },
+    {
+      name: "Exterior shading",
+      scope: "Passive system",
+      result: "Recommended",
+      status: "active",
+      path: "SunCalc exposure -> facade shading -> cooling load change -> comfort and material strategy",
+      takeaway: "Shading can lower operational risk before increasing mechanical capacity or changing glazing again."
+    }
+  ];
+}
+
 function ashraeSurface(project) {
+  const fields = state.siteSurvey.fields || {};
+  const analysis = project.analysisResults || {};
+  const ashrae = analysis.ashrae || {};
+  const carbon = analysis.carbon || {};
+  const sunStudy = analysis.sunStudy || {};
+  const model = project.designModel || {};
+  const coolingImpact = siteDisplayValue(ashrae.coolingImpactPercent);
+  const coolingLabel = coolingImpact === "--" ? "--" : `+${coolingImpact}%`;
+  const materialRows = ec3MaterialRows(project);
+  const methodRows = [
+    {
+      label: "ASHRAE",
+      title: "Energy + Envelope Check",
+      value: coolingLabel,
+      path: "Climate assumptions -> envelope assembly -> glazing percent -> shading -> heating/cooling impact.",
+      takeaway: ashrae.summary || "ASHRAE result is not saved yet.",
+      status: ashrae.envelopeRisk || "needs review"
+    },
+    {
+      label: "EC3",
+      title: "Embodied Carbon Review",
+      value: carbon.embodiedCarbonChange || "--",
+      path: "CAD material takeoff -> EC3 category mapping -> product EPD data -> baseline material comparison.",
+      takeaway: "Use EC3 as the embodied-carbon checker once quantities, product types, and EPD/source links are entered. Until then, keep claims as under review.",
+      status: fields.embodiedCarbon || "under review"
+    },
+    {
+      label: "Guide",
+      title: "Sustainability Decision Guide",
+      value: fields.sustainabilityPriority || "Balanced performance",
+      path: "Client goals -> policy initiatives -> SunCalc/ASHRAE/EC3 metrics -> design recommendation.",
+      takeaway: fields.zoneInitiatives || "Sustainability initiative notes are not saved yet.",
+      status: fields.policyLookupStatus || "needs review"
+    }
+  ];
+
   return `
-    <div class="surface-pad analysis-surface">
-      <div class="metric-panel">
-        <h3>ASHRAE / Energy</h3>
-        <div class="big-metric">+${escapeHtml(project.analysisResults.ashrae.coolingImpactPercent)}%</div>
-        <p>Cooling demand increase after glazing expansion.</p>
-      </div>
-      <div class="metric-panel">
-        <h3>Envelope Risk</h3>
-        <div class="big-metric medium-text">${escapeHtml(project.analysisResults.ashrae.envelopeRisk)}</div>
-        <p>${escapeHtml(project.analysisResults.ashrae.summary)}</p>
-      </div>
-      <div class="envelope-strip"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="surface-pad sustainability-workspace">
+      <section class="sustainability-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Sustainability workspace</span>
+          <h3>ASHRAE + EC3 Material Sustainability</h3>
+          <p>Review operational energy, envelope assumptions, embodied carbon, material choices, and sustainability initiatives in one place so design quality does not split across separate tools.</p>
+        </div>
+        <div class="sustainability-score-card">
+          <span>Envelope risk</span>
+          <strong>${escapeHtml(siteDisplayValue(ashrae.envelopeRisk))}</strong>
+          <em>Cooling impact ${escapeHtml(coolingLabel)}</em>
+        </div>
+      </section>
+
+      <section class="sustainability-metric-grid">
+        ${[
+          ["ASHRAE cooling", coolingLabel, "Current glazing and envelope assumption"],
+          ["Daylight score", siteDisplayValue(sunStudy.daylightScore), "From saved Sun Study result"],
+          ["Embodied carbon", carbon.embodiedCarbonChange || "--", carbon.sourceTitle || "Material carbon source pending"],
+          ["Material intent", model.materialIntent || "--", "Current CAD/model material direction"]
+        ].map(item => `
+          <article>
+            <span>${escapeHtml(item[0])}</span>
+            <strong>${escapeHtml(item[1])}</strong>
+            <p>${escapeHtml(item[2])}</p>
+          </article>
+        `).join("")}
+      </section>
+
+      <section class="sustainability-method-grid">
+        ${methodRows.map(row => `
+          <article>
+            <span class="mini-label">${escapeHtml(row.label)}</span>
+            <div class="sustainability-method-head">
+              <h3>${escapeHtml(row.title)}</h3>
+              <strong>${escapeHtml(siteDisplayValue(row.value))}</strong>
+            </div>
+            <p><b>Path:</b> ${escapeHtml(row.path)}</p>
+            <p><b>Takeaway:</b> ${escapeHtml(row.takeaway)}</p>
+            <em>${escapeHtml(siteDisplayValue(row.status))}</em>
+          </article>
+        `).join("")}
+      </section>
+
+      <section class="ec3-board">
+        <div class="ec3-board-head">
+          <div>
+            <span class="mini-label">EC3-ready material review</span>
+            <h3>Material Carbon + Design Consequence</h3>
+            <p>These rows are intentionally source-aware: missing quantities or EPDs remain visible instead of becoming fake precision.</p>
+          </div>
+          <button class="add-row-button" type="button" data-section="sun">Open SunCalc</button>
+        </div>
+        <div class="ec3-material-grid">
+          ${materialRows.map(item => `
+            <article class="${escapeHtml(siteStatusClass(item.status))}">
+              <span>${escapeHtml(item.scope)}</span>
+              <strong>${escapeHtml(item.name)}</strong>
+              <em>${escapeHtml(item.result)}</em>
+              <p><b>Path:</b> ${escapeHtml(item.path)}</p>
+              <p><b>Takeaway:</b> ${escapeHtml(item.takeaway)}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="sustainability-action-panel">
+        <div>
+          <span class="mini-label">ASTRA direction</span>
+          <h3>What To Do Next</h3>
+          <p>Keep timber-first material strategy, SunCalc glare review, ASHRAE envelope testing, and EC3/EPD product data tied to the same CAD model. Do not finalize a sustainability claim until the metric source and quantity basis are visible.</p>
+        </div>
+        <div class="sun-action-list">
+          <span>Enter material quantities from CAD</span>
+          <span>Add EC3/EPD source links</span>
+          <span>Compare glazing benefit against carbon and cooling impact</span>
+          <span>Attach ASHRAE assumptions to the final package</span>
+        </div>
+      </section>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
@@ -6493,6 +6764,8 @@ function renderSurface() {
     ? policySurface(project)
     : state.activeSection === "sun"
     ? sunSurface(project)
+    : state.activeSection === "ashrae"
+    ? ashraeSurface(project)
     : projectPageSurface(project, section);
   document.getElementById("visualWorkspace").innerHTML = html;
   el.annotationLayer = document.getElementById("annotationLayer");
@@ -6921,10 +7194,12 @@ function createPolicyLookupRecordFromFields() {
 }
 
 function bindSimpleProjectPage() {
-  document.querySelectorAll("[data-section='dashboard']").forEach(button => {
+  document.querySelectorAll("[data-section]").forEach(button => {
+    if (button.closest("#sectionNav")) return;
     button.addEventListener("click", () => {
+      if (!sectionById(button.dataset.section)) return;
       state.authView = null;
-      state.activeSection = "dashboard";
+      state.activeSection = button.dataset.section;
       render();
     });
   });

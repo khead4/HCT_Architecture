@@ -1410,6 +1410,213 @@ th {
   line-height: 0.9;
 }
 
+.cad-sun-composer {
+  display: grid;
+  grid-template-columns: minmax(460px, 1.15fr) minmax(330px, 0.85fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.cad-sun-canvas,
+.cad-sun-readout {
+  border: 1px solid rgba(64, 72, 65, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 20px 48px rgba(25, 29, 25, 0.12);
+}
+
+.cad-sun-canvas {
+  position: relative;
+  min-height: clamp(430px, 42vw, 660px);
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(25, 36, 34, 0.88), rgba(35, 49, 43, 0.78)),
+    #1f2f2b;
+}
+
+.cad-grid-lines {
+  position: absolute;
+  inset: 0;
+  opacity: 0.42;
+  background:
+    linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+  background-size: 46px 46px;
+}
+
+.cad-policy-line,
+.cad-site-water,
+.cad-site-view,
+.cad-sun-path-line,
+.cad-sun-building {
+  position: absolute;
+  z-index: 1;
+}
+
+.cad-policy-line {
+  border: 1px dashed rgba(240, 218, 156, 0.62);
+  border-radius: 999px;
+  color: rgba(255,255,255,.82);
+  background: rgba(214,169,94,.11);
+  padding: 8px 11px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cad-front-line {
+  right: 8%;
+  bottom: 13%;
+  left: 8%;
+  text-align: center;
+}
+
+.cad-height-line {
+  top: 12%;
+  right: 8%;
+}
+
+.cad-site-water {
+  left: 7%;
+  bottom: 12%;
+  width: 28%;
+  height: 30%;
+  display: grid;
+  place-items: center;
+  border-radius: 45% 55% 52% 48%;
+  color: rgba(202, 234, 242, 0.88);
+  background: rgba(62, 182, 194, 0.24);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cad-site-view {
+  right: -5%;
+  top: 30%;
+  width: 48%;
+  height: 18%;
+  display: grid;
+  place-items: center;
+  transform: rotate(-18deg);
+  color: rgba(246, 238, 190, 0.92);
+  background: rgba(214, 169, 94, 0.18);
+  border-top: 1px solid rgba(214, 169, 94, 0.34);
+  border-bottom: 1px solid rgba(214, 169, 94, 0.34);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cad-sun-path-line {
+  top: 9%;
+  left: 12%;
+  width: 76%;
+  height: 40%;
+  border-top: 3px solid rgba(246, 200, 95, 0.78);
+  border-radius: 50% 50% 0 0;
+  color: rgba(255,255,255,.86);
+  text-align: center;
+  padding-top: 12px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cad-sun-building {
+  left: 38%;
+  top: 41%;
+  width: 25%;
+  min-width: 170px;
+  min-height: 180px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  transform: rotate(-8deg);
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 8px;
+  color: rgba(255,255,255,.94);
+  background:
+    linear-gradient(145deg, rgba(91,167,146,.45), rgba(18,28,26,.92)),
+    rgba(0,0,0,.4);
+  box-shadow: 0 28px 70px rgba(0,0,0,.34);
+  padding: 20px;
+}
+
+.cad-sun-building strong,
+.cad-sun-building span,
+.cad-sun-building em {
+  display: block;
+  transform: rotate(8deg);
+}
+
+.cad-sun-building strong {
+  font-size: 20px;
+  line-height: 1.05;
+}
+
+.cad-sun-building span,
+.cad-sun-building em {
+  color: rgba(255,255,255,.68);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.cad-sun-readout {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: clamp(20px, 2.6vw, 34px);
+  background: rgba(255,255,255,.7);
+}
+
+.cad-sun-readout h3 {
+  margin: 0;
+  color: #1f211e;
+  font-size: clamp(28px, 2.7vw, 42px);
+  line-height: 1.02;
+}
+
+.cad-sun-readout p {
+  margin: 0;
+  color: #444940;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.cad-sun-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cad-sun-metrics article {
+  min-height: 132px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  border: 1px solid rgba(35,38,32,.11);
+  border-radius: 8px;
+  background: rgba(255,255,255,.68);
+  padding: 14px;
+}
+
+.cad-sun-metrics span {
+  color: #6f744f;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.cad-sun-metrics strong {
+  color: #22312f;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.cad-sun-metrics p {
+  color: #5a6056;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .sun-diagram-card {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
@@ -1620,27 +1827,308 @@ th {
   font-size: 13px;
 }
 
+.sustainability-workspace {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  background:
+    radial-gradient(780px 420px at 12% 0%, rgba(190,205,130,.2), transparent 68%),
+    radial-gradient(660px 360px at 90% 12%, rgba(62,182,194,.14), transparent 70%),
+    linear-gradient(135deg, #edf4e1 0%, #dcebea 48%, #f3eadb 100%);
+}
+
+.sustainability-hero,
+.sustainability-metric-grid article,
+.sustainability-method-grid article,
+.ec3-board,
+.sustainability-action-panel {
+  border: 1px solid rgba(64, 72, 65, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 20px 48px rgba(25, 29, 25, 0.1);
+}
+
+.sustainability-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(220px, 300px);
+  gap: 18px;
+  align-items: start;
+  padding: clamp(20px, 2.7vw, 34px);
+  background: rgba(255,255,255,.66);
+}
+
+.sustainability-hero h3 {
+  margin: 6px 0 10px;
+  color: #20251f;
+  font-size: clamp(34px, 4.2vw, 62px);
+  line-height: .96;
+}
+
+.sustainability-hero p,
+.ec3-board-head p,
+.sustainability-action-panel p {
+  margin: 0;
+  color: #444a40;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.sustainability-score-card {
+  min-height: 160px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 18px;
+  background: linear-gradient(150deg, rgba(190,205,130,.86), rgba(207,232,229,.9));
+}
+
+.sustainability-score-card span,
+.sustainability-score-card em {
+  color: #59644b;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.sustainability-score-card strong {
+  color: #20251f;
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: .9;
+  text-transform: capitalize;
+}
+
+.sustainability-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sustainability-metric-grid article {
+  min-height: 150px;
+  display: grid;
+  align-content: space-between;
+  gap: 10px;
+  background: rgba(255,255,255,.68);
+  padding: 18px;
+}
+
+.sustainability-metric-grid article:nth-child(2) {
+  background: rgba(230,244,243,.74);
+}
+
+.sustainability-metric-grid article:nth-child(3) {
+  background: rgba(245,237,218,.78);
+}
+
+.sustainability-metric-grid article:nth-child(4) {
+  background: rgba(236,242,223,.8);
+}
+
+.sustainability-metric-grid span,
+.ec3-material-grid span {
+  color: #687247;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.sustainability-metric-grid strong {
+  color: #1f2724;
+  font-size: clamp(24px, 2.2vw, 36px);
+  line-height: 1.04;
+}
+
+.sustainability-metric-grid p {
+  margin: 0;
+  color: #5c6258;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.sustainability-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sustainability-method-grid article {
+  min-height: 290px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  background: rgba(255,255,255,.68);
+  padding: clamp(18px, 2vw, 26px);
+}
+
+.sustainability-method-head {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.sustainability-method-head h3,
+.ec3-board-head h3,
+.sustainability-action-panel h3 {
+  margin: 0;
+  color: #20251f;
+}
+
+.sustainability-method-head h3 {
+  font-size: clamp(21px, 1.7vw, 30px);
+  line-height: 1.08;
+}
+
+.sustainability-method-head strong {
+  flex: 0 0 auto;
+  max-width: 45%;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #284b48;
+  text-align: right;
+  background: rgba(211,232,229,.82);
+}
+
+.sustainability-method-grid p {
+  margin: 0;
+  color: #464d43;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.sustainability-method-grid b {
+  color: #20251f;
+}
+
+.sustainability-method-grid em {
+  width: fit-content;
+  border: 1px solid rgba(35,38,32,.12);
+  border-radius: 999px;
+  color: #56613d;
+  background: rgba(255,255,255,.64);
+  padding: 7px 10px;
+  font-size: 11px;
+  font-style: normal;
+  text-transform: capitalize;
+}
+
+.ec3-board {
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 2.7vw, 34px);
+  background: rgba(255,255,255,.62);
+}
+
+.ec3-board-head {
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ec3-material-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ec3-material-grid article {
+  min-height: 270px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  border: 1px solid rgba(35,38,32,.12);
+  border-top: 4px solid rgba(91,167,146,.78);
+  border-radius: 8px;
+  background: rgba(255,255,255,.72);
+  padding: 16px;
+}
+
+.ec3-material-grid article.missing {
+  border-top-color: rgba(214,169,94,.88);
+}
+
+.ec3-material-grid article.needs-review,
+.ec3-material-grid article.needs_review {
+  border-top-color: rgba(202,107,84,.86);
+}
+
+.ec3-material-grid strong {
+  color: #20251f;
+  font-size: 20px;
+  line-height: 1.12;
+}
+
+.ec3-material-grid em {
+  width: fit-content;
+  border-radius: 999px;
+  color: #294c48;
+  background: rgba(211,232,229,.84);
+  padding: 6px 9px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 760;
+}
+
+.ec3-material-grid p {
+  margin: 0;
+  color: #4e554b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.ec3-material-grid b {
+  color: #20251f;
+}
+
+.sustainability-action-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .6fr);
+  gap: 18px;
+  padding: 24px;
+  background: rgba(31,44,39,.9);
+}
+
+.sustainability-action-panel h3,
+.sustainability-action-panel p,
+.sustainability-action-panel .mini-label {
+  color: #f7f2e5;
+}
+
 @media (max-width: 980px) {
   .sun-study-hero,
+  .cad-sun-composer,
   .sun-diagram-card,
-  .sun-action-panel {
+  .sun-action-panel,
+  .sustainability-hero,
+  .sustainability-action-panel {
     grid-template-columns: 1fr;
   }
 
-  .sun-method-grid {
+  .sun-method-grid,
+  .sustainability-method-grid,
+  .sustainability-metric-grid,
+  .ec3-material-grid {
     grid-template-columns: 1fr;
   }
 
-  .sun-method-card {
+  .sun-method-card,
+  .sustainability-method-grid article,
+  .ec3-material-grid article {
     min-height: auto;
   }
 }
 
 @media (max-width: 620px) {
   .sun-study-hero,
+  .cad-sun-readout,
   .sun-diagram-card,
   .sun-method-card,
-  .sun-action-panel {
+  .sun-action-panel,
+  .sustainability-hero,
+  .ec3-board,
+  .sustainability-action-panel {
     padding: 16px;
   }
 
@@ -1650,6 +2138,20 @@ th {
 
   .sun-study-score {
     min-height: 120px;
+  }
+
+  .cad-sun-canvas {
+    min-height: 420px;
+  }
+
+  .cad-sun-building {
+    left: 30%;
+    width: 42%;
+    min-width: 0;
+  }
+
+  .cad-sun-metrics {
+    grid-template-columns: 1fr;
   }
 
   .sun-study-workspace .sun-diagram {
@@ -1670,9 +2172,15 @@ th {
     display: grid;
   }
 
-  .sun-method-head strong {
+  .sun-method-head strong,
+  .sustainability-method-head strong {
     max-width: 100%;
     text-align: left;
+  }
+
+  .sustainability-method-head,
+  .ec3-board-head {
+    display: grid;
   }
 }
 
@@ -5910,6 +6418,203 @@ body:not([data-active-section="dashboard"]) #questionInput {
   --section-bg-b: rgba(91,64,31,.14);
 }
 
+.gis-policy-ai-panel {
+  --section-symbol: "AI";
+  --section-accent: rgba(190,205,130,.9);
+  --section-accent-soft: rgba(190,205,130,.34);
+  --section-accent-bg: rgba(190,205,130,.11);
+  --section-bg-a: rgba(190,205,130,.08);
+  --section-bg-b: rgba(48,75,63,.14);
+}
+
+.ai-policy-gis-grid {
+  display: grid;
+  grid-template-columns: minmax(440px, 1.05fr) minmax(360px, .95fr);
+  gap: clamp(20px, 2.4vw, 34px);
+  align-items: stretch;
+}
+
+.ai-policy-map {
+  position: relative;
+  min-height: clamp(440px, 42vw, 680px);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+    radial-gradient(480px 320px at 18% 72%, rgba(62,182,194,.22), transparent 72%),
+    radial-gradient(520px 300px at 84% 32%, rgba(214,169,94,.2), transparent 74%),
+    rgba(11, 19, 17, 0.88);
+  background-size: 52px 52px, 52px 52px, auto, auto, auto;
+  box-shadow: 0 30px 76px rgba(0,0,0,.28);
+}
+
+.ai-policy-parcel,
+.ai-policy-envelope,
+.ai-policy-water,
+.ai-policy-view,
+.ai-policy-setback,
+.ai-policy-callout {
+  position: absolute;
+  z-index: 1;
+}
+
+.ai-policy-parcel {
+  inset: 12% 15% 12% 14%;
+  border: 2px solid rgba(255,255,255,.32);
+  border-radius: 14px 28px 18px 22px;
+  color: rgba(255,255,255,.72);
+  padding: 14px;
+  font-weight: 820;
+}
+
+.ai-policy-envelope {
+  inset: 24% 30% 22% 33%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(190,205,130,.6);
+  border-radius: 8px;
+  color: rgba(245,248,220,.9);
+  background: rgba(190,205,130,.11);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ai-policy-water {
+  left: 10%;
+  bottom: 10%;
+  width: 32%;
+  height: 26%;
+  display: grid;
+  place-items: center;
+  border-radius: 42% 58% 48% 52%;
+  color: rgba(216,246,251,.92);
+  background: rgba(62,182,194,.25);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ai-policy-view {
+  right: -4%;
+  top: 28%;
+  width: 46%;
+  height: 18%;
+  display: grid;
+  place-items: center;
+  transform: rotate(-18deg);
+  color: rgba(255,242,198,.9);
+  background: rgba(214,169,94,.18);
+  border-top: 1px solid rgba(214,169,94,.44);
+  border-bottom: 1px solid rgba(214,169,94,.44);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ai-policy-setback {
+  border: 1px dashed rgba(255,255,255,.34);
+  border-radius: 999px;
+  color: rgba(255,255,255,.72);
+  background: rgba(255,255,255,.06);
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ai-policy-setback.front {
+  right: 12%;
+  bottom: 18%;
+  left: 12%;
+  text-align: center;
+}
+
+.ai-policy-setback.side {
+  top: 18%;
+  bottom: 18%;
+  left: 20%;
+  display: grid;
+  place-items: center;
+  writing-mode: vertical-rl;
+}
+
+.ai-policy-callout {
+  border: 1px solid rgba(190,205,130,.28);
+  border-radius: 8px;
+  color: rgba(255,255,255,.92);
+  background: rgba(0,0,0,.44);
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ai-policy-callout.zone {
+  top: 5%;
+  left: 5%;
+}
+
+.ai-policy-callout.source {
+  right: 5%;
+  bottom: 5%;
+}
+
+.ai-policy-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.5vw, 18px);
+}
+
+.ai-policy-card-grid article {
+  min-height: 245px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-top: 4px solid rgba(190,205,130,.82);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(190,205,130,.09), rgba(255,255,255,.014)),
+    rgba(0,0,0,.3);
+  padding: clamp(16px, 1.8vw, 24px);
+}
+
+.ai-policy-card-grid article.missing,
+.ai-policy-card-grid article.needs-review,
+.ai-policy-card-grid article.needs_review,
+.ai-policy-card-grid article.pending-lookup {
+  border-top-color: rgba(214,169,94,.9);
+}
+
+.ai-policy-card-grid article.reconsider,
+.ai-policy-card-grid article.high {
+  border-top-color: rgba(202,107,84,.92);
+}
+
+.ai-policy-card-grid span {
+  color: rgba(190,205,130,.9);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.ai-policy-card-grid strong {
+  color: rgba(255,255,255,.94);
+  font-size: clamp(20px, 1.55vw, 28px);
+  line-height: 1.1;
+}
+
+.ai-policy-card-grid p {
+  margin: 0;
+  color: rgba(255,255,255,.66);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ai-policy-card-grid b {
+  color: rgba(222,235,164,.9);
+}
+
 .arcgis-open-link {
   text-decoration: none;
 }
@@ -7328,6 +8033,8 @@ body:not([data-active-section="dashboard"]) #questionInput {
   .data-outcome-grid,
   .case-study-input-grid,
   .case-study-record-grid,
+  .ai-policy-gis-grid,
+  .ai-policy-card-grid,
   .arcgis-install-grid,
   .arcgis-install-config-grid,
   .arcgis-workbench-grid,
