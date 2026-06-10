@@ -328,6 +328,80 @@ button {
     #174f53;
 }
 
+.export-info-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 54px);
+}
+
+.export-info-modal[hidden] {
+  display: none;
+}
+
+.export-info-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0,0,0,.62);
+  cursor: pointer;
+}
+
+.export-info-card {
+  position: relative;
+  z-index: 1;
+  width: min(620px, 100%);
+  display: grid;
+  gap: 22px;
+  border: 1px solid rgba(222,235,164,.26);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(45,111,115,.18), rgba(214,169,94,.08)),
+    #111410;
+  color: rgba(255,255,255,.9);
+  box-shadow: 0 32px 90px rgba(0,0,0,.5);
+  padding: clamp(24px, 3vw, 36px);
+}
+
+.export-info-card h2 {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.96);
+  font-size: clamp(26px, 2.8vw, 42px);
+  font-weight: 560;
+  line-height: 1.08;
+}
+
+.export-info-card p {
+  margin: 12px 0 0;
+  color: rgba(255,255,255,.68);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.export-info-list {
+  display: grid;
+  gap: 10px;
+}
+
+.export-info-list div {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,.055);
+  color: rgba(255,255,255,.78);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.export-info-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .status-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5225,6 +5299,16 @@ body:not([data-active-section="dashboard"]) #questionInput {
   font-size: clamp(28px, 2.6vw, 44px);
 }
 
+.data-storage-workspace .site-fact-grid strong {
+  font-size: clamp(15px, 1.12vw, 19px);
+  line-height: 1.28;
+  font-weight: 560;
+}
+
+.data-storage-workspace .site-fact-grid article {
+  align-content: start;
+}
+
 .data-export-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5463,8 +5547,100 @@ body:not([data-active-section="dashboard"]) #questionInput {
   --section-bg-b: rgba(24,80,92,.14);
 }
 
+.gis-arcgis-install-panel {
+  --section-symbol: "APP";
+  --section-accent: rgba(214,169,94,.9);
+  --section-accent-soft: rgba(214,169,94,.34);
+  --section-accent-bg: rgba(214,169,94,.11);
+  --section-bg-a: rgba(214,169,94,.08);
+  --section-bg-b: rgba(91,64,31,.14);
+}
+
 .arcgis-open-link {
   text-decoration: none;
+}
+
+.arcgis-install-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 1.8vw, 24px);
+}
+
+.arcgis-install-grid article {
+  min-height: 240px;
+  display: grid;
+  align-content: start;
+  gap: 13px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-top: 4px solid rgba(214,169,94,.86);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(214,169,94,.12), rgba(255,255,255,.016)),
+    rgba(0,0,0,.3);
+  padding: clamp(18px, 2vw, 26px);
+}
+
+.arcgis-install-grid article:nth-child(2) {
+  border-top-color: rgba(62,182,194,.84);
+  background:
+    linear-gradient(135deg, rgba(62,182,194,.1), rgba(255,255,255,.016)),
+    rgba(0,0,0,.3);
+}
+
+.arcgis-install-grid article:nth-child(3) {
+  border-top-color: rgba(190,205,130,.84);
+  background:
+    linear-gradient(135deg, rgba(190,205,130,.1), rgba(255,255,255,.016)),
+    rgba(0,0,0,.3);
+}
+
+.arcgis-install-grid span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,.075);
+  color: rgba(222,235,164,.94);
+  font-family: var(--mono);
+  font-weight: 850;
+}
+
+.arcgis-install-grid strong {
+  color: rgba(255,255,255,.95);
+  font-size: clamp(20px, 1.45vw, 27px);
+  line-height: 1.1;
+}
+
+.arcgis-install-grid p {
+  margin: 0;
+  color: rgba(255,255,255,.66);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.arcgis-install-grid a,
+.arcgis-install-grid button {
+  width: fit-content;
+  border: 1px solid rgba(222,235,164,.34);
+  border-radius: 999px;
+  background: rgba(222,235,164,.1);
+  color: rgba(255,255,255,.88);
+  padding: 9px 12px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.arcgis-install-grid a:hover,
+.arcgis-install-grid button:hover {
+  border-color: rgba(214,169,94,.82);
+  background: rgba(214,169,94,.16);
+}
+
+.arcgis-install-config-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .arcgis-workbench-grid {
@@ -6798,6 +6974,8 @@ body:not([data-active-section="dashboard"]) #questionInput {
   .data-outcome-grid,
   .case-study-input-grid,
   .case-study-record-grid,
+  .arcgis-install-grid,
+  .arcgis-install-config-grid,
   .arcgis-workbench-grid,
   .arcgis-config-grid,
   .arcgis-handoff-grid {
@@ -6806,6 +6984,7 @@ body:not([data-active-section="dashboard"]) #questionInput {
 
   .policy-notes-grid .wide-field,
   .case-study-input-grid .wide-field,
+  .arcgis-install-config-grid .wide-field,
   .arcgis-config-grid .wide-field {
     grid-column: 1 / -1;
   }

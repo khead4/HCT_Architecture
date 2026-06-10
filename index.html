@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ASTRA Site Intelligence Platform</title>
-    <link rel="stylesheet" href="/styles.css?v=102">
+    <link rel="stylesheet" href="/styles.css?v=103">
   </head>
   <body>
     <div class="app-shell">
@@ -157,8 +157,24 @@
         <span aria-hidden="true">↑</span>
         <strong>Top</strong>
       </button>
+
+      <div id="exportInfoModal" class="export-info-modal" hidden role="dialog" aria-modal="true" aria-labelledby="exportInfoTitle">
+        <button class="export-info-backdrop" type="button" data-export-close aria-label="Close export information"></button>
+        <section class="export-info-card" aria-describedby="exportInfoBody">
+          <div>
+            <span id="exportInfoEyebrow" class="mini-label">Export</span>
+            <h2 id="exportInfoTitle">Export details</h2>
+            <p id="exportInfoBody"></p>
+          </div>
+          <div id="exportInfoList" class="export-info-list"></div>
+          <div class="export-info-actions">
+            <button type="button" class="secondary-button" data-export-close>Close</button>
+            <button type="button" id="exportInfoDownload" class="primary-button">Download</button>
+          </div>
+        </section>
+      </div>
     </div>
 
-    <script src="/app.js?v=102"></script>
+    <script src="/app.js?v=103"></script>
   </body>
 </html>

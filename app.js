@@ -592,6 +592,11 @@ function initialSiteSurvey() {
       gisSourceUrl: "Demo GIS layer stack: parcel, stormwater, viewshed, vegetation",
       gisLookupStatus: "active",
       arcgisPortalUrl: "https://www.arcgis.com",
+      arcgisProInstallStatus: "not installed",
+      arcgisProInstallUrl: "https://doc.esri.com/en/arcgis-pro/latest/get-started/install-and-sign-in-to-arcgis-pro.html",
+      arcgisProProductUrl: "https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview",
+      arcgisProLicenseStatus: "unknown",
+      arcgisProVersion: "",
       arcgisWebMapId: "",
       arcgisEmbedUrl: "",
       arcgisFeatureServiceUrl: "",
@@ -901,7 +906,13 @@ const el = {
   aiMode: document.getElementById("aiMode"),
   homeButton: document.getElementById("homeButton"),
   loginButton: document.getElementById("loginButton"),
-  toTopButton: document.getElementById("toTopButton")
+  toTopButton: document.getElementById("toTopButton"),
+  exportInfoModal: document.getElementById("exportInfoModal"),
+  exportInfoEyebrow: document.getElementById("exportInfoEyebrow"),
+  exportInfoTitle: document.getElementById("exportInfoTitle"),
+  exportInfoBody: document.getElementById("exportInfoBody"),
+  exportInfoList: document.getElementById("exportInfoList"),
+  exportInfoDownload: document.getElementById("exportInfoDownload")
 };
 
 function persistSiteSurvey() {
@@ -5145,6 +5156,11 @@ function arcgisProHandoffPackage(project) {
     },
     arcgis: {
       portalUrl: fields.arcgisPortalUrl || "",
+      proInstallStatus: fields.arcgisProInstallStatus || "",
+      proInstallUrl: fields.arcgisProInstallUrl || "",
+      proProductUrl: fields.arcgisProProductUrl || "",
+      proLicenseStatus: fields.arcgisProLicenseStatus || "",
+      proVersion: fields.arcgisProVersion || "",
       webMapId: fields.arcgisWebMapId || "",
       embedUrl: arcgisEmbedUrl(fields),
       mapViewerUrl: arcgisMapViewerUrl(fields),
@@ -5515,27 +5531,9 @@ function dataStorageSurface(project) {
 
       <div class="site-workbench-layout">
         <main class="site-main-stack" aria-label="Data storage and case study sections">
-          <section class="site-survey-section data-export-panel">
-            <div class="survey-section-head">
-              <div>
-                <span class="mini-label">1. Database export center</span>
-                <h3>Download Stored Project Data</h3>
-                <p>Export the full project package or just the custom case-study library for review, reporting, external databases, or spreadsheet workflows.</p>
-              </div>
-              <button class="add-row-button" data-case-study-generate>Generate Case Studies From Current Data</button>
-            </div>
-            <div class="data-export-grid">
-              <button data-download="parcel"><span>JSON</span><strong>Full ASTRA Project</strong><em>Project, site survey, rules, GIS, model, and cases</em></button>
-              <button data-download="csv"><span>CSV</span><strong>Project Data Table</strong><em>All saved records in a spreadsheet-ready table</em></button>
-              <button data-download="case-json"><span>JSON</span><strong>Case Studies</strong><em>Custom generated narratives with source fields</em></button>
-              <button data-download="case-csv"><span>CSV</span><strong>Case Study Table</strong><em>Desired outcome, metrics, flood, initiatives, actions</em></button>
-            </div>
-            ${siteFactGrid(dataStorageFactRows(project), "Data storage facts")}
-          </section>
-
           <section class="site-survey-section data-memory-panel">
             <div>
-              <span class="mini-label">2. Unified data memory</span>
+              <span class="mini-label">1. Unified data memory</span>
               <h3>What Is Saved, What Is Missing, Where It Exports</h3>
               <p>Each data domain reads from the current project memory. Empty or unverified inputs stay visible as -- so ASTRA can explain gaps instead of fabricating facts.</p>
             </div>
@@ -5551,11 +5549,12 @@ function dataStorageSurface(project) {
                 </article>
               `).join("")}
             </div>
+            ${siteFactGrid(dataStorageFactRows(project), "Data storage facts")}
           </section>
 
           <section class="site-survey-section data-generator-panel">
             <div>
-              <span class="mini-label">3. Generator inputs</span>
+              <span class="mini-label">2. Generator inputs</span>
               <h3>Case Study Basis</h3>
               <p>These saved fields are the inputs for custom case studies. Update them, generate again, and the JSON/CSV export will reflect the current project direction.</p>
             </div>
@@ -5575,7 +5574,7 @@ function dataStorageSurface(project) {
           <section class="site-survey-section data-outcome-panel">
             <div class="survey-section-head">
               <div>
-                <span class="mini-label">4. Outcome-based case studies</span>
+                <span class="mini-label">3. Outcome-based case studies</span>
                 <h3>Generate Cases From Actual Stored Inputs</h3>
                 <p>These cards preview the source facts used for each generated case study. When a fact is missing, the generated record keeps -- until the project data is updated.</p>
               </div>
@@ -5597,7 +5596,7 @@ function dataStorageSurface(project) {
           <section class="site-survey-section case-study-library-panel">
             <div class="survey-section-head">
               <div>
-                <span class="mini-label">5. Custom case studies</span>
+                <span class="mini-label">4. Custom case studies</span>
                 <h3>Saved Case Study Library</h3>
                 <p>Each case study is editable and stored with the project, then exported as JSON or CSV for downstream reports and reviews.</p>
               </div>
@@ -5624,7 +5623,7 @@ function dataStorageSurface(project) {
 
           <section class="site-survey-section data-schema-panel">
             <div>
-              <span class="mini-label">6. Storage map</span>
+              <span class="mini-label">5. Storage map</span>
               <h3>What the CSV Contains</h3>
               <p>The export keeps data reusable across AI retrieval, GIS, sustainability review, policy checks, case studies, and reporting.</p>
             </div>
@@ -5643,6 +5642,23 @@ function dataStorageSurface(project) {
                   <em>${escapeHtml(row[2])}</em>
                 </div>
               `).join("")}
+            </div>
+          </section>
+
+          <section class="site-survey-section data-export-panel">
+            <div class="survey-section-head">
+              <div>
+                <span class="mini-label">6. Final export center</span>
+                <h3>Download Stored Project Data</h3>
+                <p>Export only after the memory, generator inputs, case studies, and storage map have been reviewed.</p>
+              </div>
+              <button class="add-row-button" data-download="csv">Download Project CSV</button>
+            </div>
+            <div class="data-export-grid">
+              <button type="button" data-export-info="parcel"><span>JSON</span><strong>Full ASTRA Project</strong><em>Project, site survey, rules, GIS, model, and cases</em></button>
+              <button type="button" data-export-info="csv"><span>CSV</span><strong>Project Data Table</strong><em>All saved records in a spreadsheet-ready table</em></button>
+              <button type="button" data-export-info="case-json"><span>JSON</span><strong>Case Studies</strong><em>Custom generated narratives with source fields</em></button>
+              <button type="button" data-export-info="case-csv"><span>CSV</span><strong>Case Study Table</strong><em>Desired outcome, metrics, flood, initiatives, actions</em></button>
             </div>
           </section>
         </main>
@@ -5884,6 +5900,8 @@ function gisSurface(project) {
   const gisFindings = survey.gisFindings?.length ? survey.gisFindings : [];
   const embedUrl = arcgisEmbedUrl(fields);
   const mapViewerUrl = arcgisMapViewerUrl(fields);
+  const proInstallUrl = safeExternalMapUrl(fields.arcgisProInstallUrl) || "https://doc.esri.com/en/arcgis-pro/latest/get-started/install-and-sign-in-to-arcgis-pro.html";
+  const proProductUrl = safeExternalMapUrl(fields.arcgisProProductUrl) || "https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview";
 
   return `
     <div class="surface-pad site-survey-workspace gis-workspace">
@@ -5931,12 +5949,51 @@ function gisSurface(project) {
         </div>
       </section>
 
+      <section class="site-survey-section gis-arcgis-install-panel">
+        <div class="survey-section-head">
+          <div>
+            <span class="mini-label">2. ArcGIS Pro install</span>
+            <h3>Install ArcGIS Pro, Then Connect It</h3>
+            <p>ArcGIS Pro is a Windows desktop GIS application. The web app cannot install or run it inside the browser, so this step stores install, license, and version status before the web map handoff begins.</p>
+          </div>
+          <a class="add-row-button arcgis-open-link" href="${escapeHtml(proInstallUrl)}" target="_blank" rel="noopener noreferrer">Open Install Guide</a>
+        </div>
+        ${siteSubsectionIntro("APP", "Desktop setup", "Use the official Esri install guide or ArcGIS Pro product page, then record install status here so ASTRA knows whether GIS work can move into Pro or should stay as web-map review.")}
+        <div class="arcgis-install-grid">
+          <article>
+            <span>1</span>
+            <strong>Get ArcGIS Pro</strong>
+            <p>Use an Esri account, organization license, or trial path before assuming Pro is available.</p>
+            <a href="${escapeHtml(proProductUrl)}" target="_blank" rel="noopener noreferrer">ArcGIS Pro product page</a>
+          </article>
+          <article>
+            <span>2</span>
+            <strong>Install on Windows</strong>
+            <p>Install ArcGIS Pro locally, then confirm version, install context, and optional components.</p>
+            <a href="${escapeHtml(proInstallUrl)}" target="_blank" rel="noopener noreferrer">Install documentation</a>
+          </article>
+          <article>
+            <span>3</span>
+            <strong>Connect ASTRA data</strong>
+            <p>Use the ArcGIS Pro handoff JSON, feature service, web map, or GIS package to move saved site data into Pro.</p>
+            <button type="button" data-download="arcgis-pro">Download Pro Handoff</button>
+          </article>
+        </div>
+        <div class="site-intake-grid arcgis-install-config-grid">
+          ${siteFieldSelect("arcgisProInstallStatus", "ArcGIS Pro install status", ["not installed", "downloaded", "installed", "needs update", "blocked", "unknown"])}
+          ${siteFieldSelect("arcgisProLicenseStatus", "ArcGIS Pro license status", ["unknown", "trial", "named user", "single use", "concurrent use", "not licensed", "blocked"])}
+          ${siteFieldInput("arcgisProVersion", "ArcGIS Pro version")}
+          ${siteFieldInput("arcgisProInstallUrl", "ArcGIS Pro install guide URL")}
+          ${siteFieldInput("arcgisProProductUrl", "ArcGIS Pro product / trial URL")}
+        </div>
+      </section>
+
       <section class="site-survey-section gis-arcgis-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">2. ArcGIS Pro connection</span>
+            <span class="mini-label">3. ArcGIS Pro connection</span>
             <h3>Embedded ArcGIS Web Map + Pro Handoff</h3>
-            <p>ArcGIS Pro itself is a desktop application, so the browser embeds the ArcGIS web map or Enterprise portal view while storing the ArcGIS Pro project and package metadata needed for handoff.</p>
+            <p>After Pro is installed, the browser can embed an ArcGIS web map or Enterprise portal view while storing the ArcGIS Pro project and package metadata needed for handoff.</p>
           </div>
           <a class="add-row-button arcgis-open-link" href="${escapeHtml(mapViewerUrl)}" target="_blank" rel="noopener noreferrer">Open ArcGIS Map Viewer</a>
         </div>
@@ -5997,7 +6054,7 @@ function gisSurface(project) {
       <section class="site-survey-section gis-map-panel">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">3. GIS map</span>
+            <span class="mini-label">4. GIS map</span>
             <h3>Mapped Conditions</h3>
             <p>The visual map shows the current parcel context while the editable layer stack below records the source-linked findings that become project memory.</p>
           </div>
@@ -6022,7 +6079,7 @@ function gisSurface(project) {
       <section class="site-survey-section gis-layer-editor">
         <div class="survey-section-head">
           <div>
-            <span class="mini-label">4. Layer findings</span>
+            <span class="mini-label">5. Layer findings</span>
             <h3>Data Found Through GIS</h3>
             <p>Every spatial finding can be used by the survey page, policy page, design workspace, and final handoff once its source and status are recorded.</p>
           </div>
@@ -6044,7 +6101,7 @@ function gisSurface(project) {
 
       <section class="site-survey-section package-panel">
         <div>
-          <span class="mini-label">5. Connected outputs</span>
+          <span class="mini-label">6. Connected outputs</span>
           <h3>Send GIS Data Forward</h3>
           <p>ArcGIS, GIS findings, and Pro handoff data are saved into the same project memory used by Site + Survey Intelligence, Zoning + Policy Intelligence, CAD/Rhino review, and export downloads.</p>
         </div>
@@ -6339,6 +6396,104 @@ function triggerDownload(filename, mimeType, content) {
   URL.revokeObjectURL(url);
 }
 
+const exportInfoRecords = {
+  parcel: {
+    eyebrow: "Section 6 / JSON",
+    title: "Full ASTRA Project",
+    body: "This is the complete project-memory package. Use it when another tool, reviewer, or future ASTRA workspace needs the whole record, not just a table.",
+    includes: ["Project identity and client intent", "Site survey, evidence, policy, GIS, and ArcGIS handoff data", "Program spaces, rules, model values, risks, opportunities, and case studies"],
+    download: "parcel",
+    downloadLabel: "Download Full JSON"
+  },
+  csv: {
+    eyebrow: "Section 6 / CSV",
+    title: "Project Data Table",
+    body: "This is the spreadsheet-ready project table. Use it when project information needs to move cleanly into CSV workflows, QA logs, databases, or external reporting tools.",
+    includes: ["Category, name, value, and status columns", "Client, discovery, site, GIS, policy, sustainability, and program rows", "Saved records only; missing facts remain visible as blank or -- values"],
+    download: "csv",
+    downloadLabel: "Download Project CSV"
+  },
+  "case-json": {
+    eyebrow: "Section 6 / JSON",
+    title: "Case Studies",
+    body: "This package stores the generated and manually edited case-study records as reusable project memory.",
+    includes: ["Desired outcome and audience", "Sustainability metrics, flood strategy, initiative development, and design response", "Evidence basis, source status, reviewer, and recommended actions"],
+    download: "case-json",
+    downloadLabel: "Download Case JSON"
+  },
+  "case-csv": {
+    eyebrow: "Section 6 / CSV",
+    title: "Case Study Table",
+    body: "This is the focused case-study spreadsheet for review meetings, grant or initiative tracking, planning narratives, and sustainability reporting.",
+    includes: ["Desired outcome, metrics, flooding, initiatives, and actions", "Audience, focus, design response, evidence basis, and status", "One row per saved case study"],
+    download: "case-csv",
+    downloadLabel: "Download Case CSV"
+  }
+};
+
+function downloadByKind(kind) {
+  if (!state.project) return;
+  if (kind === "parcel") {
+    triggerDownload("hct-parcel.json", "application/json", parcelJson(state.project));
+  }
+  if (kind === "csv") {
+    triggerDownload("hct-project-data.csv", "text/csv", projectCsv(state.project));
+  }
+  if (kind === "case-json") {
+    triggerDownload("astra-case-studies.json", "application/json", caseStudyJson(state.project));
+  }
+  if (kind === "case-csv") {
+    triggerDownload("astra-case-studies.csv", "text/csv", caseStudyCsv(state.project));
+  }
+  if (kind === "gis") {
+    triggerDownload("astra-gis-package.json", "application/json", JSON.stringify({
+      site: state.project.site,
+      gisLayers: state.project.gisLayers,
+      gisFindings: state.siteSurvey.gisFindings,
+      layerStatus: siteLayerRows(state.siteSurvey),
+      arcgis: arcgisProHandoffPackage(state.project).arcgis
+    }, null, 2));
+  }
+  if (kind === "arcgis-pro") {
+    triggerDownload("astra-arcgis-pro-handoff.json", "application/json", JSON.stringify(arcgisProHandoffPackage(state.project), null, 2));
+  }
+  if (kind === "bim") {
+    triggerDownload("astra-bim-package.json", "application/json", JSON.stringify({
+      project: state.project.project,
+      designModel: state.project.designModel,
+      constraints: state.siteSurvey.constraints,
+      risks: state.siteSurvey.hazards,
+      opportunities: state.siteSurvey.opportunities
+    }, null, 2));
+  }
+  if (kind === "astra") {
+    triggerDownload("astra-project-package.json", "application/json", parcelJson(state.project));
+  }
+}
+
+function openExportInfo(kind) {
+  const record = exportInfoRecords[kind];
+  if (!record || !el.exportInfoModal) return;
+  el.exportInfoEyebrow.textContent = record.eyebrow;
+  el.exportInfoTitle.textContent = record.title;
+  el.exportInfoBody.textContent = record.body;
+  el.exportInfoList.innerHTML = record.includes.map(item => `<div>${escapeHtml(item)}</div>`).join("");
+  el.exportInfoDownload.textContent = record.downloadLabel;
+  el.exportInfoDownload.dataset.exportDownload = record.download;
+  el.exportInfoModal.hidden = false;
+  requestAnimationFrame(() => {
+    el.exportInfoModal.classList.add("open");
+    el.exportInfoDownload.focus();
+  });
+}
+
+function closeExportInfo() {
+  if (!el.exportInfoModal) return;
+  el.exportInfoModal.classList.remove("open");
+  el.exportInfoModal.hidden = true;
+  if (el.exportInfoDownload) el.exportInfoDownload.dataset.exportDownload = "";
+}
+
 function newSiteSurveyRow(group) {
   const today = new Date().toISOString().slice(0, 10);
   const common = {
@@ -6460,44 +6615,12 @@ function bindSimpleProjectPage() {
 
   document.querySelectorAll("[data-download]").forEach(button => {
     button.addEventListener("click", () => {
-      if (!state.project) return;
-      if (button.dataset.download === "parcel") {
-        triggerDownload("hct-parcel.json", "application/json", parcelJson(state.project));
-      }
-      if (button.dataset.download === "csv") {
-        triggerDownload("hct-project-data.csv", "text/csv", projectCsv(state.project));
-      }
-      if (button.dataset.download === "case-json") {
-        triggerDownload("astra-case-studies.json", "application/json", caseStudyJson(state.project));
-      }
-      if (button.dataset.download === "case-csv") {
-        triggerDownload("astra-case-studies.csv", "text/csv", caseStudyCsv(state.project));
-      }
-      if (button.dataset.download === "gis") {
-        triggerDownload("astra-gis-package.json", "application/json", JSON.stringify({
-          site: state.project.site,
-          gisLayers: state.project.gisLayers,
-          gisFindings: state.siteSurvey.gisFindings,
-          layerStatus: siteLayerRows(state.siteSurvey),
-          arcgis: arcgisProHandoffPackage(state.project).arcgis
-        }, null, 2));
-      }
-      if (button.dataset.download === "arcgis-pro") {
-        triggerDownload("astra-arcgis-pro-handoff.json", "application/json", JSON.stringify(arcgisProHandoffPackage(state.project), null, 2));
-      }
-      if (button.dataset.download === "bim") {
-        triggerDownload("astra-bim-package.json", "application/json", JSON.stringify({
-          project: state.project.project,
-          designModel: state.project.designModel,
-          constraints: state.siteSurvey.constraints,
-          risks: state.siteSurvey.hazards,
-          opportunities: state.siteSurvey.opportunities
-        }, null, 2));
-      }
-      if (button.dataset.download === "astra") {
-        triggerDownload("astra-project-package.json", "application/json", parcelJson(state.project));
-      }
+      downloadByKind(button.dataset.download);
     });
+  });
+
+  document.querySelectorAll("[data-export-info]").forEach(button => {
+    button.addEventListener("click", () => openExportInfo(button.dataset.exportInfo));
   });
 }
 
@@ -7458,6 +7581,23 @@ async function init() {
     window.addEventListener("scroll", updateToTopButton, { passive: true });
     document.getElementById("visualWorkspace")?.addEventListener("scroll", updateToTopButton, { passive: true });
   }
+
+  document.querySelectorAll("[data-export-close]").forEach(button => {
+    button.addEventListener("click", closeExportInfo);
+  });
+
+  if (el.exportInfoDownload) {
+    el.exportInfoDownload.addEventListener("click", () => {
+      downloadByKind(el.exportInfoDownload.dataset.exportDownload);
+      closeExportInfo();
+    });
+  }
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && el.exportInfoModal && !el.exportInfoModal.hidden) {
+      closeExportInfo();
+    }
+  });
 
   el.questionInput.addEventListener("keydown", event => {
     if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
