@@ -4870,9 +4870,22 @@ function designCoordinationRows(project) {
 function designSurface(project) {
   const model = project.designModel || {};
   const fields = state.siteSurvey.fields || {};
+  const analysis = project.analysisResults || {};
   const frontRule = (project.verifiedRules || []).find(rule => rule.ruleType === "front_setback");
   const designFacts = designCoordinationRows(project);
   const designRisks = (state.siteSurvey.hazards || []).slice(0, 3);
+  const sunStudyFacts = [
+    ["Study date", fields.sunStudyDate || "--"],
+    ["Latitude / longitude", `${fields.latitude || "--"} / ${fields.longitude || "--"}`],
+    ["Daylight score", analysis.sunStudy?.daylightScore || fields.daylightFactor || "--"],
+    ["Glare risk", analysis.sunStudy?.glareRisk || "--"]
+  ];
+  const ashraeFacts = [
+    ["Energy basis", fields.annualEnergyUse || "--"],
+    ["Cooling impact", analysis.ashrae?.coolingImpactPercent ? `+${analysis.ashrae.coolingImpactPercent}%` : "--"],
+    ["Envelope risk", analysis.ashrae?.envelopeRisk || "--"],
+    ["Embodied carbon", analysis.carbon?.embodiedCarbonChange || fields.embodiedCarbon || "--"]
+  ];
   const lumionFacts = [
     ["Lumion scene", fields.lumionProjectName || "--"],
     ["Import file", fields.lumionCadFileName || "--"],
@@ -5042,39 +5055,110 @@ function designSurface(project) {
           </div>
         </article>
 
-        <article class="design-instruction-card design-lumion-card">
-          <div class="design-lumion-copy">
-            <span class="mini-label">Visualization destination</span>
-            <h3>Where Lumion Enters The Flow</h3>
-            <p>Lumion sits after CAD/Rhino model setup and before final client-facing review. Use it for atmosphere, material appearance, daylight feeling, landscape context, and render critique while ASTRA keeps the evidence, risks, costs, and decisions attached.</p>
-            <div class="design-lumion-route" aria-label="CAD Rhino Lumion ASTRA route">
-              <span>AutoCAD / Rhino model</span>
-              <i aria-hidden="true"></i>
-              <strong>Lumion scene</strong>
-              <i aria-hidden="true"></i>
-              <span>ASTRA memory</span>
-            </div>
+        <article class="design-instruction-card design-downstream-card">
+          <div class="design-downstream-head">
+            <span class="mini-label">Downstream model checks</span>
+            <h3>Send The CAD/Rhino Model To The Right Workspace</h3>
+            <p>These are separate destinations. Sun Studies checks placement and comfort, ASHRAE + Materials checks energy/carbon/envelope assumptions, and Lumion checks visual experience. Each result returns to ASTRA memory instead of becoming a disconnected file.</p>
           </div>
-          <div class="design-lumion-box" aria-label="Lumion destination box">
-            <div class="lumion-screen-frame">
-              <div class="lumion-sky"></div>
-              <div class="lumion-model-preview">
-                <span>${escapeHtml(model.name || "Concept massing")}</span>
+          <div class="design-downstream-grid">
+            <div class="design-lumion-box design-destination-box sun-destination" aria-label="Sun studies destination box">
+              <div class="downstream-screen-frame sun-screen-frame">
+                <div class="sun-preview-arc"></div>
+                <div class="sun-preview-building">${escapeHtml(model.orientation || "Orientation")}</div>
+                <div class="sun-preview-shadow"></div>
               </div>
-              <div class="lumion-ground"></div>
+              <div class="design-destination-copy">
+                <span class="mini-label">01 / Sun Studies</span>
+                <h4>Path, Shadow, Glare, Orientation</h4>
+                <p>Use this before treating placement, openings, shading, or glare assumptions as resolved.</p>
+              </div>
+              <div class="design-lumion-route" aria-label="CAD Rhino Sun Studies ASTRA route">
+                <span>CAD / Rhino massing</span>
+                <i aria-hidden="true"></i>
+                <strong>Sun Studies</strong>
+                <i aria-hidden="true"></i>
+                <span>Placement decision</span>
+              </div>
+              <div class="design-lumion-facts">
+                ${sunStudyFacts.map(row => `
+                  <div>
+                    <span>${escapeHtml(row[0])}</span>
+                    <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+                  </div>
+                `).join("")}
+              </div>
+              <div class="design-lumion-actions">
+                <button data-section="sun">Open Sun Studies</button>
+                <button data-download="sun-study">Download Sun JSON</button>
+              </div>
             </div>
-            <div class="design-lumion-facts">
-              ${lumionFacts.map(row => `
-                <div>
-                  <span>${escapeHtml(row[0])}</span>
-                  <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+
+            <div class="design-lumion-box design-destination-box ashrae-destination" aria-label="ASHRAE and material sustainability destination box">
+              <div class="downstream-screen-frame ashrae-screen-frame">
+                <div class="ashrae-preview-envelope"></div>
+                <div class="ashrae-preview-meter">ASHRAE</div>
+                <div class="ashrae-preview-carbon">EC3</div>
+              </div>
+              <div class="design-destination-copy">
+                <span class="mini-label">02 / ASHRAE + Materials</span>
+                <h4>Energy, Envelope, Carbon, EC3</h4>
+                <p>Use this after geometry and material intent are known enough to test performance claims.</p>
+              </div>
+              <div class="design-lumion-route" aria-label="CAD Rhino ASHRAE ASTRA route">
+                <span>Model + materials</span>
+                <i aria-hidden="true"></i>
+                <strong>ASHRAE + EC3</strong>
+                <i aria-hidden="true"></i>
+                <span>Technical basis</span>
+              </div>
+              <div class="design-lumion-facts">
+                ${ashraeFacts.map(row => `
+                  <div>
+                    <span>${escapeHtml(row[0])}</span>
+                    <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+                  </div>
+                `).join("")}
+              </div>
+              <div class="design-lumion-actions">
+                <button data-section="ashrae">Open ASHRAE</button>
+                <button data-download="sustainability">Download Sustainability JSON</button>
+              </div>
+            </div>
+
+            <div class="design-lumion-box design-destination-box lumion-destination" aria-label="Lumion destination box">
+              <div class="lumion-screen-frame">
+                <div class="lumion-sky"></div>
+                <div class="lumion-model-preview">
+                  <span>${escapeHtml(model.name || "Concept massing")}</span>
                 </div>
-              `).join("")}
-            </div>
-            <div class="design-lumion-actions">
-              <button data-section="lumion">Open Lumion Workspace</button>
-              <button data-download="lumion-cad">Download Lumion .DAE</button>
-              <button data-download="lumion">Download Lumion Brief</button>
+                <div class="lumion-ground"></div>
+              </div>
+              <div class="design-destination-copy">
+                <span class="mini-label">03 / Lumion</span>
+                <h4>Atmosphere, Materials, Client Review</h4>
+                <p>Use this for visual experience only, then send render decisions and concerns back to ASTRA.</p>
+              </div>
+              <div class="design-lumion-route" aria-label="CAD Rhino Lumion ASTRA route">
+                <span>CAD / Rhino export</span>
+                <i aria-hidden="true"></i>
+                <strong>Lumion scene</strong>
+                <i aria-hidden="true"></i>
+                <span>Visual review</span>
+              </div>
+              <div class="design-lumion-facts">
+                ${lumionFacts.map(row => `
+                  <div>
+                    <span>${escapeHtml(row[0])}</span>
+                    <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+                  </div>
+                `).join("")}
+              </div>
+              <div class="design-lumion-actions">
+                <button data-section="lumion">Open Lumion</button>
+                <button data-download="lumion-cad">Download .DAE</button>
+                <button data-download="lumion">Download Brief</button>
+              </div>
             </div>
           </div>
         </article>
@@ -5082,12 +5166,14 @@ function designSurface(project) {
         <article class="design-instruction-card design-handoff-card">
           <span class="mini-label">Handoff</span>
           <h3>Send The Work Forward</h3>
-          <p>Use these exports when the AutoCAD/Rhino work needs to move into Lumion, BIM, project memory, or spreadsheet review. Replace prototype geometry with the real CAD/Rhino file when it is ready.</p>
+          <p>Use these exports when the AutoCAD/Rhino work needs to move into Sun Studies, ASHRAE + Materials, Lumion, BIM, project memory, or spreadsheet review. Replace prototype geometry with the real CAD/Rhino file when it is ready.</p>
           <div class="download-actions">
             <button data-download="autocad-dxf">Download AutoCAD DXF</button>
             <button data-download="autocad-handoff">Download AutoCAD JSON</button>
             <button data-download="rhino-obj">Download Rhino OBJ</button>
             <button data-download="rhino-handoff">Download Rhino JSON</button>
+            <button data-download="sun-study">Download Sun JSON</button>
+            <button data-download="sustainability">Download ASHRAE JSON</button>
             <button data-download="lumion-cad">Download Lumion .DAE</button>
             <button data-download="bim">Download BIM Package</button>
             <button data-download="csv">Download Project CSV</button>
