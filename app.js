@@ -753,6 +753,30 @@ function initialSiteSurvey() {
       { question: "What can be decided now?", answer: "Initial site response, likely placement zones, information gaps, and which constraints must be protected in concept design." },
       { question: "What should wait?", answer: "Foundation strategy, final grading, exact service entry design, and permit-ready compliance claims." }
     ],
+    creativeNotes: [
+      {
+        id: "idea-design-rationale",
+        header: "Design rationale",
+        type: "Writing",
+        writing: "Preserve landscape connection, daylight, and clear design rationale while keeping site risk and policy constraints visible.",
+        bullets: [],
+        table: { headers: ["Thread", "Design use"], rows: [["Daylight", "Compare glazing, orientation, glare, and shading before committing to openings."], ["Stormwater", "Keep the western low point visible during massing and landscape decisions."]] },
+        visuals: [],
+        createdAt: "2026-06-09T00:00:00.000Z",
+        updatedAt: "2026-06-09T00:00:00.000Z"
+      },
+      {
+        id: "idea-material-feeling",
+        header: "Material feeling",
+        type: "Bulleted list",
+        writing: "",
+        bullets: ["Warm natural material palette", "Low-carbon timber structure", "Calm daylight and landscape connection"],
+        table: { headers: ["Item", "Detail"], rows: [] },
+        visuals: [],
+        createdAt: "2026-06-09T00:00:00.000Z",
+        updatedAt: "2026-06-09T00:00:00.000Z"
+      }
+    ],
     caseStudies: [
       {
         title: "Outcome-Led Low-Energy Residence",
@@ -892,6 +916,7 @@ function mergeSiteSurvey(saved) {
     policyLookups: mergeSiteRecordsByName(base.policyLookups, saved.policyLookups),
     evidence: Array.isArray(saved.evidence) ? saved.evidence : base.evidence,
     aiInterpretation: Array.isArray(saved.aiInterpretation) ? saved.aiInterpretation : base.aiInterpretation,
+    creativeNotes: Array.isArray(saved.creativeNotes) ? saved.creativeNotes : base.creativeNotes,
     caseStudies: mergeSiteRecordsByName(base.caseStudies, saved.caseStudies),
     packageItems: mergeSitePackageItems(base.packageItems, saved.packageItems)
   };
@@ -6032,6 +6057,169 @@ function caseStudyRecords() {
   return Array.isArray(state.siteSurvey.caseStudies) ? state.siteSurvey.caseStudies : [];
 }
 
+const creativeNoteTypeOptions = ["Writing", "Bulleted list", "Table"];
+
+function creativeNoteRecords() {
+  if (!Array.isArray(state.siteSurvey.creativeNotes)) state.siteSurvey.creativeNotes = [];
+  return state.siteSurvey.creativeNotes;
+}
+
+function ensureCreativeNoteIds() {
+  const records = creativeNoteRecords();
+  let changed = false;
+  records.forEach((note, index) => {
+    if (!note.id) {
+      note.id = `idea-${Date.now()}-${index}`;
+      changed = true;
+    }
+    if (!Array.isArray(note.visuals)) note.visuals = [];
+  });
+  if (changed) persistSiteSurvey();
+  return records;
+}
+
+function creativeNoteType(note) {
+  const type = String(note?.type || "Writing");
+  return creativeNoteTypeOptions.includes(type) ? type : "Writing";
+}
+
+function newCreativeNote(type = "Writing") {
+  const now = new Date().toISOString();
+  const safeType = creativeNoteTypeOptions.includes(type) ? type : "Writing";
+  return {
+    id: `idea-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    header: "New design idea",
+    type: safeType,
+    writing: "",
+    bullets: safeType === "Bulleted list" ? [""] : [],
+    table: { headers: ["Item", "Detail"], rows: [["", ""]] },
+    visuals: [],
+    createdAt: now,
+    updatedAt: now
+  };
+}
+
+function creativeNoteTableValue(note) {
+  const table = note?.table && typeof note.table === "object" ? note.table : {};
+  const headers = Array.isArray(table.headers) && table.headers.length ? table.headers : ["Item", "Detail"];
+  const rows = Array.isArray(table.rows) ? table.rows : [];
+  return [headers, ...rows]
+    .map(row => (Array.isArray(row) ? row : String(row || "").split("|")).map(value => String(value || "").trim()).join(" | "))
+    .join("\n");
+}
+
+function parseCreativeNoteTable(value) {
+  const lines = String(value || "")
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean);
+  const parsed = lines.map(line => line.split("|").map(cell => cell.trim()));
+  return {
+    headers: parsed[0] && parsed[0].length ? parsed[0] : ["Item", "Detail"],
+    rows: parsed.slice(1)
+  };
+}
+
+function creativeNotePlainText(note) {
+  const type = creativeNoteType(note);
+  if (type === "Bulleted list") return listValue(note.bullets, []).join(" | ") || "--";
+  if (type === "Table") return creativeNoteTableValue(note).replace(/\n/g, " / ") || "--";
+  return String(note.writing || "").trim() || "--";
+}
+
+function creativeNotePreviewMarkup(note) {
+  const type = creativeNoteType(note);
+  if (type === "Bulleted list") {
+    const bullets = listValue(note.bullets, []).filter(item => String(item || "").trim());
+    return bullets.length
+      ? `<ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+      : `<p class="idea-empty">Add bullets to turn this into a reusable design thread.</p>`;
+  }
+  if (type === "Table") {
+    const table = note?.table && typeof note.table === "object" ? note.table : parseCreativeNoteTable("");
+    const headers = Array.isArray(table.headers) && table.headers.length ? table.headers : ["Item", "Detail"];
+    const rows = Array.isArray(table.rows) && table.rows.length ? table.rows : [["--", "--"]];
+    return `
+      <div class="idea-table-scroll">
+        <table class="idea-table-preview">
+          <thead><tr>${headers.map(header => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead>
+          <tbody>
+            ${rows.map(row => `<tr>${headers.map((_, cellIndex) => `<td>${escapeHtml(Array.isArray(row) ? row[cellIndex] || "--" : "--")}</td>`).join("")}</tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  return `<p>${escapeHtml(note.writing || "Add a written thought, meeting note, rationale, or design question.")}</p>`;
+}
+
+function creativeNoteVisualMarkup(note) {
+  const visuals = Array.isArray(note.visuals) ? note.visuals : [];
+  if (!visuals.length) return `<div class="idea-visual-empty">No visuals added yet</div>`;
+  return visuals.map((visual, index) => `
+    <figure>
+      <img src="${escapeHtml(visual.dataUrl || "")}" alt="${escapeHtml(visual.name || "Uploaded visual")}">
+      <figcaption>${escapeHtml(visual.name || `Visual ${index + 1}`)}</figcaption>
+      <button type="button" data-note-visual-remove="${escapeHtml(note.id)}:${index}">Remove</button>
+    </figure>
+  `).join("");
+}
+
+function creativeNoteEditorMarkup(note, index) {
+  const type = creativeNoteType(note);
+  const typeClass = type.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const contentEditor = type === "Bulleted list"
+    ? `<label class="idea-content-editor"><span>Bullets</span><textarea data-note-id="${escapeHtml(note.id)}" data-note-field="bullets" rows="6" placeholder="One bullet per line">${escapeHtml(listValue(note.bullets, []).join("\n"))}</textarea></label>`
+    : type === "Table"
+    ? `<label class="idea-content-editor"><span>Table</span><textarea data-note-id="${escapeHtml(note.id)}" data-note-field="table" rows="7" placeholder="Header | Header&#10;Value | Value">${escapeHtml(creativeNoteTableValue(note))}</textarea><em>Use one row per line and separate columns with |</em></label>`
+    : `<label class="idea-content-editor"><span>Writing</span><textarea data-note-id="${escapeHtml(note.id)}" data-note-field="writing" rows="7" placeholder="Write the design thought, rationale, question, or meeting note.">${escapeHtml(note.writing || "")}</textarea></label>`;
+
+  return `
+    <article class="idea-card ${escapeHtml(typeClass)}">
+      <header class="idea-card-head">
+        <div>
+          <span>Idea ${index + 1}</span>
+          <strong>${escapeHtml(note.header || "Untitled idea")}</strong>
+        </div>
+        <button type="button" data-note-remove="${escapeHtml(note.id)}">Remove</button>
+      </header>
+      <div class="idea-form-grid">
+        <label>
+          <span>Header</span>
+          <input type="text" data-note-id="${escapeHtml(note.id)}" data-note-field="header" value="${escapeHtml(note.header || "")}" placeholder="Name this idea">
+        </label>
+        <label>
+          <span>Structure</span>
+          <select data-note-id="${escapeHtml(note.id)}" data-note-field="type">
+            ${optionMarkup(creativeNoteTypeOptions, type)}
+          </select>
+        </label>
+      </div>
+      ${contentEditor}
+      <section class="idea-preview">
+        <span>Live structure</span>
+        <h4>${escapeHtml(note.header || "Untitled idea")}</h4>
+        ${creativeNotePreviewMarkup(note)}
+      </section>
+      <section class="idea-visuals">
+        <div class="idea-visual-head">
+          <div>
+            <span>Visuals</span>
+            <strong>${escapeHtml(String((note.visuals || []).length))} attached</strong>
+          </div>
+          <label class="idea-visual-drop">
+            <input type="file" accept="image/*" multiple data-note-visual="${escapeHtml(note.id)}">
+            <span>+ Add visual</span>
+          </label>
+        </div>
+        <div class="idea-visual-grid">
+          ${creativeNoteVisualMarkup(note)}
+        </div>
+      </section>
+    </article>
+  `;
+}
+
 function sustainabilityMetricSummary(project, survey) {
   const fields = survey.fields || {};
   const analysis = project?.analysisResults || {};
@@ -8325,8 +8513,9 @@ function permitSurface(project) {
 
 function notesSurface(project) {
   const discovery = state.projectDiscovery || {};
-  const notes = [
-    ["Design rationale", discovery.outcomes || project.clientIntent.summary, "brief"],
+  const notes = ensureCreativeNoteIds();
+  const contextThreads = [
+    ["Client values", discovery.outcomes || project.clientIntent.summary, "brief"],
     ["Material feeling", listValue(discovery.atmosphere, []).join(", ") || "--", "style"],
     ["Risk thought", projectFlowIssues(project)[0]?.text || "Keep front setback, height, stormwater, slope, and geotechnical assumptions visible.", "risk"],
     ["Next creative move", "Compare massing options against daylight, views, stormwater, carbon, and client values.", "direction"]
@@ -8340,9 +8529,15 @@ function notesSurface(project) {
           <h3>Connected Design Thinking</h3>
           <p>Capture design rationale, open ideas, meeting notes, and creative prompts without separating them from site, policy, sun, sustainability, or client evidence.</p>
         </div>
+        <div class="completion-score-card notes-score-card">
+          <span>Saved ideas</span>
+          <strong>${escapeHtml(String(notes.length))}</strong>
+          <em>writing, bullets, tables, visuals</em>
+          <button class="notes-add-button" type="button" data-note-add>+ Add idea</button>
+        </div>
       </header>
-      <section class="notes-grid">
-        ${notes.map(note => `
+      <section class="notes-grid notes-context-grid">
+        ${contextThreads.map(note => `
           <article class="sticky-note ${escapeHtml(note[2])}">
             <span>${escapeHtml(note[2])}</span>
             <strong>${escapeHtml(note[0])}</strong>
@@ -8350,10 +8545,41 @@ function notesSurface(project) {
           </article>
         `).join("")}
       </section>
-      <section class="completion-main-grid">
-        <article class="completion-panel wide">
-          <span class="mini-label">Idea clusters</span>
-          <h3>Reusable Creative Threads</h3>
+      <section class="notes-command-strip">
+        <div>
+          <span class="mini-label">Create structure</span>
+          <h3>Add Ideas, Notes, Tables, Lists, And Visual References</h3>
+          <p>Use the plus button to create a new thinking block, then decide whether it should read like writing, a bullet list, or a table. Visuals stay with the idea so ASTRA can connect the note to design intent.</p>
+        </div>
+        <button class="notes-add-button large" type="button" data-note-add aria-label="Add a new note or idea">+</button>
+      </section>
+      <section class="notes-builder-grid" aria-label="Editable notes and ideation blocks">
+        ${notes.length ? notes.map((note, index) => creativeNoteEditorMarkup(note, index)).join("") : `
+          <article class="notes-empty-state">
+            <span class="mini-label">No notes yet</span>
+            <h3>Start with one design thought.</h3>
+            <p>Add a header, choose a structure, and attach visuals when a sketch, precedent, diagram, material board, or screenshot helps explain the idea.</p>
+            <button class="notes-add-button" type="button" data-note-add>+ Add idea</button>
+          </article>
+        `}
+      </section>
+      <section class="completion-main-grid notes-memory-grid">
+        <article class="completion-panel">
+          <span class="mini-label">How ASTRA reads this</span>
+          <h3>Idea Memory</h3>
+          <div class="completion-list compact">
+            ${notes.slice(0, 5).map(note => `
+              <div>
+                <strong>${escapeHtml(note.header || "Untitled idea")}</strong>
+                <p>${escapeHtml(creativeNotePlainText(note))}</p>
+                <em>${escapeHtml(creativeNoteType(note))}</em>
+              </div>
+            `).join("") || `<div class="empty-state">Add an idea to create memory that can support design review, case studies, and exports.</div>`}
+          </div>
+        </article>
+        <article class="completion-panel">
+          <span class="mini-label">Project links</span>
+          <h3>Connected Threads</h3>
           <div class="completion-table">
             ${[
               ["Client values", listValue(discovery.architecturalStyle, []).join(" / ") || "--", "design filter"],
@@ -8534,6 +8760,7 @@ function renderSurface() {
   bindSimpleProjectPage();
   if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae" || state.activeSection === "lumion" || state.activeSection === "design" || state.activeSection === "case-study") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
+  if (state.activeSection === "notes") bindNotesPage();
 }
 
 function csvValue(value) {
@@ -8594,6 +8821,7 @@ function projectCsv(project) {
     ...state.siteSurvey.policyLookups.map(item => ["site_policy_lookup", item.name, `${item.address || ""} | ${item.jurisdiction || ""} | ${item.result || ""} | ${item.sourceUrl || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.evidence.map(item => ["site_evidence", item.name, `${item.owner || ""}: ${item.value || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.aiInterpretation.map(item => ["site_ai_interpretation", item.question, item.answer, "saved"]),
+    ...creativeNoteRecords().map(item => ["creative_note", item.header || "Untitled idea", `${creativeNoteType(item)} | ${creativeNotePlainText(item)} | visuals: ${(item.visuals || []).length}`, "saved"]),
     ...caseStudyRecords().map(item => ["site_case_study", item.title, `${item.audience || ""} | ${item.focus || ""} | desired: ${item.desiredOutcome || ""} | sustainability: ${item.sustainabilityMetrics || ""} | sun: ${item.sunStudyEvidence || ""} | flood: ${item.floodStrategy || ""} | initiative: ${item.initiativeDevelopment || ""} | actions: ${item.recommendedActions || ""} | ${sourceStatusText(item)}`, item.status || "saved"]),
     ...state.siteSurvey.packageItems.map(item => ["site_package_item", item.name, item.included ? "included" : "excluded", "saved"]),
     ...state.programSpaces.flatMap(space => [
@@ -9349,6 +9577,98 @@ function bindSiteSurveyPage() {
       render();
     });
   }
+}
+
+function refreshCreativeNoteCard(card, note) {
+  if (!card || !note) return;
+  const title = card.querySelector(".idea-card-head strong");
+  if (title) title.textContent = note.header || "Untitled idea";
+  const preview = card.querySelector(".idea-preview");
+  if (preview) {
+    preview.innerHTML = `
+      <span>Live structure</span>
+      <h4>${escapeHtml(note.header || "Untitled idea")}</h4>
+      ${creativeNotePreviewMarkup(note)}
+    `;
+  }
+}
+
+function readCreativeNoteImage(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = () => resolve({ name: file.name, dataUrl: reader.result });
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
+function bindNotesPage() {
+  document.querySelectorAll("[data-note-add]").forEach(button => {
+    button.addEventListener("click", () => {
+      creativeNoteRecords().unshift(newCreativeNote());
+      persistSiteSurvey();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-note-remove]").forEach(button => {
+    button.addEventListener("click", () => {
+      const noteId = button.dataset.noteRemove;
+      state.siteSurvey.creativeNotes = creativeNoteRecords().filter(note => note.id !== noteId);
+      persistSiteSurvey();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-note-field]").forEach(input => {
+    const saveNoteField = () => {
+      const note = creativeNoteRecords().find(item => item.id === input.dataset.noteId);
+      if (!note) return;
+      const field = input.dataset.noteField;
+      if (field === "header") note.header = input.value;
+      if (field === "writing") note.writing = input.value;
+      if (field === "bullets") note.bullets = input.value.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
+      if (field === "table") note.table = parseCreativeNoteTable(input.value);
+      if (field === "type") {
+        note.type = creativeNoteTypeOptions.includes(input.value) ? input.value : "Writing";
+        if (!Array.isArray(note.bullets)) note.bullets = [];
+        if (!note.table || typeof note.table !== "object") note.table = { headers: ["Item", "Detail"], rows: [["", ""]] };
+        note.updatedAt = new Date().toISOString();
+        persistSiteSurvey();
+        render();
+        return;
+      }
+      note.updatedAt = new Date().toISOString();
+      persistSiteSurvey();
+      refreshCreativeNoteCard(input.closest(".idea-card"), note);
+    };
+    input.addEventListener(input.tagName === "SELECT" ? "change" : "input", saveNoteField);
+  });
+
+  document.querySelectorAll("[data-note-visual]").forEach(input => {
+    input.addEventListener("change", async () => {
+      const note = creativeNoteRecords().find(item => item.id === input.dataset.noteVisual);
+      if (!note) return;
+      const files = Array.from(input.files || []).slice(0, 6);
+      const visuals = (await Promise.all(files.map(readCreativeNoteImage))).filter(Boolean);
+      note.visuals = [...(Array.isArray(note.visuals) ? note.visuals : []), ...visuals].slice(0, 12);
+      note.updatedAt = new Date().toISOString();
+      persistSiteSurvey();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-note-visual-remove]").forEach(button => {
+    button.addEventListener("click", () => {
+      const [noteId, visualIndex] = String(button.dataset.noteVisualRemove || "").split(":");
+      const note = creativeNoteRecords().find(item => item.id === noteId);
+      if (!note || !Array.isArray(note.visuals)) return;
+      note.visuals = note.visuals.filter((_, index) => index !== Number(visualIndex));
+      note.updatedAt = new Date().toISOString();
+      persistSiteSurvey();
+      render();
+    });
+  });
 }
 
 function bindClientBriefPage() {
