@@ -10918,6 +10918,23 @@ body[data-active-section="dashboard"] .dashboard-flow.journey-home {
   background: rgba(214,169,94,.18);
 }
 
+body[data-active-section="dashboard"] .dashboard-flow.journey-home {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: clamp(16px, 2.1vw, 28px);
+}
+
+body[data-active-section="dashboard"] .dashboard-flow.journey-home > .entry-actions {
+  position: sticky;
+  top: clamp(12px, 1.8vw, 24px);
+  right: auto;
+  justify-self: end;
+  max-width: min(620px, 100%);
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
 body[data-active-section="dashboard"] .dashboard-flow.role-home {
   display: flex;
   align-items: flex-start;
@@ -11814,6 +11831,17 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
     background:
       linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.58)),
       rgba(0,0,0,.18);
+  }
+
+  body[data-active-section="dashboard"] .dashboard-flow.journey-home > .entry-actions {
+    position: static;
+    left: auto;
+    right: auto;
+    justify-self: stretch;
+    justify-content: flex-end;
+    max-width: none;
+    padding: 0;
+    background: transparent;
   }
 
   .entry-actions button {
