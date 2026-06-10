@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ASTRA Site Intelligence Platform</title>
-    <link rel="stylesheet" href="/styles.css?v=109">
+    <link rel="stylesheet" href="/styles.css?v=110">
   </head>
   <body>
     <div class="app-shell">
@@ -173,8 +173,28 @@
           </div>
         </section>
       </div>
+
+      <div id="dataMemoryModal" class="data-memory-modal" hidden role="dialog" aria-modal="true" aria-labelledby="dataMemoryTitle">
+        <button class="data-memory-backdrop" type="button" data-data-memory-close aria-label="Close data memory"></button>
+        <section class="data-memory-card" aria-describedby="dataMemoryBody">
+          <header>
+            <div>
+              <span id="dataMemoryEyebrow" class="mini-label">Project memory</span>
+              <h2 id="dataMemoryTitle">Memory details</h2>
+              <p id="dataMemoryBody"></p>
+            </div>
+            <button type="button" class="secondary-button" data-data-memory-close>Close</button>
+          </header>
+          <div id="dataMemorySummary" class="data-memory-summary"></div>
+          <div id="dataMemoryDetail" class="data-memory-detail"></div>
+          <footer class="data-memory-actions">
+            <button type="button" class="secondary-button" id="dataMemoryClear">Clear selected</button>
+            <button type="button" class="primary-button" id="dataMemoryDownload">Download selected CSV</button>
+          </footer>
+        </section>
+      </div>
     </div>
 
-    <script src="/app.js?v=109"></script>
+    <script src="/app.js?v=110"></script>
   </body>
 </html>

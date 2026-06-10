@@ -859,6 +859,26 @@ function loadSiteSurvey() {
   }
 }
 
+function loadSelectedDataMemory() {
+  try {
+    if (typeof localStorage === "undefined") return [];
+    const parsed = JSON.parse(localStorage.getItem("hct-selected-data-memory") || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function persistSelectedDataMemory() {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("hct-selected-data-memory", JSON.stringify(state.selectedDataMemory));
+    }
+  } catch (error) {
+    // Selected facts are a prototype convenience; exports can still be generated from full project memory.
+  }
+}
+
 function initialActiveSection() {
   if (typeof window === "undefined") return "dashboard";
   const requested = new URLSearchParams(window.location.search).get("section") || window.location.hash.replace("#", "");
@@ -874,6 +894,7 @@ const state = {
   spaceDraft: { category: "room", type: "Bedroom" },
   projectDiscovery: initialProjectDiscovery(),
   siteSurvey: loadSiteSurvey(),
+  selectedDataMemory: loadSelectedDataMemory(),
   selectedProgramSpaceId: "program-primary-bedroom",
   authView: null,
   joinType: "freelance",
@@ -920,7 +941,15 @@ const el = {
   exportInfoTitle: document.getElementById("exportInfoTitle"),
   exportInfoBody: document.getElementById("exportInfoBody"),
   exportInfoList: document.getElementById("exportInfoList"),
-  exportInfoDownload: document.getElementById("exportInfoDownload")
+  exportInfoDownload: document.getElementById("exportInfoDownload"),
+  dataMemoryModal: document.getElementById("dataMemoryModal"),
+  dataMemoryEyebrow: document.getElementById("dataMemoryEyebrow"),
+  dataMemoryTitle: document.getElementById("dataMemoryTitle"),
+  dataMemoryBody: document.getElementById("dataMemoryBody"),
+  dataMemorySummary: document.getElementById("dataMemorySummary"),
+  dataMemoryDetail: document.getElementById("dataMemoryDetail"),
+  dataMemoryClear: document.getElementById("dataMemoryClear"),
+  dataMemoryDownload: document.getElementById("dataMemoryDownload")
 };
 
 function persistSiteSurvey() {
@@ -5524,6 +5553,175 @@ function dataStorageFactRows(project) {
   ];
 }
 
+function dataMemorySlug(value) {
+  return String(value || "item").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 42) || "item";
+}
+
+function dataMemoryRecord(domain, index, label, value, detail, status = "saved", csv = "", source = "", type = "fact") {
+  const displayValue = siteDisplayValue(value);
+  const cleanStatus = displayValue === "--" ? "missing" : status || "saved";
+  return {
+    id: `${domain}-${index}-${dataMemorySlug(label)}`,
+    domain,
+    label: label || "Project memory",
+    value: displayValue,
+    detail: detail || "Saved project fact",
+    status: cleanStatus,
+    csv: csv || domain,
+    source: source || "Current project memory",
+    type
+  };
+}
+
+function dataMemorySelectedKey(item) {
+  return `${item.domain}:${item.id}`;
+}
+
+function dataMemoryIsSelected(item) {
+  const key = dataMemorySelectedKey(item);
+  return state.selectedDataMemory.some(saved => saved.key === key);
+}
+
+function selectedDataMemoryRows() {
+  return Array.isArray(state.selectedDataMemory) ? state.selectedDataMemory : [];
+}
+
+function selectedDataMemoryCsv() {
+  const rows = [
+    ["domain", "label", "value", "detail", "status", "csv_field", "source", "type"]
+  ];
+  selectedDataMemoryRows().forEach(item => {
+    rows.push([item.domain, item.label, item.value, item.detail, item.status, item.csv, item.source, item.type]);
+  });
+  return rows.map(row => row.map(csvValue).join(",")).join("\n");
+}
+
+function dataMemorySelectedMarkup() {
+  const selected = selectedDataMemoryRows();
+  if (!selected.length) {
+    return `
+      <aside class="selected-data-memory empty">
+        <span class="mini-label">Sticky data</span>
+        <h3>Selected For Use</h3>
+        <p>Click a memory domain, choose facts or case studies, and they will stay here for review, export, and ASTRA guidance.</p>
+      </aside>
+    `;
+  }
+
+  return `
+    <aside class="selected-data-memory">
+      <div class="selected-data-head">
+        <div>
+          <span class="mini-label">Sticky data</span>
+          <h3>Selected For Use</h3>
+        </div>
+        <button type="button" data-data-memory-clear-all>Clear</button>
+      </div>
+      <div class="selected-data-list">
+        ${selected.map(item => `
+          <article>
+            <span>${escapeHtml(item.domain)}</span>
+            <strong>${escapeHtml(item.label)}</strong>
+            <p>${escapeHtml(item.value)}</p>
+            <em>${escapeHtml(item.status)}</em>
+          </article>
+        `).join("")}
+      </div>
+      <button type="button" class="download-selected-memory" data-download="selected-memory-csv">Download Selected CSV</button>
+    </aside>
+  `;
+}
+
+function dataMemoryDomainRecords(project, domainKey) {
+  const survey = state.siteSurvey;
+  const fields = survey.fields || {};
+  const discovery = state.projectDiscovery || {};
+  const analysis = project.analysisResults || {};
+  const records = [];
+  const add = (label, value, detail, status, csv, source, type) => {
+    records.push(dataMemoryRecord(domainKey, records.length + 1, label, value, detail, status, csv, source, type));
+  };
+
+  if (domainKey === "BRF") {
+    add("Project name", discovery.projectName || fields.projectName || project.project.name, "Project identity used by every export and case study.", "saved", "discovery_project_name", "Client brief", "client brief");
+    add("Client goals", fields.clientGoals || discovery.goals, "Primary design filters for intent, quality, and case-study language.", "saved", "client_goal", "Client brief", "client brief");
+    add("Desired outcome", fields.desiredFutureUse || discovery.outcomes, "Narrative basis for outcome-led case studies.", policyFieldStatus(fields.desiredFutureUse || discovery.outcomes), "desired_outcome", "Client brief / data storage", "case input");
+    project.clientIntent.priorities.forEach(priority => {
+      add(priority.label, priority.weight, priority.source || "Client priority", "saved", "client_priority", priority.source || "Client brief", "client priority");
+    });
+    topProjectValues(discovery, 8).forEach(value => {
+      add(`Value: ${value}`, discovery.values?.[value] || "High", "Ranked client/project value used by ASTRA when advising.", "saved", "discovery_value", "Project discovery", "client value");
+    });
+  }
+
+  if (domainKey === "SITE") {
+    [
+      ["Address / parcel", fields.parcelAddress || fields.addressLookup, "Lookup basis for site, policy, GIS, and exports.", policyFieldStatus(fields.parcelAddress || fields.addressLookup), "site_survey_form"],
+      ["Site area", fields.siteSize || project.site.parcelAreaSqFt, "Parcel size used for feasibility and package exports.", "saved", "site_survey_form"],
+      ["Elevation range", fields.elevationPolicy || `${fields.minElevation || "--"} to ${fields.maxElevation || "--"}`, "Elevation, slope, and flood-related design basis.", policyFieldStatus(fields.elevationPolicy || fields.minElevation || fields.maxElevation), "site_survey_form"],
+      ["Drainage notes", fields.drainageNotes, "Hydrology fact used for limited-flooding case studies.", policyFieldStatus(fields.drainageNotes), "site_survey_form"],
+      ["Environmental hazards", fields.environmentalHazards, "Hazard summary used by resilience and recovery workflows.", policyFieldStatus(fields.environmentalHazards), "site_hazard"]
+    ].forEach(row => add(...row, "Site survey", "site fact"));
+    [...(survey.evidence || []), ...(survey.sourceFindings || []), ...(survey.hazards || [])].forEach(item => {
+      add(siteRecordName(item), siteRecordText(item), siteFactDetailFromRecord(item), item.status || item.verificationStatus || "needs review", "site_evidence", sourceStatusText(item), item.documentType || "site finding");
+    });
+  }
+
+  if (domainKey === "GIS") {
+    [
+      ["GIS source stack", fields.gisSourceUrl, "Layer/source reference for mapped constraints and policy geography.", fields.gisLookupStatus, "gis_layer"],
+      ["QGIS package", fields.qgisPackageName, "Free GIS handoff package tracked by ASTRA.", fields.qgisInstallStatus || fields.gisLookupStatus, "qgis_handoff"],
+      ["ArcGIS web map", fields.arcgisWebMapId || fields.arcgisEmbedUrl, "Optional ArcGIS web-map reference when licensed/available.", fields.arcgisLayerSyncStatus || "not connected", "arcgis_handoff"]
+    ].forEach(row => add(...row, "GIS workspace", "gis setup"));
+    [...(project.gisLayers || []), ...(survey.gisFindings || [])].forEach(item => {
+      add(item.name || item.layerType || "GIS layer", item.finding || item.status || "--", item.usedFor || item.source || "Mapped project finding", item.status || "needs review", "site_gis_finding", sourceStatusText(item), item.layerType || "GIS layer");
+    });
+  }
+
+  if (domainKey === "LAW") {
+    policyFactRows(project, survey).forEach(item => {
+      add(item.label, item.value, item.detail, item.status, "site_policy_lookup", "Policy fact row", "policy fact");
+    });
+    (project.verifiedRules || []).forEach(rule => {
+      add(rule.section || rule.ruleType, policyRuleValue(rule), rule.exactText || rule.sourceTitle || "Policy rule", rule.verificationStatus || "needs review", "policy_rule", rule.sourceTitle || "Policy source", "policy rule");
+    });
+    (survey.policyLookups || []).forEach(item => {
+      add(item.name || "Policy lookup", item.result || item.address || "--", siteFactDetailFromRecord(item), item.status || "pending lookup", "site_policy_lookup", sourceStatusText(item), item.documentType || "policy lookup");
+    });
+  }
+
+  if (domainKey === "SUS") {
+    [
+      ["Annual energy use", fields.annualEnergyUse, "Energy target or ASHRAE model status.", policyFieldStatus(fields.annualEnergyUse), "success_metric"],
+      ["Embodied carbon target", fields.embodiedCarbon, "Material carbon target used by EC3-ready review.", policyFieldStatus(fields.embodiedCarbon), "success_metric"],
+      ["Daylight factor", fields.daylightFactor, "Daylight goal tied to SunCalc and design review.", policyFieldStatus(fields.daylightFactor), "success_metric"],
+      ["Stormwater retention", fields.stormwaterRetention, "Water/landscape metric used by resilience case studies.", policyFieldStatus(fields.stormwaterRetention), "success_metric"],
+      ["Sun study daylight score", analysis.sunStudy?.daylightScore, analysis.sunStudy?.summary, "saved", "sun_study"],
+      ["ASHRAE cooling impact", analysis.ashrae?.coolingImpactPercent ? `+${analysis.ashrae.coolingImpactPercent}%` : "", analysis.ashrae?.summary, analysis.ashrae?.envelopeRisk || "needs review", "ashrae_result"],
+      ["Embodied carbon comparison", analysis.carbon?.embodiedCarbonChange, analysis.carbon?.summary, "under review", "ec3_carbon_result"]
+    ].forEach(row => add(...row, "ASHRAE + EC3 workspace", "sustainability metric"));
+    ec3MaterialRows(project).forEach(item => {
+      add(item.name, item.result, item.takeaway, item.status, "ec3_material", item.path, item.scope);
+    });
+  }
+
+  if (domainKey === "CASE") {
+    caseStudyRecords().forEach(item => {
+      add(item.title, item.desiredOutcome || item.focus || "--", [
+        item.sustainabilityMetrics ? `Metrics: ${item.sustainabilityMetrics}` : "",
+        item.floodStrategy ? `Flood: ${item.floodStrategy}` : "",
+        item.initiativeDevelopment ? `Initiative: ${item.initiativeDevelopment}` : "",
+        item.recommendedActions ? `Actions: ${item.recommendedActions}` : ""
+      ].filter(Boolean).join(" / "), item.status || "saved", "site_case_study", sourceStatusText(item), item.audience || "case study");
+    });
+    dataStorageFactRows(project).forEach(item => {
+      add(item.label, item.value, item.detail, item.status, "site_case_study", "Generated case-study basis", "case input");
+    });
+  }
+
+  return records;
+}
+
 function dataCount(value, label = "records") {
   const count = Number(value || 0);
   return count ? `${count} ${label}` : "--";
@@ -5535,6 +5733,7 @@ function dataStorageMemoryRows(project) {
   const discovery = state.projectDiscovery || {};
   return [
     {
+      key: "BRF",
       symbol: "BRF",
       title: "Client brief + goals",
       count: dataCount(project.clientIntent.priorities.length + topProjectValues(discovery, 8).length, "items"),
@@ -5544,6 +5743,7 @@ function dataStorageMemoryRows(project) {
       status: policyFieldStatus(discovery.projectName || project.clientIntent.summary)
     },
     {
+      key: "SITE",
       symbol: "SITE",
       title: "Site survey facts",
       count: dataCount(Object.keys(fields).length + (survey.evidence || []).length, "fields"),
@@ -5553,6 +5753,7 @@ function dataStorageMemoryRows(project) {
       status: policyFieldStatus(fields.parcelAddress || fields.addressLookup)
     },
     {
+      key: "GIS",
       symbol: "GIS",
       title: "GIS + QGIS/ArcGIS layers",
       count: dataCount((survey.gisFindings || []).length + (project.gisLayers || []).length, "layers"),
@@ -5562,6 +5763,7 @@ function dataStorageMemoryRows(project) {
       status: fields.gisLookupStatus || policyFieldStatus(fields.qgisPackageName || fields.arcgisWebMapId || fields.gisSourceUrl)
     },
     {
+      key: "LAW",
       symbol: "LAW",
       title: "Policy + code records",
       count: dataCount((survey.policyLookups || []).length + (project.verifiedRules || []).length, "records"),
@@ -5571,6 +5773,7 @@ function dataStorageMemoryRows(project) {
       status: fields.policyLookupStatus || policyFieldStatus(fields.detectedZoneArea || fields.zoningDistrict)
     },
     {
+      key: "SUS",
       symbol: "SUS",
       title: "Sustainability metrics",
       count: caseStudyMetricSummary(project, survey) ? "saved" : "--",
@@ -5580,6 +5783,7 @@ function dataStorageMemoryRows(project) {
       status: caseStudyMetricSummary(project, survey) ? "saved" : "missing"
     },
     {
+      key: "CASE",
       symbol: "CASE",
       title: "Case study library",
       count: dataCount(caseStudyRecords().length, "cases"),
@@ -5673,17 +5877,28 @@ function dataStorageSurface(project) {
               <h3>What Is Saved, What Is Missing, Where It Exports</h3>
               <p>Each data domain reads from the current project memory. Empty or unverified inputs stay visible as -- so ASTRA can explain gaps instead of fabricating facts.</p>
             </div>
-            <div class="data-memory-grid">
-              ${memoryRows.map(item => `
-                <article class="${escapeHtml(item.status)}">
-                  <span>${escapeHtml(item.symbol)}</span>
-                  <strong>${escapeHtml(item.title)}</strong>
-                  <div><b>Saved</b><em>${escapeHtml(item.count)}</em></div>
-                  <p><b>Current fact</b>${escapeHtml(siteDisplayValue(item.stored))}</p>
-                  <p><b>CSV field</b>${escapeHtml(item.csv)}</p>
-                  <p>${escapeHtml(item.use)}</p>
-                </article>
-              `).join("")}
+            <div class="data-memory-layout">
+              <div class="data-memory-grid">
+                ${memoryRows.map(item => {
+                  const domainRecords = dataMemoryDomainRecords(project, item.key);
+                  const missing = domainRecords.filter(record => record.value === "--" || String(record.status || "").includes("missing")).length;
+                  const selected = domainRecords.filter(record => dataMemoryIsSelected(record)).length;
+                  return `
+                    <button type="button" class="${escapeHtml(item.status)}" data-data-memory-domain="${escapeHtml(item.key)}" aria-label="Open ${escapeHtml(item.title)} memory details">
+                      <span>${escapeHtml(item.symbol)}</span>
+                      <strong>${escapeHtml(item.title)}</strong>
+                      <div><b>Saved</b><em>${escapeHtml(item.count)}</em></div>
+                      <div><b>Rows</b><em>${escapeHtml(domainRecords.length)}</em></div>
+                      <div><b>Missing</b><em>${escapeHtml(missing || "--")}</em></div>
+                      <div><b>Chosen</b><em>${escapeHtml(selected || "--")}</em></div>
+                      <p><b>Current fact</b>${escapeHtml(siteDisplayValue(item.stored))}</p>
+                      <p><b>CSV field</b>${escapeHtml(item.csv)}</p>
+                      <p>${escapeHtml(item.use)}</p>
+                    </button>
+                  `;
+                }).join("")}
+              </div>
+              ${dataMemorySelectedMarkup()}
             </div>
             ${siteFactGrid(dataStorageFactRows(project), "Data storage facts")}
           </section>
@@ -6591,6 +6806,27 @@ function ashraeSurface(project) {
         `).join("")}
       </section>
 
+      <section class="ashrae-assumption-panel">
+        <div class="ec3-board-head">
+          <div>
+            <span class="mini-label">ASHRAE inputs</span>
+            <h3>Editable Energy + Sustainability Basis</h3>
+            <p>Update the assumptions here and the Data Storage, CSV, case studies, and ASTRA recommendations will read the same project memory.</p>
+          </div>
+          <button class="add-row-button" type="button" data-section="data">Open Data Memory</button>
+        </div>
+        <div class="site-intake-grid ashrae-input-grid">
+          ${siteFieldInput("annualEnergyUse", "Annual energy use / model status")}
+          ${siteFieldInput("embodiedCarbon", "Embodied carbon target")}
+          ${siteFieldInput("daylightFactor", "Daylight / glare target")}
+          ${siteFieldInput("stormwaterRetention", "Stormwater retention metric")}
+          ${siteFieldSelect("sustainabilityPriority", "Sustainability priority", sustainabilityPriorityOptions)}
+          ${siteFieldInput("policyLookupStatus", "Source / verification status")}
+          ${siteFieldTextarea("buildingCodeSummary", "Code / ASHRAE basis", 3)}
+          ${siteFieldTextarea("policyDesignImplications", "Design implication", 3)}
+        </div>
+      </section>
+
       <section class="sustainability-method-grid">
         ${methodRows.map(row => `
           <article>
@@ -6771,7 +7007,7 @@ function renderSurface() {
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
-  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data") bindSiteSurveyPage();
+  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "ashrae") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
@@ -6860,7 +7096,8 @@ function projectCsv(project) {
     ...project.verifiedRules.map(rule => ["policy_rule", rule.section, `${rule.value} ${rule.unit}`, rule.verificationStatus]),
     ["model", "height_ft", project.designModel.heightFt, "current"],
     ["model", "front_distance_ft", project.designModel.frontDistanceFt, "current"],
-    ["model", "south_glazing_percent", project.designModel.southGlazingPercent, "current"]
+    ["model", "south_glazing_percent", project.designModel.southGlazingPercent, "current"],
+    ...selectedDataMemoryRows().map(item => ["selected_memory", `${item.domain}: ${item.label}`, `${item.value} | ${item.detail} | csv: ${item.csv} | source: ${item.source}`, item.status || "selected"])
   ];
   return rows.map(row => row.map(csvValue).join(",")).join("\n");
 }
@@ -6959,6 +7196,7 @@ function parcelJson(project) {
     projectDiscovery: state.projectDiscovery,
     siteSurvey: state.siteSurvey,
     programSpaces: state.programSpaces,
+    selectedDataMemory: selectedDataMemoryRows(),
     site: project.site,
     gisLayers: project.gisLayers,
     verifiedRules: project.verifiedRules,
@@ -7030,6 +7268,9 @@ function downloadByKind(kind) {
   if (kind === "case-csv") {
     triggerDownload("astra-case-studies.csv", "text/csv", caseStudyCsv(state.project));
   }
+  if (kind === "selected-memory-csv") {
+    triggerDownload("astra-selected-memory.csv", "text/csv", selectedDataMemoryCsv());
+  }
   if (kind === "gis") {
     triggerDownload("astra-gis-package.json", "application/json", JSON.stringify({
       site: state.project.site,
@@ -7081,6 +7322,101 @@ function closeExportInfo() {
   el.exportInfoModal.classList.remove("open");
   el.exportInfoModal.hidden = true;
   if (el.exportInfoDownload) el.exportInfoDownload.dataset.exportDownload = "";
+}
+
+function dataMemoryDomainSummary(records) {
+  const total = records.length;
+  const missing = records.filter(record => record.value === "--" || String(record.status || "").includes("missing")).length;
+  const review = records.filter(record => String(record.status || "").includes("review") || String(record.status || "").includes("pending")).length;
+  const selected = records.filter(record => dataMemoryIsSelected(record)).length;
+  const verified = records.filter(record => isVerifiedSiteStatus(record.status)).length;
+  return { total, missing, review, selected, verified };
+}
+
+function openDataMemoryModal(domainKey) {
+  if (!el.dataMemoryModal || !state.project) return;
+  const domain = dataStorageMemoryRows(state.project).find(item => item.key === domainKey);
+  if (!domain) return;
+  const records = dataMemoryDomainRecords(state.project, domainKey);
+  const summary = dataMemoryDomainSummary(records);
+
+  el.dataMemoryEyebrow.textContent = `${domain.symbol} project memory`;
+  el.dataMemoryTitle.textContent = domain.title;
+  el.dataMemoryBody.textContent = `${domain.use} Click any row to keep it sticky for ASTRA review, case studies, or export.`;
+  el.dataMemorySummary.innerHTML = [
+    ["Rows", summary.total],
+    ["Verified", summary.verified || "--"],
+    ["Needs review", summary.review || "--"],
+    ["Missing", summary.missing || "--"],
+    ["Chosen", summary.selected || "--"]
+  ].map(item => `
+    <article>
+      <span>${escapeHtml(item[0])}</span>
+      <strong>${escapeHtml(item[1])}</strong>
+    </article>
+  `).join("");
+  el.dataMemoryDetail.innerHTML = `
+    <div class="data-memory-table-head">
+      <span>Use</span>
+      <span>Fact / case study</span>
+      <span>Value</span>
+      <span>Status</span>
+      <span>CSV / source</span>
+    </div>
+    ${records.map(record => `
+      <label class="data-memory-row ${escapeHtml(siteStatusClass(record.status))}">
+        <input type="checkbox" data-data-memory-pick="${escapeHtml(record.domain)}:${escapeHtml(record.id)}" ${dataMemoryIsSelected(record) ? "checked" : ""}>
+        <strong>${escapeHtml(record.label)}<small>${escapeHtml(record.type)}</small></strong>
+        <p>${escapeHtml(record.value)}<small>${escapeHtml(record.detail)}</small></p>
+        <em>${escapeHtml(record.status)}</em>
+        <span>${escapeHtml(record.csv)}<small>${escapeHtml(record.source)}</small></span>
+      </label>
+    `).join("")}
+  `;
+  el.dataMemoryDetail.querySelectorAll("[data-data-memory-pick]").forEach(input => {
+    input.addEventListener("change", () => handleDataMemoryPick(input.dataset.dataMemoryPick, input.checked));
+  });
+  el.dataMemoryModal.dataset.activeDomain = domainKey;
+  el.dataMemoryModal.hidden = false;
+  requestAnimationFrame(() => {
+    el.dataMemoryModal.classList.add("open");
+    el.dataMemoryModal.querySelector("[data-data-memory-close]")?.focus();
+  });
+}
+
+function closeDataMemoryModal() {
+  if (!el.dataMemoryModal) return;
+  el.dataMemoryModal.classList.remove("open");
+  el.dataMemoryModal.hidden = true;
+  el.dataMemoryModal.dataset.activeDomain = "";
+}
+
+function setSelectedDataMemory(record, selected) {
+  const key = dataMemorySelectedKey(record);
+  if (selected) {
+    if (!state.selectedDataMemory.some(item => item.key === key)) {
+      state.selectedDataMemory = [...state.selectedDataMemory, { ...record, key }];
+    }
+  } else {
+    state.selectedDataMemory = state.selectedDataMemory.filter(item => item.key !== key);
+  }
+  persistSelectedDataMemory();
+}
+
+function clearSelectedDataMemory(domainKey = "") {
+  state.selectedDataMemory = domainKey
+    ? state.selectedDataMemory.filter(item => item.domain !== domainKey)
+    : [];
+  persistSelectedDataMemory();
+}
+
+function handleDataMemoryPick(value, checked) {
+  const [domainKey, recordId] = String(value || "").split(":");
+  const record = dataMemoryDomainRecords(state.project, domainKey).find(item => item.id === recordId);
+  if (!record) return;
+  setSelectedDataMemory(record, checked);
+  if (state.activeSection === "data") render();
+  openDataMemoryModal(domainKey);
 }
 
 function newSiteSurveyRow(group) {
@@ -7212,6 +7548,17 @@ function bindSimpleProjectPage() {
 
   document.querySelectorAll("[data-export-info]").forEach(button => {
     button.addEventListener("click", () => openExportInfo(button.dataset.exportInfo));
+  });
+
+  document.querySelectorAll("[data-data-memory-domain]").forEach(button => {
+    button.addEventListener("click", () => openDataMemoryModal(button.dataset.dataMemoryDomain));
+  });
+
+  document.querySelectorAll("[data-data-memory-clear-all]").forEach(button => {
+    button.addEventListener("click", () => {
+      clearSelectedDataMemory();
+      render();
+    });
   });
 }
 
@@ -8177,6 +8524,10 @@ async function init() {
     button.addEventListener("click", closeExportInfo);
   });
 
+  document.querySelectorAll("[data-data-memory-close]").forEach(button => {
+    button.addEventListener("click", closeDataMemoryModal);
+  });
+
   if (el.exportInfoDownload) {
     el.exportInfoDownload.addEventListener("click", () => {
       downloadByKind(el.exportInfoDownload.dataset.exportDownload);
@@ -8184,9 +8535,25 @@ async function init() {
     });
   }
 
+  if (el.dataMemoryDownload) {
+    el.dataMemoryDownload.addEventListener("click", () => downloadByKind("selected-memory-csv"));
+  }
+
+  if (el.dataMemoryClear) {
+    el.dataMemoryClear.addEventListener("click", () => {
+      const activeDomain = el.dataMemoryModal?.dataset.activeDomain || "";
+      clearSelectedDataMemory(activeDomain);
+      if (state.activeSection === "data") render();
+      if (activeDomain) openDataMemoryModal(activeDomain);
+    });
+  }
+
   document.addEventListener("keydown", event => {
     if (event.key === "Escape" && el.exportInfoModal && !el.exportInfoModal.hidden) {
       closeExportInfo();
+    }
+    if (event.key === "Escape" && el.dataMemoryModal && !el.dataMemoryModal.hidden) {
+      closeDataMemoryModal();
     }
   });
 

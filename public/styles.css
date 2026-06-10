@@ -420,6 +420,206 @@ button {
   flex-wrap: wrap;
 }
 
+.data-memory-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 165;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 3.6vw, 48px);
+}
+
+.data-memory-modal[hidden] {
+  display: none;
+}
+
+.data-memory-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0,0,0,.66);
+  cursor: pointer;
+}
+
+.data-memory-card {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, 100%);
+  max-height: min(86vh, 920px);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(222,235,164,.24);
+  border-radius: 8px;
+  background:
+    radial-gradient(820px 460px at 10% 0%, rgba(62,182,194,.18), transparent 72%),
+    linear-gradient(145deg, rgba(45,111,115,.17), rgba(214,169,94,.08)),
+    #111410;
+  color: rgba(255,255,255,.9);
+  box-shadow: 0 34px 94px rgba(0,0,0,.54);
+  padding: clamp(20px, 2.8vw, 34px);
+}
+
+.data-memory-card header {
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.data-memory-card h2 {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.96);
+  font-size: clamp(30px, 3vw, 50px);
+  font-weight: 560;
+  line-height: 1.02;
+}
+
+.data-memory-card p {
+  margin: 10px 0 0;
+  color: rgba(255,255,255,.68);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.data-memory-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.data-memory-summary article {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,.055);
+  padding: 12px;
+}
+
+.data-memory-summary span,
+.data-memory-table-head span {
+  color: rgba(190,205,130,.9);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.data-memory-summary strong {
+  display: block;
+  margin-top: 6px;
+  color: rgba(255,255,255,.94);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.data-memory-detail {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.data-memory-table-head,
+.data-memory-row {
+  display: grid;
+  grid-template-columns: 52px minmax(170px, .9fr) minmax(240px, 1.3fr) 120px minmax(170px, .8fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.data-memory-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  background: rgba(17,20,16,.94);
+  padding: 10px 12px;
+}
+
+.data-memory-row {
+  border: 1px solid rgba(255,255,255,.1);
+  border-left: 4px solid rgba(91,167,146,.78);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 12px;
+}
+
+.data-memory-row.missing,
+.data-memory-row.needs-review,
+.data-memory-row.pending-lookup {
+  border-left-color: rgba(214,169,94,.9);
+}
+
+.data-memory-row.conflict,
+.data-memory-row.reconsider,
+.data-memory-row.high {
+  border-left-color: rgba(202,107,84,.92);
+}
+
+.data-memory-row input {
+  width: 22px;
+  height: 22px;
+  accent-color: rgba(190,205,130,.95);
+}
+
+.data-memory-row strong,
+.data-memory-row p,
+.data-memory-row span {
+  min-width: 0;
+}
+
+.data-memory-row strong {
+  color: rgba(255,255,255,.92);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.data-memory-row small {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255,255,255,.52);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.data-memory-row p {
+  margin: 0;
+  color: rgba(255,255,255,.76);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.data-memory-row em {
+  width: fit-content;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  color: rgba(255,255,255,.76);
+  background: rgba(255,255,255,.06);
+  padding: 6px 8px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.data-memory-row span {
+  color: rgba(222,235,164,.82);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.data-memory-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .status-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2018,6 +2218,24 @@ th {
   gap: 18px;
   padding: clamp(20px, 2.7vw, 34px);
   background: rgba(255,255,255,.62);
+}
+
+.ashrae-assumption-panel {
+  display: grid;
+  gap: 18px;
+  border: 1px solid rgba(64, 72, 65, 0.18);
+  border-radius: 8px;
+  background: rgba(255,255,255,.64);
+  box-shadow: 0 20px 48px rgba(25, 29, 25, 0.1);
+  padding: clamp(20px, 2.7vw, 34px);
+}
+
+.ashrae-input-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ashrae-input-grid .wide-field {
+  grid-column: span 2;
 }
 
 .ec3-board-head {
@@ -6316,6 +6534,205 @@ body:not([data-active-section="dashboard"]) #questionInput {
   overflow-wrap: anywhere;
 }
 
+.data-memory-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: clamp(18px, 2vw, 30px);
+  align-items: start;
+}
+
+.data-memory-grid button {
+  width: 100%;
+  min-height: 320px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-top: 4px solid rgba(214,169,94,.84);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(214,169,94,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.32);
+  color: inherit;
+  padding: clamp(18px, 2vw, 26px);
+  text-align: left;
+  cursor: pointer;
+}
+
+.data-memory-grid button:nth-child(2) {
+  border-top-color: rgba(91,167,146,.86);
+  background:
+    linear-gradient(135deg, rgba(91,167,146,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.32);
+}
+
+.data-memory-grid button:nth-child(3) {
+  border-top-color: rgba(62,182,194,.86);
+  background:
+    linear-gradient(135deg, rgba(62,182,194,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.32);
+}
+
+.data-memory-grid button:nth-child(4) {
+  border-top-color: rgba(107,149,217,.86);
+  background:
+    linear-gradient(135deg, rgba(107,149,217,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.32);
+}
+
+.data-memory-grid button:nth-child(5) {
+  border-top-color: rgba(190,205,130,.86);
+  background:
+    linear-gradient(135deg, rgba(190,205,130,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.32);
+}
+
+.data-memory-grid button:nth-child(6) {
+  border-top-color: rgba(202,107,84,.86);
+  background:
+    linear-gradient(135deg, rgba(202,107,84,.1), rgba(255,255,255,.018)),
+    rgba(0,0,0,.32);
+}
+
+.data-memory-grid button:hover,
+.data-memory-grid button:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.22);
+  outline: 2px solid rgba(222,235,164,.55);
+  outline-offset: 3px;
+}
+
+.data-memory-grid button > span {
+  width: fit-content;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  color: rgba(222,235,164,.94);
+  background: rgba(255,255,255,.06);
+  padding: 7px 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .12em;
+}
+
+.data-memory-grid button strong {
+  color: rgba(255,255,255,.95);
+  font-size: clamp(22px, 1.7vw, 30px);
+  line-height: 1.08;
+}
+
+.data-memory-grid button div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-top: 10px;
+}
+
+.data-memory-grid button b {
+  color: rgba(190,205,130,.9);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.data-memory-grid button em {
+  color: rgba(255,255,255,.86);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.data-memory-grid button p {
+  margin: 0;
+  color: rgba(255,255,255,.66);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.selected-data-memory {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-top: 4px solid rgba(222,235,164,.86);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(190,205,130,.11), rgba(62,182,194,.05)),
+    rgba(0,0,0,.42);
+  box-shadow: 0 24px 58px rgba(0,0,0,.26);
+  padding: clamp(18px, 2vw, 24px);
+}
+
+.selected-data-memory.empty {
+  border-top-color: rgba(255,255,255,.2);
+}
+
+.selected-data-memory h3 {
+  margin: 0;
+  color: rgba(255,255,255,.94);
+  font-size: clamp(22px, 1.8vw, 30px);
+}
+
+.selected-data-memory p {
+  margin: 0;
+  color: rgba(255,255,255,.64);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.selected-data-head {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.selected-data-head button,
+.download-selected-memory {
+  border: 1px solid rgba(222,235,164,.28);
+  border-radius: 999px;
+  background: rgba(222,235,164,.08);
+  color: rgba(255,255,255,.86);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.selected-data-list {
+  display: grid;
+  gap: 10px;
+  max-height: 460px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.selected-data-list article {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 11px;
+}
+
+.selected-data-list span,
+.selected-data-list em {
+  color: rgba(190,205,130,.9);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.selected-data-list strong {
+  color: rgba(255,255,255,.9);
+  font-size: 14px;
+}
+
 .data-export-grid button:nth-child(2) {
   border-top-color: rgba(190,205,130,.86);
   background:
@@ -8033,6 +8450,7 @@ body:not([data-active-section="dashboard"]) #questionInput {
   .data-outcome-grid,
   .case-study-input-grid,
   .case-study-record-grid,
+  .data-memory-layout,
   .ai-policy-gis-grid,
   .ai-policy-card-grid,
   .arcgis-install-grid,
@@ -8045,9 +8463,33 @@ body:not([data-active-section="dashboard"]) #questionInput {
 
   .policy-notes-grid .wide-field,
   .case-study-input-grid .wide-field,
+  .ashrae-input-grid .wide-field,
   .arcgis-install-config-grid .wide-field,
   .arcgis-config-grid .wide-field {
     grid-column: 1 / -1;
+  }
+
+  .selected-data-memory {
+    position: static;
+  }
+
+  .data-memory-summary,
+  .ashrae-input-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .data-memory-table-head {
+    display: none;
+  }
+
+  .data-memory-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .data-memory-row p,
+  .data-memory-row em,
+  .data-memory-row span {
+    grid-column: 2;
   }
 
   .policy-zone-snapshot {
@@ -9909,6 +10351,22 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
 }
 
 @media (max-width: 760px) {
+  .data-memory-card {
+    max-height: 92vh;
+    padding: 16px;
+  }
+
+  .data-memory-card header,
+  .data-memory-actions {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .data-memory-summary,
+  .ashrae-input-grid {
+    grid-template-columns: 1fr;
+  }
+
   .to-top-button {
     left: 14px;
     bottom: 14px;
