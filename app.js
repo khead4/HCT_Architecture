@@ -1234,6 +1234,53 @@ function siteDisplayValue(value) {
   return text ? text : "--";
 }
 
+function numericSiteValue(value) {
+  const number = Number.parseFloat(String(value ?? "").replace(/[^\d.-]/g, ""));
+  return Number.isFinite(number) ? number : null;
+}
+
+function solarPositionReadout(latitude, longitude, date = new Date()) {
+  const lat = numericSiteValue(latitude);
+  const lon = numericSiteValue(longitude);
+  if (lat === null || lon === null) {
+    return {
+      basis: "--",
+      altitude: "--",
+      dayLength: "--",
+      shadow: "--",
+      takeaway: "Enter latitude and longitude before treating sun angles as verified. Until then, use this as a design prompt only."
+    };
+  }
+
+  const radians = Math.PI / 180;
+  const yearStart = new Date(date.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date - yearStart) / 86400000);
+  const declination = 23.44 * Math.sin(radians * ((360 / 365) * (dayOfYear - 81)));
+  const latitudeRadians = lat * radians;
+  const declinationRadians = declination * radians;
+  const hourAngleCos = -Math.tan(latitudeRadians) * Math.tan(declinationRadians);
+  const hourAngle = Math.acos(Math.max(-1, Math.min(1, hourAngleCos))) / radians;
+  const dayLength = (2 * hourAngle) / 15;
+  const noonAltitude = Math.max(0, 90 - Math.abs(lat - declination));
+  const altitude = `${noonAltitude.toFixed(1)} deg`;
+  const daylight = `${dayLength.toFixed(1)} hr`;
+  const shadow = noonAltitude >= 55
+    ? "Shorter noon shadows"
+    : noonAltitude >= 30
+    ? "Moderate noon shadows"
+    : "Long noon shadows";
+  const dateLabel = date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const hemisphere = lat >= 0 ? "northern" : "southern";
+
+  return {
+    basis: `${lat.toFixed(4)}, ${lon.toFixed(4)}`,
+    altitude,
+    dayLength: daylight,
+    shadow,
+    takeaway: `Using the saved ${hemisphere} latitude on ${dateLabel}, solar noon is about ${altitude} with about ${daylight} of daylight. Use this as early planning guidance, then confirm with a dedicated sun-study export before final design.`
+  };
+}
+
 function siteFactRecord(records, terms) {
   const list = Array.isArray(records) ? records : [];
   const needles = terms.map(term => String(term || "").toLowerCase());
@@ -6177,19 +6224,133 @@ function gisSurface(project) {
 }
 
 function sunSurface(project) {
+  const fields = state.siteSurvey.fields || {};
+  const environmental = state.siteSurvey.environmental || [];
+  const opportunities = state.siteSurvey.opportunities || [];
+  const gisFindings = state.siteSurvey.gisFindings || [];
+  const sunFact = siteFactRecord(environmental, ["sun", "solar", "daylight"]);
+  const solarOpportunity = siteFactRecord(opportunities, ["solar", "orientation"]);
+  const viewFinding = siteFactRecord(gisFindings, ["view", "viewshed", "corridor"]);
+  const sunStudy = project.analysisResults.sunStudy || {};
+  const ashrae = project.analysisResults.ashrae || {};
+  const model = project.designModel || {};
+  const lat = siteDisplayValue(fields.latitude);
+  const lon = siteDisplayValue(fields.longitude);
+  const orientation = siteDisplayValue(model.orientation || fields.detectedZoneArea || "southwest");
+  const solarReadout = solarPositionReadout(fields.latitude, fields.longitude);
+  const sunSummary = siteDisplayValue(sunFact ? siteRecordText(sunFact) : sunStudy.summary);
+  const orientationSummary = siteDisplayValue(solarOpportunity ? siteRecordText(solarOpportunity) : "Solar orientation needs a saved opportunity record.");
+  const viewSummary = siteDisplayValue(viewFinding ? siteRecordText(viewFinding) : "No saved view corridor finding yet.");
+  const studyRows = [
+    {
+      label: "SunCalc",
+      title: "Solar Position Inputs",
+      value: solarReadout.basis,
+      path: "Address or parcel coordinates -> latitude / longitude -> date and time -> solar altitude, azimuth, sunrise, sunset, and shadow direction.",
+      takeaway: solarReadout.takeaway,
+      metrics: [
+        ["Latitude", lat],
+        ["Longitude", lon],
+        ["Noon altitude", solarReadout.altitude],
+        ["Daylight", solarReadout.dayLength],
+        ["Shadow cue", solarReadout.shadow]
+      ]
+    },
+    {
+      label: "Sun Diagram",
+      title: "Daily Exposure Pattern",
+      value: `${siteDisplayValue(sunStudy.daylightScore)} daylight`,
+      path: "Morning east light -> noon high southern exposure -> afternoon southwest/west exposure -> evening low-angle glare check.",
+      takeaway: `${sunSummary} Pair the diagram with glare and cooling review before increasing glass area.`,
+      metrics: [
+        ["Daylight score", siteDisplayValue(sunStudy.daylightScore)],
+        ["Glare risk", siteDisplayValue(sunStudy.glareRisk)],
+        ["Strong exposure", "Afternoon SW"]
+      ]
+    },
+    {
+      label: "Solar Orientation",
+      title: "Massing + Opening Direction",
+      value: orientation,
+      path: "Building orientation -> south glazing percent -> roof / facade exposure -> views, shade, cooling impact, and passive-design opportunity.",
+      takeaway: `${orientationSummary} Current south glazing is ${siteDisplayValue(model.southGlazingPercent)}% and ASHRAE cooling impact is +${siteDisplayValue(ashrae.coolingImpactPercent)}%, so shading and envelope quality should stay linked to orientation decisions.`,
+      metrics: [
+        ["Orientation", orientation],
+        ["South glazing", `${siteDisplayValue(model.southGlazingPercent)}%`],
+        ["Cooling impact", `+${siteDisplayValue(ashrae.coolingImpactPercent)}%`]
+      ]
+    }
+  ];
+
   return `
-    <div class="surface-pad analysis-surface">
-      <div class="sun-diagram">
-        <div class="sun-band">Morning</div>
-        <div class="sun-band strong">Afternoon exposure</div>
-        <div class="sun-band">Evening</div>
-      </div>
-      <div class="metric-panel">
-        <h3>Sun Study V4</h3>
-        <div class="big-metric">${escapeHtml(project.analysisResults.sunStudy.daylightScore)}</div>
-        <p>${escapeHtml(project.analysisResults.sunStudy.summary)}</p>
-        <span class="status-token medium">Glare risk: ${escapeHtml(project.analysisResults.sunStudy.glareRisk)}</span>
-      </div>
+    <div class="surface-pad analysis-surface sun-study-workspace">
+      <section class="sun-study-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Solar study workspace</span>
+          <h3>SunCalc + Sun Diagram + Solar Orientation</h3>
+          <p>Use entered coordinates, site evidence, and model orientation to understand sun path, daylight, glare, heat gain, and passive-design moves.</p>
+        </div>
+        <div class="sun-study-score">
+          <span>Daylight score</span>
+          <strong>${escapeHtml(siteDisplayValue(sunStudy.daylightScore))}</strong>
+          <em>Glare risk: ${escapeHtml(siteDisplayValue(sunStudy.glareRisk))}</em>
+        </div>
+      </section>
+
+      <section class="sun-diagram-card">
+        <div class="sun-diagram">
+          <div class="sun-orbit" aria-hidden="true">
+            <span class="sun-point morning">AM</span>
+            <span class="sun-point noon">NOON</span>
+            <span class="sun-point evening">PM</span>
+          </div>
+          <div class="sun-band">Morning<br><small>lower east light</small></div>
+          <div class="sun-band strong">Afternoon<br><small>strong southwest exposure</small></div>
+          <div class="sun-band">Evening<br><small>low glare angle</small></div>
+        </div>
+        <div class="sun-diagram-notes">
+          <span class="mini-label">Diagram takeaway</span>
+          <h3>What The Path Shows</h3>
+          <p>${escapeHtml(sunSummary)}</p>
+          <p>View cue: ${escapeHtml(viewSummary)}</p>
+        </div>
+      </section>
+
+      <section class="sun-method-grid" aria-label="Sun study methods">
+        ${studyRows.map(row => `
+          <article class="sun-method-card">
+            <span class="mini-label">${escapeHtml(row.label)}</span>
+            <div class="sun-method-head">
+              <h3>${escapeHtml(row.title)}</h3>
+              <strong>${escapeHtml(row.value)}</strong>
+            </div>
+            <div class="sun-method-copy">
+              <div class="sun-method-metrics">
+                ${(row.metrics || []).map(metric => `
+                  <span><b>${escapeHtml(metric[0])}</b>${escapeHtml(metric[1])}</span>
+                `).join("")}
+              </div>
+              <p><b>Path:</b> ${escapeHtml(row.path)}</p>
+              <p><b>Takeaway:</b> ${escapeHtml(row.takeaway)}</p>
+            </div>
+          </article>
+        `).join("")}
+      </section>
+
+      <section class="sun-action-panel">
+        <div>
+          <span class="mini-label">ASTRA interpretation</span>
+          <h3>Design Direction</h3>
+          <p>Keep the west/southwest daylight and view benefit, but avoid treating more glazing as the only solution. Pair orientation with exterior shading, high-performance glass, roof solar readiness, landscape shade, and ASHRAE cooling review.</p>
+        </div>
+        <div class="sun-action-list">
+          <span>Set coordinates before final solar angles</span>
+          <span>Compare morning, noon, and afternoon study dates</span>
+          <span>Check glare before approving facade changes</span>
+          <span>Link orientation to material and envelope choices</span>
+        </div>
+      </section>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
@@ -6330,6 +6491,8 @@ function renderSurface() {
     ? gisSurface(project)
     : state.activeSection === "policy"
     ? policySurface(project)
+    : state.activeSection === "sun"
+    ? sunSurface(project)
     : projectPageSurface(project, section);
   document.getElementById("visualWorkspace").innerHTML = html;
   el.annotationLayer = document.getElementById("annotationLayer");

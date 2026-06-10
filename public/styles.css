@@ -1341,6 +1341,341 @@ th {
   background: rgba(185, 129, 47, 0.42);
 }
 
+.sun-study-workspace {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 18px;
+  background:
+    radial-gradient(720px 360px at 16% 0%, rgba(214, 169, 94, 0.22), transparent 68%),
+    radial-gradient(620px 320px at 86% 8%, rgba(45, 111, 115, 0.17), transparent 66%),
+    linear-gradient(135deg, #f7f0de 0%, #ddebea 55%, #edf2e9 100%);
+}
+
+.sun-study-hero,
+.sun-diagram-card,
+.sun-method-card,
+.sun-action-panel {
+  border: 1px solid rgba(64, 72, 65, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 18px 42px rgba(25, 29, 25, 0.1);
+}
+
+.sun-study-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(180px, 260px);
+  gap: 18px;
+  align-items: start;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.sun-study-hero h3 {
+  margin: 6px 0 10px;
+  color: #1f211e;
+  font-size: clamp(30px, 4vw, 54px);
+  line-height: 0.98;
+}
+
+.sun-study-hero p,
+.sun-diagram-notes p,
+.sun-action-panel p {
+  max-width: 780px;
+  margin: 0;
+  color: #454940;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.sun-study-score {
+  min-height: 150px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 18px;
+  color: #27311f;
+  background: linear-gradient(160deg, rgba(247, 218, 145, 0.86), rgba(207, 227, 217, 0.88));
+}
+
+.sun-study-score span,
+.sun-study-score em {
+  color: #5f654f;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.sun-study-score strong {
+  color: #1f211e;
+  font-size: 58px;
+  line-height: 0.9;
+}
+
+.sun-diagram-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  gap: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.sun-study-workspace .sun-diagram {
+  position: relative;
+  min-height: 330px;
+  overflow: hidden;
+  border-color: rgba(98, 94, 67, 0.26);
+  background:
+    linear-gradient(180deg, rgba(252, 238, 188, 0.9), rgba(223, 237, 232, 0.96) 55%, rgba(195, 214, 194, 0.9)),
+    repeating-linear-gradient(90deg, rgba(38, 44, 39, 0.07) 0, rgba(38, 44, 39, 0.07) 1px, transparent 1px, transparent 72px);
+}
+
+.sun-orbit {
+  position: absolute;
+  top: 28px;
+  right: 8%;
+  left: 8%;
+  height: 150px;
+  border-top: 2px solid rgba(114, 87, 38, 0.52);
+  border-radius: 50% 50% 0 0;
+  pointer-events: none;
+}
+
+.sun-point {
+  position: absolute;
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  border: 1px solid rgba(104, 76, 30, 0.35);
+  border-radius: 50%;
+  color: #4f3c17;
+  background: #f6c85f;
+  box-shadow: 0 12px 30px rgba(196, 130, 36, 0.3);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.sun-point.morning {
+  top: 108px;
+  left: -3px;
+}
+
+.sun-point.noon {
+  top: -23px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sun-point.evening {
+  top: 108px;
+  right: -3px;
+}
+
+.sun-study-workspace .sun-band {
+  position: relative;
+  z-index: 1;
+  min-height: 112px;
+  align-self: end;
+  padding: 14px;
+  text-align: center;
+  background: rgba(255, 244, 205, 0.74);
+}
+
+.sun-study-workspace .sun-band strong,
+.sun-study-workspace .sun-band small {
+  display: block;
+}
+
+.sun-study-workspace .sun-band small {
+  margin-top: 5px;
+  color: rgba(74, 58, 26, 0.72);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sun-study-workspace .sun-band.strong {
+  min-height: 230px;
+  background: rgba(236, 166, 64, 0.44);
+}
+
+.sun-diagram-notes {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  border: 1px solid rgba(64, 72, 65, 0.14);
+  border-radius: 8px;
+  padding: 20px;
+  background: rgba(250, 250, 244, 0.76);
+}
+
+.sun-diagram-notes h3,
+.sun-method-head h3,
+.sun-action-panel h3 {
+  margin: 0;
+  color: #232620;
+}
+
+.sun-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sun-method-card {
+  min-height: 260px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.sun-method-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.sun-method-head h3 {
+  font-size: 20px;
+  line-height: 1.12;
+}
+
+.sun-method-head strong {
+  flex: 0 0 auto;
+  max-width: 44%;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #2e4d4d;
+  text-align: right;
+  background: rgba(215, 234, 232, 0.82);
+}
+
+.sun-method-copy {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.sun-method-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.sun-method-metrics span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  border: 1px solid rgba(35, 38, 32, 0.12);
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #33413d;
+  background: rgba(255, 255, 255, 0.66);
+  font-size: 12px;
+}
+
+.sun-method-metrics b {
+  color: #6f744f;
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.sun-method-copy p {
+  margin: 0;
+  color: #44493f;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sun-method-copy b {
+  color: #1f211e;
+}
+
+.sun-action-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.6fr);
+  gap: 18px;
+  padding: 22px;
+  background: rgba(31, 44, 39, 0.9);
+}
+
+.sun-action-panel h3,
+.sun-action-panel p,
+.sun-action-panel .mini-label {
+  color: #f7f2e5;
+}
+
+.sun-action-list {
+  display: grid;
+  gap: 8px;
+}
+
+.sun-action-list span {
+  border: 1px solid rgba(247, 242, 229, 0.16);
+  border-radius: 8px;
+  padding: 11px 12px;
+  color: #eef4e9;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 13px;
+}
+
+@media (max-width: 980px) {
+  .sun-study-hero,
+  .sun-diagram-card,
+  .sun-action-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .sun-method-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sun-method-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .sun-study-hero,
+  .sun-diagram-card,
+  .sun-method-card,
+  .sun-action-panel {
+    padding: 16px;
+  }
+
+  .sun-study-hero h3 {
+    font-size: 34px;
+  }
+
+  .sun-study-score {
+    min-height: 120px;
+  }
+
+  .sun-study-workspace .sun-diagram {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .sun-orbit {
+    display: none;
+  }
+
+  .sun-study-workspace .sun-band,
+  .sun-study-workspace .sun-band.strong {
+    min-height: 96px;
+  }
+
+  .sun-method-head {
+    display: grid;
+  }
+
+  .sun-method-head strong {
+    max-width: 100%;
+    text-align: left;
+  }
+}
+
 .big-metric {
   font-size: 54px;
   line-height: 1;
