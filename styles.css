@@ -2474,6 +2474,378 @@ th {
   grid-column: 1 / -1;
 }
 
+.lumion-workspace {
+  display: grid;
+  gap: clamp(24px, 3vw, 42px);
+  width: min(1960px, 100%);
+  max-width: none;
+  margin: 0 auto;
+  min-height: 100%;
+  padding: clamp(24px, 3.6vw, 56px);
+  background:
+    radial-gradient(900px 540px at 12% 0%, rgba(218,150,196,.13), transparent 70%),
+    radial-gradient(780px 460px at 92% 16%, rgba(214,169,94,.12), transparent 72%),
+    radial-gradient(620px 420px at 52% 94%, rgba(104,199,189,.08), transparent 72%),
+    linear-gradient(145deg, #07100e 0%, #111712 52%, #201a14 100%);
+  color: rgba(245,242,228,.94);
+}
+
+.lumion-hero,
+.lumion-cad-bridge,
+.lumion-tool-panel,
+.lumion-schedule-panel {
+  border: 1px solid rgba(214,169,94,.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.07), rgba(255,255,255,.022)),
+    rgba(8,18,16,.72);
+  box-shadow: 0 26px 76px rgba(0,0,0,.34);
+}
+
+.lumion-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(220px, .26fr);
+  gap: clamp(18px, 2.4vw, 38px);
+  align-items: center;
+  padding: clamp(24px, 3vw, 44px);
+}
+
+.lumion-hero h3,
+.lumion-cad-bridge h3,
+.lumion-tool-panel h3,
+.lumion-schedule-head h3 {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.96);
+  font-size: clamp(28px, 3vw, 50px);
+  font-weight: 560;
+  line-height: 1.03;
+  letter-spacing: 0;
+}
+
+.lumion-hero p,
+.lumion-cad-bridge p,
+.lumion-tool-panel p,
+.lumion-schedule-head p {
+  max-width: 920px;
+  color: rgba(222,230,216,.72);
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+.lumion-score {
+  min-height: 150px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  border: 1px solid rgba(214,169,94,.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(214,169,94,.18), rgba(218,150,196,.1)),
+    rgba(255,255,255,.045);
+  padding: 18px;
+}
+
+.lumion-score span,
+.lumion-score em,
+.lumion-material-list span,
+.lumion-schedule-row.head span {
+  color: rgba(224,207,139,.88);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.lumion-score strong {
+  color: rgba(255,255,255,.96);
+  font-size: clamp(48px, 5vw, 78px);
+  line-height: .9;
+}
+
+.lumion-cad-bridge {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(420px, 1fr);
+  gap: clamp(22px, 3vw, 48px);
+  align-items: start;
+  padding: clamp(24px, 3vw, 42px);
+}
+
+.lumion-input-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lumion-render-wall {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
+}
+
+.lumion-render-wall .render-frame {
+  min-height: clamp(260px, 24vw, 420px);
+  display: grid;
+  align-content: end;
+  gap: 10px;
+  border-color: rgba(255,255,255,.14);
+  box-shadow: 0 26px 76px rgba(0,0,0,.28);
+}
+
+.lumion-render-wall .render-frame span {
+  font-size: 12px;
+  font-weight: 820;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.lumion-render-wall .render-frame strong {
+  max-width: 94%;
+  font-size: clamp(26px, 2.5vw, 44px);
+  font-weight: 560;
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+}
+
+.lumion-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 2.2vw, 30px);
+}
+
+.lumion-tool-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: clamp(22px, 2.6vw, 36px);
+}
+
+.lumion-material-list,
+.lumion-risk-list,
+.lumion-case-facts {
+  display: grid;
+  gap: 12px;
+}
+
+.lumion-material-list div,
+.lumion-risk-list div,
+.lumion-case-facts span {
+  border: 1px solid rgba(255,255,255,.1);
+  border-left: 4px solid rgba(104,199,189,.76);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 13px;
+}
+
+.lumion-material-list div.missing,
+.lumion-risk-list div.missing,
+.lumion-material-list div.needs-review,
+.lumion-risk-list div.needs-review,
+.lumion-material-list div.needs_review,
+.lumion-risk-list div.needs_review {
+  border-left-color: rgba(214,169,94,.9);
+}
+
+.lumion-material-list div.high,
+.lumion-risk-list div.high,
+.lumion-material-list div.reconsider,
+.lumion-risk-list div.reconsider {
+  border-left-color: rgba(216,106,82,.9);
+}
+
+.lumion-material-list strong,
+.lumion-risk-list strong,
+.lumion-case-facts span {
+  display: block;
+  color: rgba(255,255,255,.92);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.lumion-material-list p,
+.lumion-risk-list p {
+  margin: 8px 0 0;
+  color: rgba(222,230,216,.66);
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.lumion-material-list em,
+.lumion-risk-list span {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 10px;
+  border: 1px solid rgba(214,169,94,.24);
+  border-radius: 999px;
+  color: rgba(224,207,139,.9);
+  background: rgba(214,169,94,.08);
+  padding: 6px 8px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 780;
+}
+
+.lumion-style-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.lumion-style-chips span {
+  border: 1px solid rgba(214,169,94,.24);
+  border-radius: 999px;
+  color: rgba(255,255,255,.86);
+  background: rgba(255,255,255,.055);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.lumion-schedule-panel {
+  display: grid;
+  gap: 20px;
+  padding: clamp(22px, 2.8vw, 40px);
+}
+
+.lumion-schedule-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.lumion-schedule-table {
+  display: grid;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.lumion-schedule-row {
+  min-width: 1180px;
+  display: grid;
+  grid-template-columns: 150px 170px 80px 170px minmax(300px, 1fr) 120px 120px 180px;
+  gap: 12px;
+  align-items: start;
+  border: 1px solid rgba(255,255,255,.1);
+  border-left: 4px solid rgba(104,199,189,.72);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 13px;
+}
+
+.lumion-schedule-row.head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-left-color: rgba(214,169,94,.78);
+  background: rgba(17,20,16,.94);
+}
+
+.lumion-schedule-row.needs-review,
+.lumion-schedule-row.needs_review,
+.lumion-schedule-row.missing {
+  border-left-color: rgba(214,169,94,.9);
+}
+
+.lumion-schedule-row strong,
+.lumion-schedule-row span {
+  min-width: 0;
+  color: rgba(255,255,255,.82);
+  font-size: 13px;
+  line-height: 1.38;
+  overflow-wrap: anywhere;
+}
+
+.lumion-schedule-row strong {
+  color: rgba(255,255,255,.94);
+  font-size: 14px;
+}
+
+.lumion-schedule-editor {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lumion-workspace .site-intake-grid input,
+.lumion-workspace .site-intake-grid textarea,
+.lumion-workspace .site-intake-grid select,
+.lumion-tool-panel > label textarea {
+  border-color: rgba(117,184,170,.2);
+  background: rgba(255,255,255,.055);
+  color: rgba(255,255,255,.92);
+}
+
+.lumion-workspace .site-intake-grid input:focus,
+.lumion-workspace .site-intake-grid textarea:focus,
+.lumion-workspace .site-intake-grid select:focus,
+.lumion-tool-panel > label textarea:focus {
+  border-color: rgba(214,169,94,.72);
+  box-shadow: 0 0 0 4px rgba(214,169,94,.1);
+}
+
+.lumion-workspace .field-label,
+.lumion-workspace .site-intake-grid label > span,
+.lumion-tool-panel > label > span {
+  color: rgba(224,207,139,.82);
+}
+
+.lumion-tool-panel > label {
+  display: grid;
+  gap: 9px;
+}
+
+.lumion-tool-panel > label textarea {
+  width: 100%;
+  min-height: 136px;
+  border: 1px solid rgba(117,184,170,.2);
+  border-radius: 8px;
+  padding: 13px 14px;
+  font: 650 15px/1.45 var(--sans);
+  resize: vertical;
+  outline: none;
+}
+
+@media (max-width: 1100px) {
+  .lumion-hero,
+  .lumion-cad-bridge,
+  .lumion-tool-grid,
+  .lumion-render-wall {
+    grid-template-columns: 1fr;
+  }
+
+  .lumion-score {
+    min-height: auto;
+  }
+
+  .lumion-schedule-editor,
+  .lumion-input-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .lumion-workspace {
+    gap: 28px;
+    padding: 16px;
+  }
+
+  .lumion-hero,
+  .lumion-cad-bridge,
+  .lumion-tool-panel,
+  .lumion-schedule-panel {
+    padding: 20px;
+  }
+
+  .lumion-hero h3,
+  .lumion-cad-bridge h3,
+  .lumion-tool-panel h3,
+  .lumion-schedule-head h3 {
+    font-size: clamp(26px, 9vw, 38px);
+  }
+
+  .lumion-render-wall .render-frame {
+    min-height: 230px;
+  }
+}
+
 .checklist-surface {
   max-width: 720px;
 }
@@ -10993,11 +11365,33 @@ body[data-active-section="dashboard"] .dashboard-flow.auth-home {
   }
 
   .role-card {
-    min-height: 540px;
+    min-height: auto;
+    border-color: rgba(214,169,94,.28);
+    background:
+      linear-gradient(135deg, rgba(214,169,94,.13), rgba(104,199,189,.055)),
+      rgba(0,0,0,.74);
+    padding: 24px;
   }
 
   .role-card .role-visual {
-    height: 210px;
+    display: none;
+  }
+
+  .role-card .role-name {
+    margin-bottom: 12px;
+    color: rgba(214,169,94,.82);
+    font-size: 12px;
+  }
+
+  .role-card strong {
+    font-size: clamp(30px, 9vw, 42px);
+  }
+
+  .role-card p {
+    margin-top: 18px;
+    color: rgba(255,255,255,.72);
+    font-size: 16px;
+    line-height: 1.55;
   }
 
   .role-hover-map {

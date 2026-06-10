@@ -624,7 +624,30 @@ function initialSiteSurvey() {
       assistantMode: "Qwen local + deterministic fallback",
       ragDepth: "Evidence pack",
       reasoningSpecialist: "DeepSeek R1 on complex checks",
-      wcagPriority: "WCAG AA"
+      wcagPriority: "WCAG AA",
+      lumionCadFileName: "Aalborg_HCT_Concept_Massing.dae",
+      lumionCadSource: "ASTRA generated massing from current CAD/Rhino design model",
+      lumionCadFormat: "DAE / Collada",
+      lumionProjectName: "Aalborg HCT Lumion Scene",
+      lumionMaterialLibrary: "Warm Nordic low-carbon palette",
+      lumionStyleGuide: "Warm Scandinavian, biophilic, calm daylight, natural materials, visible landscape connection, restrained render mood.",
+      lumionRiskNotes: "Do not hide height/front-setback issues, western stormwater low point, glare risk, or unverified material carbon claims in visualization.",
+      lumionCaseStudyFocus: "Show how daylight, low-carbon material intent, stormwater resilience, and client atmosphere work together.",
+      lumionFrameCost: "$42,000",
+      lumionFrameShipDate: "2026-07-15",
+      lumionFrameEta: "4 weeks after order",
+      lumionGlazingCost: "$36,000",
+      lumionGlazingShipDate: "2026-08-05",
+      lumionGlazingEta: "6 weeks after shop drawing approval",
+      lumionPlasterCost: "$18,500",
+      lumionPlasterShipDate: "2026-07-28",
+      lumionPlasterEta: "3 weeks after color approval",
+      lumionShadingCost: "$12,800",
+      lumionShadingShipDate: "2026-08-12",
+      lumionShadingEta: "5 weeks after bracket confirmation",
+      lumionLandscapeCost: "$9,500",
+      lumionLandscapeShipDate: "2026-09-02",
+      lumionLandscapeEta: "2 weeks after grading confirmation"
     },
     uploads: [],
     environmental: [
@@ -7018,6 +7041,185 @@ function materialIntentItems(project) {
     .filter(Boolean);
 }
 
+function lumionMaterialScheduleRows(project) {
+  const fields = state.siteSurvey.fields || {};
+  const materialRows = ec3MaterialRows(project);
+  const materialIntent = materialIntentItems(project);
+  const materialAt = index => materialRows[index] || {};
+  const fallbackMaterial = index => materialIntent[index] || "--";
+
+  return [
+    {
+      item: "Structural frame",
+      material: materialAt(0).name || fallbackMaterial(0),
+      performanceScore: 88,
+      style: "Warm exposed timber",
+      details: materialAt(0).takeaway || "Low-carbon structural material intent under review.",
+      cost: fields.lumionFrameCost,
+      shipmentDate: fields.lumionFrameShipDate,
+      eta: fields.lumionFrameEta,
+      status: materialAt(0).status || "under review"
+    },
+    {
+      item: "Glazing package",
+      material: materialAt(1).name || fallbackMaterial(2),
+      performanceScore: 82,
+      style: "Clear daylight, quiet frame rhythm",
+      details: materialAt(1).takeaway || "Thermal and glare tradeoffs need product review.",
+      cost: fields.lumionGlazingCost,
+      shipmentDate: fields.lumionGlazingShipDate,
+      eta: fields.lumionGlazingEta,
+      status: materialAt(1).status || "needs review"
+    },
+    {
+      item: "Interior / exterior finish",
+      material: materialAt(2).name || fallbackMaterial(1),
+      performanceScore: 74,
+      style: "Matte mineral, calm tactile finish",
+      details: materialAt(2).takeaway || "Finish product and EPD source still need confirmation.",
+      cost: fields.lumionPlasterCost,
+      shipmentDate: fields.lumionPlasterShipDate,
+      eta: fields.lumionPlasterEta,
+      status: materialAt(2).status || "missing"
+    },
+    {
+      item: "Exterior shading",
+      material: materialAt(3).name || "Wood or metal shade system",
+      performanceScore: 86,
+      style: "Slim passive-shading expression",
+      details: materialAt(3).takeaway || "Use shading to reduce glare and cooling risk before changing glazing again.",
+      cost: fields.lumionShadingCost,
+      shipmentDate: fields.lumionShadingShipDate,
+      eta: fields.lumionShadingEta,
+      status: materialAt(3).status || "active"
+    },
+    {
+      item: "Landscape / stormwater zone",
+      material: "Native planting, rainwater-supported landscape",
+      performanceScore: 84,
+      style: "Preserved landscape edge",
+      details: siteFactValueFromRecord(state.siteSurvey.hazards || [], ["flood", "stormwater"], "Use planting and grading to keep the western low point visible in renders and decisions."),
+      cost: fields.lumionLandscapeCost,
+      shipmentDate: fields.lumionLandscapeShipDate,
+      eta: fields.lumionLandscapeEta,
+      status: "active"
+    }
+  ];
+}
+
+function lumionScheduleCsv(project) {
+  const rows = [
+    ["item", "material", "material_performance_score", "style", "details", "cost", "shipment_date", "eta", "status"],
+    ...lumionMaterialScheduleRows(project).map(row => [
+      row.item,
+      row.material,
+      row.performanceScore,
+      row.style,
+      row.details,
+      row.cost,
+      row.shipmentDate,
+      row.eta,
+      row.status
+    ])
+  ];
+  return rows.map(row => row.map(csvValue).join(",")).join("\n");
+}
+
+function lumionScheduleExcel(project) {
+  const rows = [
+    ["Item", "Material", "Material Performance Score", "Style", "Details", "Cost", "Shipment Date", "ETA", "Status"],
+    ...lumionMaterialScheduleRows(project).map(row => [
+      row.item,
+      row.material,
+      row.performanceScore,
+      row.style,
+      row.details,
+      row.cost,
+      row.shipmentDate,
+      row.eta,
+      row.status
+    ])
+  ];
+  const xmlRows = rows.map(row => `
+    <Row>${row.map(value => `<Cell><Data ss:Type="${typeof value === "number" ? "Number" : "String"}">${escapeHtml(value)}</Data></Cell>`).join("")}</Row>
+  `).join("");
+  return `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="Lumion Schedule">
+    <Table>${xmlRows}</Table>
+  </Worksheet>
+</Workbook>`;
+}
+
+function lumionCadDae(project) {
+  const model = project.designModel || {};
+  const width = 48;
+  const depth = 32;
+  const height = numericSiteValue(model.heightFt) || 28;
+  const hw = width / 2;
+  const hd = depth / 2;
+  const name = fieldsSafeName(state.siteSurvey.fields?.lumionCadFileName || model.name || "astra-lumion-massing");
+  const positions = [
+    -hw, -hd, 0, hw, -hd, 0, hw, hd, 0, -hw, hd, 0,
+    -hw, -hd, height, hw, -hd, height, hw, hd, height, -hw, hd, height
+  ].join(" ");
+  const triangles = "0 2 1 0 3 2 4 5 6 4 6 7 0 1 5 0 5 4 1 2 6 1 6 5 2 3 7 2 7 6 3 0 4 3 4 7";
+  return `<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor><authoring_tool>ASTRA Lumion CAD handoff</authoring_tool></contributor>
+    <unit name="foot" meter="0.3048"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="astra-material-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert><diffuse><color>0.72 0.58 0.38 1</color></diffuse></lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="astra-material" name="${escapeHtml(project.designModel?.materialIntent || "ASTRA material intent")}">
+      <instance_effect url="#astra-material-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="astra-massing-geometry" name="${escapeHtml(name)}">
+      <mesh>
+        <source id="astra-massing-positions">
+          <float_array id="astra-massing-positions-array" count="24">${positions}</float_array>
+          <technique_common>
+            <accessor source="#astra-massing-positions-array" count="8" stride="3">
+              <param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="astra-massing-vertices"><input semantic="POSITION" source="#astra-massing-positions"/></vertices>
+        <triangles material="astra-material" count="12"><input semantic="VERTEX" source="#astra-massing-vertices" offset="0"/><p>${triangles}</p></triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="astra-scene" name="ASTRA Lumion Scene">
+      <node id="astra-massing" name="${escapeHtml(model.name || "ASTRA concept massing")}">
+        <instance_geometry url="#astra-massing-geometry"><bind_material><technique_common><instance_material symbol="astra-material" target="#astra-material"/></technique_common></bind_material></instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene><instance_visual_scene url="#astra-scene"/></scene>
+</COLLADA>`;
+}
+
+function fieldsSafeName(value) {
+  return String(value || "astra-lumion-massing").replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "") || "astra-lumion-massing";
+}
+
 function ashraeSurface(project) {
   const fields = state.siteSurvey.fields || {};
   const analysis = project.analysisResults || {};
@@ -7194,16 +7396,167 @@ function materialsSurface(project) {
   `;
 }
 
-function lumionSurface() {
+function lumionSurface(project) {
+  const fields = state.siteSurvey.fields || {};
+  const materialRows = ec3MaterialRows(project);
+  const scheduleRows = lumionMaterialScheduleRows(project);
+  const risks = (state.siteSurvey.hazards || []).slice(0, 4);
+  const caseStudy = (state.siteSurvey.caseStudies || []).find(item => /sustain|material|initiative/i.test(`${item.title || ""} ${item.focus || ""}`)) || (state.siteSurvey.caseStudies || [])[0];
+  const atmosphere = listValue(state.projectDiscovery?.atmosphere, []);
+  const styleDirection = listValue(state.projectDiscovery?.architecturalStyle, []);
+  const model = project.designModel || {};
+  const scoreAverage = scheduleRows.length
+    ? Math.round(scheduleRows.reduce((sum, row) => sum + Number(row.performanceScore || 0), 0) / scheduleRows.length)
+    : "--";
+
   return `
-    <div class="surface-pad render-board">
-      <div class="render-frame warm">Exterior dusk</div>
-      <div class="render-frame daylight">Daylight interior</div>
-      <div class="render-frame material">Material study</div>
-      <div class="render-notes">
-        <h3>Visual Review</h3>
-        <p>Render boards evaluate atmosphere, client style fit, material feel, and daylight experience.</p>
-      </div>
+    <div class="surface-pad lumion-workspace">
+      <header class="lumion-hero">
+        <button class="journey-link" data-section="dashboard">Back to flow</button>
+        <div>
+          <span class="mini-label">Lumion visualization handoff</span>
+          <h3>Render, Materials, Risk, And Style Guide</h3>
+          <p>Use Lumion for atmosphere and client-facing design review, while ASTRA keeps the CAD source, material performance, sustainability case study, risks, costs, shipment dates, and exports together.</p>
+        </div>
+        <div class="lumion-score">
+          <span>Material score</span>
+          <strong>${escapeHtml(scoreAverage)}</strong>
+          <em>${escapeHtml(scheduleRows.length)} scheduled items</em>
+        </div>
+      </header>
+
+      <section class="lumion-cad-bridge">
+        <div>
+          <span class="mini-label">CAD to Lumion</span>
+          <h3>Download The Current Massing For Lumion</h3>
+          <p>ASTRA generates a simple Collada/DAE massing from the current design model so Lumion can start with a real import file. Replace it later with the actual Rhino/CAD export when the detailed model is ready.</p>
+          <div class="download-actions">
+            <button data-download="lumion-cad">Download CAD .DAE</button>
+            <button data-download="lumion">Download Lumion Brief</button>
+          </div>
+        </div>
+        <div class="site-intake-grid lumion-input-grid">
+          ${siteFieldInput("lumionCadFileName", "CAD file / download name")}
+          ${siteFieldInput("lumionCadSource", "CAD source")}
+          ${siteFieldSelect("lumionCadFormat", "Lumion import format", ["DAE / Collada", "FBX", "SKP", "OBJ", "DWG reference only"])}
+          ${siteFieldInput("lumionProjectName", "Lumion project name")}
+        </div>
+      </section>
+
+      <section class="lumion-render-wall" aria-label="Lumion render review boards">
+        <div class="render-frame warm">
+          <span>Exterior Dusk</span>
+          <strong>${escapeHtml(model.orientation || "Orientation pending")}</strong>
+        </div>
+        <div class="render-frame daylight">
+          <span>Daylight Interior</span>
+          <strong>${escapeHtml(siteDisplayValue(project.analysisResults?.sunStudy?.daylightScore))}</strong>
+        </div>
+        <div class="render-frame material">
+          <span>Material Study</span>
+          <strong>${escapeHtml(siteDisplayValue(model.materialIntent))}</strong>
+        </div>
+      </section>
+
+      <section class="lumion-tool-grid">
+        <article class="lumion-tool-panel lumion-material-tab">
+          <span class="mini-label">Materials tab</span>
+          <h3>Material Appearance + Performance</h3>
+          <div class="lumion-material-list">
+            ${materialRows.map(row => `
+              <div class="${escapeHtml(siteStatusClass(row.status))}">
+                <span>${escapeHtml(row.scope)}</span>
+                <strong>${escapeHtml(row.name)}</strong>
+                <p>${escapeHtml(row.takeaway)}</p>
+                <em>${escapeHtml(row.result)}</em>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+
+        <article class="lumion-tool-panel lumion-style-guide">
+          <span class="mini-label">Style guide</span>
+          <h3>Visual Direction</h3>
+          ${siteFieldTextarea("lumionStyleGuide", "Style guide notes", 5)}
+          <div class="lumion-style-chips">
+            ${[...styleDirection, ...atmosphere].map(item => `<span>${escapeHtml(item)}</span>`).join("") || "<span>--</span>"}
+          </div>
+        </article>
+
+        <article class="lumion-tool-panel lumion-case-card">
+          <span class="mini-label">Sustainability case study</span>
+          <h3>${escapeHtml(caseStudy?.title || "Case study pending")}</h3>
+          <p>${escapeHtml(caseStudy?.designResponse || caseStudy?.desiredOutcome || "Generate or save a sustainability case study before using this as a client-facing claim.")}</p>
+          <div class="lumion-case-facts">
+            <span>${escapeHtml(caseStudy?.sustainabilityMetrics || sustainabilityMetricSummary(project, state.siteSurvey) || "--")}</span>
+            <span>${escapeHtml(caseStudy?.evidenceBasis || "--")}</span>
+          </div>
+          ${siteFieldTextarea("lumionCaseStudyFocus", "Lumion case-study focus", 3)}
+        </article>
+
+        <article class="lumion-tool-panel lumion-risk-card">
+          <span class="mini-label">Risk card</span>
+          <h3>What The Render Must Not Hide</h3>
+          <div class="lumion-risk-list">
+            ${risks.map(risk => `
+              <div class="${escapeHtml(siteStatusClass(risk.status || risk.severity))}">
+                <strong>${escapeHtml(risk.name || "Risk")}</strong>
+                <span>${escapeHtml(siteRiskSeverity(risk))}</span>
+                <p>${escapeHtml(siteRecordText(risk) || "--")}</p>
+              </div>
+            `).join("") || `<div><strong>--</strong><span>--</span><p>No risk records saved yet.</p></div>`}
+          </div>
+          ${siteFieldTextarea("lumionRiskNotes", "Risk notes for Lumion review", 3)}
+        </article>
+      </section>
+
+      <section class="lumion-schedule-panel">
+        <div class="lumion-schedule-head">
+          <div>
+            <span class="mini-label">Materials + logistics schedule</span>
+            <h3>Items, Materials, Score, Cost, Shipment, ETA</h3>
+            <p>Use this list after site and visual review to coordinate what appears in Lumion with the material performance score, style direction, procurement notes, cost, shipment date, and ETA.</p>
+          </div>
+          <div class="download-actions">
+            <button data-download="lumion-schedule-xls">Download Excel Sheet</button>
+            <button data-download="lumion-schedule-csv">Download CSV</button>
+          </div>
+        </div>
+        <div class="lumion-schedule-table" role="table" aria-label="Lumion material schedule">
+          <div role="row" class="lumion-schedule-row head">
+            <span>Item</span><span>Material</span><span>Score</span><span>Style</span><span>Details</span><span>Cost</span><span>Ship</span><span>ETA</span>
+          </div>
+          ${scheduleRows.map(row => `
+            <div role="row" class="lumion-schedule-row ${escapeHtml(siteStatusClass(row.status))}">
+              <strong>${escapeHtml(row.item)}</strong>
+              <span>${escapeHtml(row.material)}</span>
+              <span>${escapeHtml(row.performanceScore)}</span>
+              <span>${escapeHtml(row.style)}</span>
+              <span>${escapeHtml(row.details)}</span>
+              <span>${escapeHtml(siteDisplayValue(row.cost))}</span>
+              <span>${escapeHtml(siteDisplayValue(row.shipmentDate))}</span>
+              <span>${escapeHtml(siteDisplayValue(row.eta))}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div class="lumion-schedule-editor site-intake-grid">
+          ${siteFieldInput("lumionFrameCost", "Frame cost")}
+          ${siteFieldInput("lumionFrameShipDate", "Frame shipment date", "date")}
+          ${siteFieldInput("lumionFrameEta", "Frame ETA")}
+          ${siteFieldInput("lumionGlazingCost", "Glazing cost")}
+          ${siteFieldInput("lumionGlazingShipDate", "Glazing shipment date", "date")}
+          ${siteFieldInput("lumionGlazingEta", "Glazing ETA")}
+          ${siteFieldInput("lumionPlasterCost", "Finish cost")}
+          ${siteFieldInput("lumionPlasterShipDate", "Finish shipment date", "date")}
+          ${siteFieldInput("lumionPlasterEta", "Finish ETA")}
+          ${siteFieldInput("lumionShadingCost", "Shading cost")}
+          ${siteFieldInput("lumionShadingShipDate", "Shading shipment date", "date")}
+          ${siteFieldInput("lumionShadingEta", "Shading ETA")}
+          ${siteFieldInput("lumionLandscapeCost", "Landscape cost")}
+          ${siteFieldInput("lumionLandscapeShipDate", "Landscape shipment date", "date")}
+          ${siteFieldInput("lumionLandscapeEta", "Landscape ETA")}
+        </div>
+      </section>
       <div id="annotationLayer" class="annotation-layer"></div>
     </div>
   `;
@@ -7292,12 +7645,14 @@ function renderSurface() {
     ? sunSurface(project)
     : state.activeSection === "ashrae"
     ? ashraeSurface(project)
+    : state.activeSection === "lumion"
+    ? lumionSurface(project)
     : projectPageSurface(project, section);
   document.getElementById("visualWorkspace").innerHTML = html;
   el.annotationLayer = document.getElementById("annotationLayer");
   if (state.authView || state.activeSection === "dashboard") bindDashboardFlow();
   bindSimpleProjectPage();
-  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae") bindSiteSurveyPage();
+  if (state.activeSection === "survey" || state.activeSection === "gis" || state.activeSection === "policy" || state.activeSection === "data" || state.activeSection === "sun" || state.activeSection === "ashrae" || state.activeSection === "lumion") bindSiteSurveyPage();
   if (state.activeSection === "clientele") bindClientBriefPage();
 }
 
@@ -7601,14 +7956,25 @@ function sustainabilityHandoffPackage(project) {
 function lumionHandoffPackage(project) {
   const viewRecord = siteFactRecord(state.siteSurvey.gisFindings || [], ["view", "viewshed", "corridor"]);
   const vegetationRecord = siteFactRecord(state.siteSurvey.gisFindings || [], ["vegetation", "tree"]);
+  const fields = state.siteSurvey.fields || {};
   return {
     exportedAt: new Date().toISOString(),
     intent: "Lumion visualization brief from ASTRA",
     project: project.project,
     designModel: project.designModel,
+    cadImport: {
+      fileName: fields.lumionCadFileName || "astra-lumion-massing.dae",
+      source: fields.lumionCadSource || "--",
+      format: fields.lumionCadFormat || "DAE / Collada",
+      projectName: fields.lumionProjectName || "--"
+    },
     clientAtmosphere: state.projectDiscovery?.atmosphere || [],
     styleDirection: state.projectDiscovery?.architecturalStyle || [],
+    styleGuide: fields.lumionStyleGuide || "--",
     materialIntent: project.designModel?.materialIntent || "--",
+    materialSchedule: lumionMaterialScheduleRows(project),
+    sustainabilityCaseStudy: (state.siteSurvey.caseStudies || []).find(item => /sustain|material|initiative/i.test(`${item.title || ""} ${item.focus || ""}`)) || null,
+    riskNotes: fields.lumionRiskNotes || "--",
     siteContext: {
       views: siteRecordText(viewRecord || {}) || "--",
       vegetation: siteRecordText(vegetationRecord || {}) || "--",
@@ -7678,6 +8044,16 @@ function downloadByKind(kind) {
   }
   if (kind === "lumion") {
     triggerDownload("astra-lumion-visualization-brief.json", "application/json", JSON.stringify(lumionHandoffPackage(state.project), null, 2));
+  }
+  if (kind === "lumion-cad") {
+    const fileName = fieldsSafeName(state.siteSurvey.fields?.lumionCadFileName || "astra-lumion-massing.dae");
+    triggerDownload(fileName.toLowerCase().endsWith(".dae") ? fileName : `${fileName}.dae`, "model/vnd.collada+xml", lumionCadDae(state.project));
+  }
+  if (kind === "lumion-schedule-xls") {
+    triggerDownload("astra-lumion-material-schedule.xls", "application/vnd.ms-excel", lumionScheduleExcel(state.project));
+  }
+  if (kind === "lumion-schedule-csv") {
+    triggerDownload("astra-lumion-material-schedule.csv", "text/csv", lumionScheduleCsv(state.project));
   }
   if (kind === "gis") {
     triggerDownload("astra-gis-package.json", "application/json", JSON.stringify({
