@@ -2690,6 +2690,9 @@ th {
 }
 
 .lumion-style-chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   border: 1px solid rgba(214,169,94,.24);
   border-radius: 999px;
   color: rgba(255,255,255,.86);
@@ -2697,6 +2700,63 @@ th {
   padding: 8px 10px;
   font-size: 12px;
   font-weight: 720;
+}
+
+.lumion-style-chips button {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 50%;
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.74);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 860;
+  line-height: 1;
+  padding: 0;
+}
+
+.lumion-style-chips button:hover,
+.lumion-style-chips button:focus-visible {
+  border-color: rgba(216,106,82,.54);
+  color: rgba(255,226,218,.96);
+  outline: none;
+}
+
+.lumion-custom-bubble-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.lumion-custom-bubble-control input {
+  min-height: 44px;
+  border: 1px solid rgba(117,184,170,.2);
+  border-radius: 8px;
+  background: rgba(255,255,255,.055);
+  color: rgba(255,255,255,.92);
+  font: 650 14px/1.25 var(--sans);
+  outline: none;
+  padding: 12px 13px;
+}
+
+.lumion-custom-bubble-control input:focus {
+  border-color: rgba(214,169,94,.72);
+  box-shadow: 0 0 0 4px rgba(214,169,94,.1);
+}
+
+.lumion-custom-bubble-control button {
+  min-height: 44px;
+  border: 1px solid rgba(214,169,94,.3);
+  border-radius: 8px;
+  background: rgba(214,169,94,.1);
+  color: rgba(255,232,184,.95);
+  cursor: pointer;
+  font-weight: 800;
+  padding: 11px 13px;
 }
 
 .lumion-app-residence {
@@ -2764,7 +2824,7 @@ th {
 
 .lumion-scene-preview {
   position: relative;
-  min-height: clamp(420px, 34vw, 620px);
+  min-height: var(--lumion-app-height, clamp(420px, 34vw, 620px));
   overflow: hidden;
   background:
     linear-gradient(180deg, rgba(87,132,150,.48), rgba(238,188,122,.22) 42%, rgba(25,38,31,.92) 72%),
@@ -2889,6 +2949,75 @@ th {
   color: rgba(222,230,216,.72);
   font-size: 16px;
   line-height: 1.62;
+}
+
+.lumion-app-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,.045);
+  padding: 14px;
+}
+
+.lumion-app-controls label {
+  display: grid;
+  gap: 8px;
+}
+
+.lumion-app-controls label span {
+  color: rgba(224,207,139,.86);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.lumion-app-controls input[type="range"] {
+  width: 100%;
+  accent-color: rgba(214,169,94,.92);
+}
+
+.lumion-app-controls em {
+  color: rgba(222,230,216,.68);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.lumion-app-controls button {
+  min-height: 44px;
+  border: 1px solid rgba(104,199,189,.34);
+  border-radius: 8px;
+  background: rgba(104,199,189,.08);
+  color: rgba(219,255,249,.94);
+  cursor: pointer;
+  font-weight: 800;
+  padding: 11px 13px;
+}
+
+.lumion-app-controls button:hover,
+.lumion-app-controls button:focus-visible,
+.lumion-custom-bubble-control button:hover,
+.lumion-custom-bubble-control button:focus-visible {
+  border-color: rgba(104,199,189,.54);
+  background: rgba(104,199,189,.12);
+  outline: none;
+}
+
+.lumion-app-residence.is-full-size {
+  grid-template-columns: 1fr;
+  min-height: auto;
+}
+
+.lumion-app-residence.is-full-size .lumion-scene-preview {
+  min-height: clamp(620px, calc(var(--lumion-app-height, 720px) + 120px), 1120px);
+}
+
+.lumion-app-residence.is-full-size .lumion-app-copy {
+  align-content: start;
 }
 
 .lumion-app-facts {
@@ -3124,6 +3253,16 @@ th {
     min-height: 230px;
   }
 
+  .lumion-custom-bubble-control,
+  .lumion-app-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .lumion-custom-bubble-control button,
+  .lumion-app-controls button {
+    width: 100%;
+  }
+
   .lumion-app-residence {
     min-height: auto;
     gap: 18px;
@@ -3151,7 +3290,11 @@ th {
   }
 
   .lumion-scene-preview {
-    min-height: 310px;
+    min-height: min(var(--lumion-app-height, 520px), 72vh);
+  }
+
+  .lumion-app-residence.is-full-size .lumion-scene-preview {
+    min-height: min(calc(var(--lumion-app-height, 620px) + 80px), 78vh);
   }
 
   .lumion-preview-sun {
@@ -3268,7 +3411,11 @@ th {
   }
 
   .lumion-scene-preview {
-    min-height: 260px;
+    min-height: min(var(--lumion-app-height, 460px), 64vh);
+  }
+
+  .lumion-app-residence.is-full-size .lumion-scene-preview {
+    min-height: min(calc(var(--lumion-app-height, 540px) + 60px), 70vh);
   }
 
   .lumion-preview-building {

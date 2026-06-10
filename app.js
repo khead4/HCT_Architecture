@@ -8103,6 +8103,16 @@ function materialsSurface(project) {
   `;
 }
 
+function lumionCustomBubbles(fields = {}) {
+  return uniqueList(String(fields.lumionCustomBubbles || "")
+    .split(/[\n|,]+/)
+    .map(item => item.trim()));
+}
+
+function lumionBubbleValue(bubbles) {
+  return uniqueList(bubbles).join(" | ");
+}
+
 function lumionSurface(project) {
   const fields = state.siteSurvey.fields || {};
   const materialRows = ec3MaterialRows(project);
@@ -8112,6 +8122,10 @@ function lumionSurface(project) {
   const atmosphere = listValue(state.projectDiscovery?.atmosphere, []);
   const styleDirection = listValue(state.projectDiscovery?.architecturalStyle, []);
   const model = project.designModel || {};
+  const customBubbles = lumionCustomBubbles(fields);
+  const styleBubbles = uniqueList([...styleDirection, ...atmosphere, ...customBubbles]);
+  const appSize = clampNumber(fields.lumionAppHeight || 640, 420, 980);
+  const appFullSize = String(fields.lumionAppFullSize || "").toLowerCase() === "true";
   const scoreAverage = scheduleRows.length
     ? Math.round(scheduleRows.reduce((sum, row) => sum + Number(row.performanceScore || 0), 0) / scheduleRows.length)
     : "--";
@@ -8186,10 +8200,74 @@ function lumionSurface(project) {
           <h3>Visual Direction</h3>
           ${siteFieldTextarea("lumionStyleGuide", "Style guide notes", 5)}
           <div class="lumion-style-chips">
-            ${[...styleDirection, ...atmosphere].map(item => `<span>${escapeHtml(item)}</span>`).join("") || "<span>--</span>"}
+            ${styleBubbles.map(item => `
+              <span>
+                ${escapeHtml(item)}
+                ${customBubbles.includes(item) ? `<button type="button" aria-label="Remove ${escapeHtml(item)} bubble" data-lumion-bubble-remove="${escapeHtml(item)}">x</button>` : ""}
+              </span>
+            `).join("") || "<span>--</span>"}
+          </div>
+          <div class="lumion-custom-bubble-control">
+            <input data-lumion-bubble-input placeholder="Add custom bubble">
+            <button type="button" data-lumion-bubble-add>Add bubble</button>
           </div>
         </article>
+      </section>
 
+      <section class="lumion-app-residence ${appFullSize ? "is-full-size" : ""}" style="--lumion-app-height: ${escapeHtml(String(appSize))}px;" aria-label="Lumion application workspace">
+        <div class="lumion-app-stage">
+          <div class="lumion-app-window">
+            <div class="lumion-app-toolbar">
+              <span></span><span></span><span></span>
+              <strong>Lumion scene workspace</strong>
+            </div>
+            <div class="lumion-scene-preview">
+              <div class="lumion-preview-sky"></div>
+              <div class="lumion-preview-sun"></div>
+              <div class="lumion-preview-building">
+                <i></i><i></i><i></i>
+              </div>
+              <div class="lumion-preview-ground"></div>
+              <div class="lumion-preview-materials">
+                ${materialRows.slice(0, 4).map(row => `<span>${escapeHtml(row.name || row.scope || "--")}</span>`).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="lumion-app-copy">
+          <span class="mini-label">Application residence</span>
+          <h3>Lumion Lives Here Before The Schedule</h3>
+          <p>This is the dedicated Lumion application area: import the CAD/Rhino massing, stage the scene, test material appearance, check style direction, and send visual decisions back to ASTRA before the material logistics table is exported.</p>
+          <div class="lumion-app-controls" aria-label="Lumion application size controls">
+            <label>
+              <span>App box size</span>
+              <input type="range" min="420" max="980" step="20" value="${escapeHtml(String(appSize))}" data-lumion-app-size>
+              <em>${escapeHtml(String(appSize))} px</em>
+            </label>
+            <button type="button" data-lumion-app-full>${appFullSize ? "Exit full size" : "Extend full size"}</button>
+          </div>
+          <div class="lumion-app-facts">
+            ${[
+              ["Scene", fields.lumionProjectName || "--"],
+              ["Import file", fields.lumionCadFileName || "--"],
+              ["Format", fields.lumionCadFormat || "--"],
+              ["Library", fields.lumionMaterialLibrary || "--"]
+            ].map(row => `
+              <div>
+                <span>${escapeHtml(row[0])}</span>
+                <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
+              </div>
+            `).join("")}
+          </div>
+          <div class="lumion-app-actions">
+            <button data-download="lumion-cad">Download CAD .DAE</button>
+            <button data-download="lumion">Download Lumion Brief</button>
+            <button data-download="lumion-schedule-csv">Download Schedule CSV</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="lumion-tool-grid lumion-followup-grid">
         <article class="lumion-tool-panel lumion-case-card">
           <span class="mini-label">Sustainability case study</span>
           <h3>${escapeHtml(caseStudy?.title || "Case study pending")}</h3>
@@ -8215,51 +8293,6 @@ function lumionSurface(project) {
           </div>
           ${siteFieldTextarea("lumionRiskNotes", "Risk notes for Lumion review", 3)}
         </article>
-      </section>
-
-      <section class="lumion-app-residence" aria-label="Lumion application workspace">
-        <div class="lumion-app-stage">
-          <div class="lumion-app-window">
-            <div class="lumion-app-toolbar">
-              <span></span><span></span><span></span>
-              <strong>Lumion scene workspace</strong>
-            </div>
-            <div class="lumion-scene-preview">
-              <div class="lumion-preview-sky"></div>
-              <div class="lumion-preview-sun"></div>
-              <div class="lumion-preview-building">
-                <i></i><i></i><i></i>
-              </div>
-              <div class="lumion-preview-ground"></div>
-              <div class="lumion-preview-materials">
-                ${materialRows.slice(0, 4).map(row => `<span>${escapeHtml(row.name || row.scope || "--")}</span>`).join("")}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="lumion-app-copy">
-          <span class="mini-label">Application residence</span>
-          <h3>Lumion Lives Here Before The Schedule</h3>
-          <p>This is the dedicated Lumion application area: import the CAD/Rhino massing, stage the scene, test material appearance, check style direction, and send visual decisions back to ASTRA before the material logistics table is exported.</p>
-          <div class="lumion-app-facts">
-            ${[
-              ["Scene", fields.lumionProjectName || "--"],
-              ["Import file", fields.lumionCadFileName || "--"],
-              ["Format", fields.lumionCadFormat || "--"],
-              ["Library", fields.lumionMaterialLibrary || "--"]
-            ].map(row => `
-              <div>
-                <span>${escapeHtml(row[0])}</span>
-                <strong>${escapeHtml(siteDisplayValue(row[1]))}</strong>
-              </div>
-            `).join("")}
-          </div>
-          <div class="lumion-app-actions">
-            <button data-download="lumion-cad">Download CAD .DAE</button>
-            <button data-download="lumion">Download Lumion Brief</button>
-            <button data-download="lumion-schedule-csv">Download Schedule CSV</button>
-          </div>
-        </div>
       </section>
 
       <section class="lumion-schedule-panel">
@@ -9634,6 +9667,56 @@ function bindSiteSurveyPage() {
     bindValueControl(input, () => {
       state.siteSurvey.fields[input.dataset.siteField] = input.value;
       persistSiteSurvey();
+    });
+  });
+
+  document.querySelectorAll("[data-lumion-bubble-add]").forEach(button => {
+    button.addEventListener("click", () => {
+      const input = document.querySelector("[data-lumion-bubble-input]");
+      const value = input?.value.trim();
+      if (!value) return;
+      const bubbles = lumionCustomBubbles(state.siteSurvey.fields);
+      state.siteSurvey.fields.lumionCustomBubbles = lumionBubbleValue([...bubbles, value]);
+      persistSiteSurvey();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-lumion-bubble-input]").forEach(input => {
+    input.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      document.querySelector("[data-lumion-bubble-add]")?.click();
+    });
+  });
+
+  document.querySelectorAll("[data-lumion-bubble-remove]").forEach(button => {
+    button.addEventListener("click", () => {
+      const value = button.dataset.lumionBubbleRemove;
+      state.siteSurvey.fields.lumionCustomBubbles = lumionBubbleValue(lumionCustomBubbles(state.siteSurvey.fields).filter(item => item !== value));
+      persistSiteSurvey();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-lumion-app-size]").forEach(input => {
+    bindValueControl(input, () => {
+      const size = clampNumber(input.value, 420, 980);
+      state.siteSurvey.fields.lumionAppHeight = String(size);
+      const appBox = input.closest(".lumion-app-residence");
+      if (appBox) appBox.style.setProperty("--lumion-app-height", `${size}px`);
+      const readout = input.parentElement?.querySelector("em");
+      if (readout) readout.textContent = `${size} px`;
+      persistSiteSurvey();
+    });
+  });
+
+  document.querySelectorAll("[data-lumion-app-full]").forEach(button => {
+    button.addEventListener("click", () => {
+      const isFull = String(state.siteSurvey.fields.lumionAppFullSize || "").toLowerCase() === "true";
+      state.siteSurvey.fields.lumionAppFullSize = isFull ? "false" : "true";
+      persistSiteSurvey();
+      render();
     });
   });
 
